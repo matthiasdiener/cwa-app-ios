@@ -280,6 +280,7 @@ extension SubmissionError: LocalizedError {
 	}
 }
 
+#warning ("Remove this model")
 struct FetchTestResultResponse: Codable {
 	let testResult: Int
 	let sc: Int?

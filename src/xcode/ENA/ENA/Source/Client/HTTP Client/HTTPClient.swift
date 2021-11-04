@@ -41,7 +41,7 @@ final class HTTPClient: Client {
 		let url = configuration.diagnosisKeysURL(day: day, forCountry: country)
 		fetchDay(from: url, completion: completeWith)
 	}
-
+	@available(*, deprecated, message: "Parse your data by hand instead")
 	func getTestResult(forDevice registrationToken: String, isFake: Bool = false, completion completeWith: @escaping TestResultHandler) {
 		guard
 			let testResultRequest = try? URLRequest.getTestResultRequest(
