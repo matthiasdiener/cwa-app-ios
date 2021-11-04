@@ -1441,6 +1441,7 @@
 		EBD2D07F25A869B9006E4220 /* HomeTableViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD2D07E25A869B9006E4220 /* HomeTableViewModelTests.swift */; };
 		EBD2D09825A86C1A006E4220 /* RiskProviding.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1FE13DC248821CB00D012E5 /* RiskProviding.swift */; };
 		EBD2D0A725A86C68006E4220 /* MockRiskProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD2D09F25A86C2A006E4220 /* MockRiskProvider.swift */; };
+		EBD2E3902733FA9D001087FA /* TestResultModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD2E38F2733FA9D001087FA /* TestResultModel.swift */; };
 		EBDE11B2255EC2C4008C0F51 /* DMDeviceTimeCheckViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBDE11B1255EC2C4008C0F51 /* DMDeviceTimeCheckViewController.swift */; };
 		EBDE11BB255EC34C008C0F51 /* DMDeviceTimeCheckViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBDE11BA255EC34C008C0F51 /* DMDeviceTimeCheckViewModel.swift */; };
 		EE22DB81247FB40A001B0A71 /* ENStateHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE22DB7F247FB409001B0A71 /* ENStateHandler.swift */; };
@@ -2968,6 +2969,7 @@
 		EBCD2411250790F400E5574C /* ExposureSubmissionSymptomsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExposureSubmissionSymptomsViewController.swift; sourceTree = "<group>"; };
 		EBD2D07E25A869B9006E4220 /* HomeTableViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTableViewModelTests.swift; sourceTree = "<group>"; };
 		EBD2D09F25A86C2A006E4220 /* MockRiskProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockRiskProvider.swift; sourceTree = "<group>"; };
+		EBD2E38F2733FA9D001087FA /* TestResultModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestResultModel.swift; sourceTree = "<group>"; };
 		EBDE11B1255EC2C4008C0F51 /* DMDeviceTimeCheckViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMDeviceTimeCheckViewController.swift; sourceTree = "<group>"; };
 		EBDE11BA255EC34C008C0F51 /* DMDeviceTimeCheckViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMDeviceTimeCheckViewModel.swift; sourceTree = "<group>"; };
 		EE22DB7F247FB409001B0A71 /* ENStateHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ENStateHandler.swift; sourceTree = "<group>"; };
@@ -7588,6 +7590,7 @@
 		BA5C87A92729AE97003360AD /* Receive */ = {
 			isa = PBXGroup;
 			children = (
+				EBD2E38F2733FA9D001087FA /* TestResultModel.swift */,
 				AB0246E227230F5E002668A1 /* RegistrationTokenModel.swift */,
 			);
 			path = Receive;
@@ -9436,6 +9439,7 @@
 				AB5F84B224F8F7E3000400D4 /* Migration0To1.swift in Sources */,
 				8F5B5C0E26456B1F00456381 /* HealthCertifiedPersonTableViewCell.swift in Sources */,
 				5017F64D25FFAD11003A812E /* PPASubmissionState.swift in Sources */,
+				EBD2E3902733FA9D001087FA /* TestResultModel.swift in Sources */,
 				01A4DC7025922EB4007D5794 /* HomeItemView.swift in Sources */,
 				BAC7419E26414D4700955311 /* SimpleTextCell.swift in Sources */,
 				5081EEF125FF739B004B8FDE /* CheckinsInfoScreenViewModel.swift in Sources */,
