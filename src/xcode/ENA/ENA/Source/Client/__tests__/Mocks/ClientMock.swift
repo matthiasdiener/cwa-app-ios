@@ -158,7 +158,7 @@ extension ClientMock: Client {
 		guard let onGetTestResult = self.onGetTestResult else {
 			completeWith(
 				.success(
-					FetchTestResultResponse(
+					TestResultModel(
 						testResult: TestResult.positive.rawValue,
 						sc: nil,
 						labId: "SomeLabId"

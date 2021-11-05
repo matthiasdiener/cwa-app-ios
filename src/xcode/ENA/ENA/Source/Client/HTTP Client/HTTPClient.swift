@@ -74,7 +74,7 @@ final class HTTPClient: Client {
 				}
 				do {
 					let testResultResponse = try JSONDecoder().decode(
-						FetchTestResultResponse.self,
+						TestResultModel.self,
 						from: testResultResponseData
 					)
 					completeWith(.success(testResultResponse))

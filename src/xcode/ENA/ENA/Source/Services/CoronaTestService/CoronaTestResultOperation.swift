@@ -40,8 +40,20 @@ final class CoronaTestResultOperation: AsyncOperation {
 //				completion(.failure(.serviceError(error)))
 //			}
 //		}
+		let sendModel = RegistrationTokenSendModel(registrationToken: registrationToken)
+		let resource = TestResultResource(isFake: false, sendModel: sendModel)
 		
-		self.finish()
+		restService.load(resource) { [weak self] result in
+			switch result {
+			case .success(let model):
+				self?.completion(.success(model))
+			case .failure(let error):
+				print(error)
+				//self?.completion(.failure(.serviceError(error)))
+			}
+			self?.finish()
+		}
+
 
 	}
 	
