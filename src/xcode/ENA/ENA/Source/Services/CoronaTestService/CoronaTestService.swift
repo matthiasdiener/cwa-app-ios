@@ -689,7 +689,7 @@ class CoronaTestService {
 			antigenTestResultIsLoading = true
 		}
 		
-		let operation = CoronaTestResultOperation(client: client, registrationToken: registrationToken) { [weak self] result in
+		let operation = CoronaTestResultOperation(restService: restServiceProvider, registrationToken: registrationToken) { [weak self] result in
 			guard let self = self else { return }
 
 			switch coronaTestType {
