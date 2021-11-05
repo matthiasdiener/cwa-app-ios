@@ -624,7 +624,7 @@ class CoronaTestService {
 			case .success(let model):
 				completion(.success(model.registrationToken))
 			case .failure(let error):
-				completion(.failure(.serviceError(error)))
+				completion(.failure(.teleTanServiceError(error)))
 			}
 		}
 	}
@@ -714,8 +714,8 @@ class CoronaTestService {
 			case let .failure(error):
 				Log.error("[CoronaTestService] Getting test result failed: \(error.localizedDescription)", log: .api)
 
-				// For error code 400 (.qrDoesNotExist) we set the test result to expired
-				if error == .qrDoesNotExist {
+				// For error .qrDoesNotExist we set the test result to expired
+				if case let .receivedResourceError(ressourceError) = error, ressourceError == .qrDoesNotExist {
 					Log.info("[CoronaTestService] Error Code 400 when getting test result, setting expired test result", log: .api)
 
 					switch coronaTestType {
@@ -733,10 +733,10 @@ class CoronaTestService {
 					} else {
 						Log.error("[CoronaTestService] Test younger than 21 days, error is returned", log: .api)
 
-						completion(.failure(.responseFailure(error)))
+						completion(.failure(.testResultError(error)))
 					}
 				} else {
-					completion(.failure(.responseFailure(error)))
+					completion(.failure(.testResultError(error)))
 				}
 			case let .success(response):
 				guard let testResult = TestResult(serverResponse: response.testResult) else {

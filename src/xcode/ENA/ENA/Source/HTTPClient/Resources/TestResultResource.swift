@@ -23,14 +23,14 @@ struct TestResultResource: Resource {
 
 	typealias Send = JSONSendResource<RegistrationTokenSendModel>
 	typealias Receive = JSONReceiveResource<TestResultModel>
-	typealias CustomError = URLSession.Response.Failure
+	typealias CustomError = TestResultError
 
 	var locator: Locator
 	var type: ServiceType
 	var sendResource: JSONSendResource<RegistrationTokenSendModel>
 	var receiveResource: JSONReceiveResource<TestResultModel>
 
-	func customStatusCodeError(statusCode: Int) -> URLSession.Response.Failure? {
+	func customStatusCodeError(statusCode: Int) -> TestResultError? {
 		switch statusCode {
 		case 400:
 			return .qrDoesNotExist
@@ -42,4 +42,16 @@ struct TestResultResource: Resource {
 	// MARK: - Private
 
 	private let regTokenModel: RegistrationTokenSendModel
+}
+
+enum TestResultError: Error {
+	case qrDoesNotExist
+
+	var errorDescription: String? {
+		switch self {
+		case .qrDoesNotExist:
+			return AppStrings.ExposureSubmissionError.qrNotExist
+
+		}
+	}
 }

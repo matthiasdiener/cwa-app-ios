@@ -6,7 +6,8 @@ import Foundation
 
 enum CoronaTestServiceError: LocalizedError, Equatable {
 	case responseFailure(URLSession.Response.Failure)
-	case serviceError(ServiceError<TeleTanError>)
+	case teleTanServiceError(ServiceError<TeleTanError>)
+	case testResultError(ServiceError<TestResultError>)
 	case unknownTestResult
 	case testExpired
 	case noRegistrationToken
