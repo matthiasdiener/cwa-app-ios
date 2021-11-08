@@ -531,6 +531,9 @@ class CoronaTestServiceTests: CWATestCase {
 
 		let restServiceProvider = RestServiceProviderStub(results: [
 			.success(
+				TestResultModel(testResult: 2, sc: nil, labId: nil)
+			),
+			.success(
 				RegistrationTokenModel(registrationToken: "registrationToken")
 			)
 		])
@@ -1775,6 +1778,9 @@ class CoronaTestServiceTests: CWATestCase {
 
 	func testUpdateAntigenTestResult_success() {
 		let restServiceProvider = RestServiceProviderStub(results: [
+			.success(
+				TestResultModel(testResult: 2, sc: nil, labId: nil)
+			),
 			.success(
 				RegistrationTokenModel(registrationToken: "registrationToken")
 			)
