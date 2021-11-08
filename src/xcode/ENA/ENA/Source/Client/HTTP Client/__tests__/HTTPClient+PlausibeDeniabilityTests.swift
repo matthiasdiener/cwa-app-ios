@@ -11,24 +11,23 @@ import ExposureNotification
 class HTTPClientPlausibleDeniabilityTests: CWATestCase {
 
 	func test_getTestResult_requestPadding() {
+		// GIVE
+		let sendResource = JSONSendResource<RegistrationTokenSendModel>(
+			RegistrationTokenSendModel(
+				registrationToken: "123456789"
+			)
+		)
 
-		// Setup.
+		// WHEN
+		let result = sendResource.encode()
 
-		let expectation = self.expectation(description: "all callbacks called")
-		expectation.expectedFulfillmentCount = 4
-		let session = MockUrlSession(data: nil, nextResponse: nil, error: nil) { request in
-			expectation.fulfill()
-			XCTAssertEqual(request.httpBody?.count, 250)
+		// THEN
+		switch result {
+		case let .success(bodyData):
+			XCTAssertEqual(bodyData?.count, 250)
+		case .failure:
+			XCTFail("Padding size is wrong")
 		}
-
-		let stack = MockNetworkStack(mockSession: session)
-		let client = HTTPClient.makeWith(mock: stack)
-
-		// Test.
-
-		client.getTestResult(forDevice: "dummyDevice") { _ in expectation.fulfill() }
-		client.getTestResult(forDevice: "dummyDevice", isFake: true) { _ in expectation.fulfill() }
-		waitForExpectations(timeout: .short)
 	}
 
 	func test_getRegistrationToken_requestPadding() {
@@ -76,6 +75,7 @@ class HTTPClientPlausibleDeniabilityTests: CWATestCase {
 
 	// This test makes sure that all headers + urls have the same length.
 	// That test should check for all requests with padding later
+	// Will be no longer needed if we transition to new HTTPClient
 	func test_headerPadding() {
 
 		// Setup.
@@ -108,8 +108,6 @@ class HTTPClientPlausibleDeniabilityTests: CWATestCase {
 
 		client.getTANForExposureSubmit(forDevice: "dummyRegToken") { _ in expectation.fulfill() }
 		client.getTANForExposureSubmit(forDevice: "dummyRegToken", isFake: true) { _ in expectation.fulfill() }
-		client.getTestResult(forDevice: "dummyDevice") { _ in expectation.fulfill() }
-		client.getTestResult(forDevice: "dummyDevice", isFake: true) { _ in expectation.fulfill() }
 
 		waitForExpectations(timeout: .short)
 	}
