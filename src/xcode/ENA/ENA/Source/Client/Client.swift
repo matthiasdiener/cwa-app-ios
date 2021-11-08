@@ -53,13 +53,6 @@ protocol Client {
 
 	// MARK: Getting the Configuration
 
-	/// Gets the test result for the device
-	func getTestResult(
-		forDevice registrationToken: String,
-		isFake: Bool,
-		completion completeWith: @escaping TestResultHandler
-	)
-
 	/// Gets the TAN for the device
 	func getTANForExposureSubmit(
 		forDevice registrationToken: String,
@@ -277,25 +270,6 @@ extension SubmissionError: LocalizedError {
 		case let .other(error):
 			return error.localizedDescription
 		}
-	}
-}
-
-#warning ("Remove this model")
-struct FetchTestResultResponse: Codable {
-	let testResult: Int
-	let sc: Int?
-	let labId: String?
-
-	static func fake(
-		testResult: Int = 0,
-		sc: Int? = nil,
-		labId: String? = nil
-	) -> FetchTestResultResponse {
-		FetchTestResultResponse(
-			testResult: testResult,
-			sc: sc,
-			labId: labId
-		)
 	}
 }
 
