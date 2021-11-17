@@ -19,4 +19,5 @@ jobs:
         run: sudo xcode-select --switch /Applications/Xcode_13.1.app
       - name: Brew bundle
         run: |
+           rm '/usr/local/bin/swiftlint'
            brew bundle
