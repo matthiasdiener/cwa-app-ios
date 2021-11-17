@@ -14,3 +14,6 @@ jobs:
         run: |
           sw_vers  
           xcodebuild -version
+          ls -n /Applications/ | grep Xcode*
+      - name: Select Xcode 13.1
+        run: sudo xcode-select --switch /Applications/Xcode_13.1.app
