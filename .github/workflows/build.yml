@@ -21,3 +21,5 @@ jobs:
         run: |
            rm '/usr/local/bin/swiftlint'
            brew bundle
+      - name: Install Bundler
+        run: sudo gem install rake bundler:2.1.4 
