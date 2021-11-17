@@ -83,7 +83,7 @@ jobs:
             - /Users/distiller/Library/Caches/Homebrew
             - /usr/local/Homebrew
             - /Users/distiller/.rubies/ruby-*/bin/
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ GITHUB_SHA }}            
+          key: ${{ runner.os }}-${{ env.cache-name }}-${GITHUB_SHA}          
       - name: Build for testing
         run: |
           cd src/xcode && bundle exec fastlane build_for_testing
