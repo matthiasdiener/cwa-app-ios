@@ -29,23 +29,27 @@ jobs:
         run: cd src/xcode && bundle install --path=vendor --jobs=8
       - name: Show Workspace
         run: ls -la
-      - name: save tools cache
+      - name: save git repo cache
         uses: actions/cache@v2
+        env:
+          cache-name: cache-git-repo
         with:
           path: |
-            - /Users/distiller/Library/Caches/Homebrew
-            - /usr/local/Homebrew
-            - /Users/distiller/.rubies/ruby-*/bin/
-          key: tools_cache_key v6-${{ hashFiles('Brewfile.lock.json') }}
-      - name: save cache
+            - .
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ GITHUB_SHA }}
+      - name: save dependencies and tools cache
         uses: actions/cache@v2
+        env:
+          cache-name: cache-dependencies-and-tools
         with:
           path: |
-            - src/xcode/
             - /usr/local/Cellar/
             - /usr/local/opt/
             - /usr/local/bin/
-          key: cache_key v6-${{ hashFiles('src/xcode/Gemfile.lock') }}    
+            - /Users/distiller/Library/Caches/Homebrew
+            - /usr/local/Homebrew
+            - /Users/distiller/.rubies/ruby-*/bin/
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ GITHUB_SHA }}     
   build:
     runs-on: macos-11
     needs: [dependencies]
@@ -59,23 +63,27 @@ jobs:
         run: |
            sudo xcode-select --switch /Applications/Xcode_13.1.app
            xcodebuild -version 
-      - name: restore tools cache
+      - name: restore git repo cache
         uses: actions/cache@v2
+        env:
+          cache-name: cache-git-repo
         with:
           path: |
-            - /Users/distiller/Library/Caches/Homebrew
-            - /usr/local/Homebrew
-            - /Users/distiller/.rubies/ruby-*/bin/
-          key: tools_cache_key v6-${{ hashFiles('Brewfile.lock.json') }}
-      - name: restore save cache
+            - .
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ GITHUB_SHA }}
+      - name: restore dependencies and tools cache
         uses: actions/cache@v2
+        env:
+          cache-name: cache-dependencies-and-tools
         with:
           path: |
-            - src/xcode/
             - /usr/local/Cellar/
             - /usr/local/opt/
             - /usr/local/bin/
-          key: cache_key v6-${{ hashFiles('src/xcode/Gemfile.lock') }}           
+            - /Users/distiller/Library/Caches/Homebrew
+            - /usr/local/Homebrew
+            - /Users/distiller/.rubies/ruby-*/bin/
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ GITHUB_SHA }}            
       - name: Build for testing
         run: |
           cd src/xcode && bundle exec fastlane build_for_testing
@@ -92,23 +100,27 @@ jobs:
         run: |
            sudo xcode-select --switch /Applications/Xcode_13.1.app
            xcodebuild -version      
-      - name: restore tools cache
+      - name: restore git repo cache
         uses: actions/cache@v2
+        env:
+          cache-name: cache-git-repo
         with:
           path: |
-            - /Users/distiller/Library/Caches/Homebrew
-            - /usr/local/Homebrew
-            - /Users/distiller/.rubies/ruby-*/bin/
-          key: tools_cache_key v6-${{ hashFiles('Brewfile.lock.json') }}
-      - name: restore save cache
+            - .
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ GITHUB_SHA }}
+      - name: restore dependencies and tools cache
         uses: actions/cache@v2
+        env:
+          cache-name: cache-dependencies-and-tools
         with:
           path: |
-            - src/xcode/
             - /usr/local/Cellar/
             - /usr/local/opt/
             - /usr/local/bin/
-          key: cache_key v6-${{ hashFiles('src/xcode/Gemfile.lock') }}
+            - /Users/distiller/Library/Caches/Homebrew
+            - /usr/local/Homebrew
+            - /Users/distiller/.rubies/ruby-*/bin/
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ GITHUB_SHA }}     
       - name: Swiftlint
         run: |
           swiftlint --version
