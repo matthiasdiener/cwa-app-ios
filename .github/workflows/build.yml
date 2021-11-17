@@ -27,7 +27,7 @@ jobs:
         run: sudo gem install rake bundler:2.1.4 
       - name: Install dependencies
         run: cd src/xcode && bundle install --path=vendor --jobs=8
-      - name: save cache
+      - name: save tools cache
         uses: actions/cache@v2
         with:
           path: |
@@ -35,6 +35,45 @@ jobs:
             - /usr/local/Homebrew
             - /Users/distiller/.rubies/ruby-*/bin/
           key: tools_cache_key v6-${{ hashFiles('Brewfile.lock.json') }}
+      - name: save cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            - src/xcode/vendor/
+            - /usr/local/Cellar/
+            - /usr/local/opt/
+            - /usr/local/bin/
+          key: cache_key v6-${{ hashFiles('src/xcode/Gemfile.lock') }}    
+  build:
+    runs-on: macos-11
+    needs: [dependencies]
+    steps:
       - name: Build for testing
         run: |
           cd src/xcode && bundle exec fastlane build_for_testing
+  swiftlint:
+    runs-on: macos-11
+    needs: [dependencies]
+    steps:
+      - name: restore tools cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            - /Users/distiller/Library/Caches/Homebrew
+            - /usr/local/Homebrew
+            - /Users/distiller/.rubies/ruby-*/bin/
+          key: tools_cache_key v6-${{ hashFiles('Brewfile.lock.json') }}
+      - name: restore save cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            - src/xcode/vendor/
+            - /usr/local/Cellar/
+            - /usr/local/opt/
+            - /usr/local/bin/
+          key: cache_key v6-${{ hashFiles('src/xcode/Gemfile.lock') }}
+      - name: Swiftlint
+        run: |
+          swiftlint --version
+          cd src/xcode && bundle exec fastlane lint          
+    
