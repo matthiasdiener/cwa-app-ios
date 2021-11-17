@@ -10,7 +10,6 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
-      - name: Install GitHub CLI
+      - name: Check xCode version
         run: |
-          brew update
-          brew install gh
+          xcodebuild -version
