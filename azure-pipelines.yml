@@ -4,16 +4,35 @@
 # https://aka.ms/yaml
 
 trigger:
-- admin/azure_devops
+- azure-pipelines
 
 pool:
-  vmImage: ubuntu-latest
+  name: "Mobile PE"
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+variables:
+  - name: repositoryName
+    value: "cwa-app-ios"
+  - name: templateName
+    value: "templates/ios/stages/"
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+  - group: "HYPERSPACE_iOS_ENTERPRISE_PIPELINES"
+
+# Define yml templates for specific steps. They are hosted on a external GitHub repsitory.
+resources:
+  repositories:
+    - repository: templates
+      type: githubenterprise
+      name: SAPMobile/Azure_DevOps_Pipeline_Templates
+      endpoint: github.tools.sap
+
+##################################################################################################################################
+# This is where the pipeline starts.
+##################################################################################################################################
+stages:
+  - template: ${{ variables.templateName }}build.yml@templates
+    parameters:
+      stageId: "TestStage"
+      stageName: "Test Stage"
+      repositoryName: ${{ variables.repositoryName }}
+      jobName: "Run UI tests and grab screenshots"
+      customLane: "test"
