@@ -2,7 +2,7 @@ name: Build on macOS
 on:
   push:
     branches:
-      - azure-pipelines
+      - admin/ci-cd-pipelines
 
 jobs:
   build:
