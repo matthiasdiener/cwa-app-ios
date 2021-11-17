@@ -83,7 +83,9 @@ jobs:
             - /Users/distiller/Library/Caches/Homebrew
             - /usr/local/Homebrew
             - /Users/distiller/.rubies/ruby-*/bin/
-          key: ${{ runner.os }}-${{ env.cache-name }}-${GITHUB_SHA}          
+          key: ${{ runner.os }}-${{ env.cache-name }}-${GITHUB_SHA}       
+      - name: Show Workspace
+        run: ls -la          
       - name: Build for testing
         run: |
           cd src/xcode && bundle exec fastlane build_for_testing
@@ -121,6 +123,8 @@ jobs:
             - /usr/local/Homebrew
             - /Users/distiller/.rubies/ruby-*/bin/
           key: ${{ runner.os }}-${{ env.cache-name }}-${GITHUB_SHA}  
+      - name: Show Workspace
+        run: ls -la          
       - name: Swiftlint
         run: |
           swiftlint --version
