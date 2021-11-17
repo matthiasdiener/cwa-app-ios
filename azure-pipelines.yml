@@ -15,8 +15,6 @@ variables:
   - name: templateName
     value: "templates/ios/stages/"
 
-  - group: "HYPERSPACE_iOS_ENTERPRISE_PIPELINES"
-
 # Define yml templates for specific steps. They are hosted on a external GitHub repsitory.
 resources:
   repositories:
