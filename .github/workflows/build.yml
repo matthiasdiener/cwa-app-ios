@@ -10,6 +10,7 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
-      - name: Check xCode version
+      - name: Check MachOS and xCode version
         run: |
+          sw_vers  
           xcodebuild -version
