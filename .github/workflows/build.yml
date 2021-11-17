@@ -1,5 +1,8 @@
 name: Build on macOS
-on: push
+on:
+  push:
+    branches:
+      - azure-pipelines
 
 jobs:
   build:
