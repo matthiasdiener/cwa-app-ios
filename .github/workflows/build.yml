@@ -14,6 +14,7 @@ jobs:
         run: |
           echo GITHUB_SHA: $GITHUB_SHA
           echo github.sha: ${{ github.sha }}
+          echo github.workspace: ${{ github.workspace }}
       - name: Check MacOS and xCode version
         run: |
           sw_vers  
