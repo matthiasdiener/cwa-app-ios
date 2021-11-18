@@ -37,7 +37,7 @@ jobs:
           cache-name: cache-workspace
         with:
           path: |
-            - /Users/runner/work/cwa-app-ios/cwa-app-ios
+            - /Users/runner/work/cwa-app-ios/cwa-app-ios/
           key: ${{ runner.os }}-${{ env.cache-name }}-$GITHUB_SHA
       - name: save dependencies and tools cache
         uses: actions/cache@v2
@@ -51,7 +51,7 @@ jobs:
             - /Users/distiller/Library/Caches/Homebrew
             - /usr/local/Homebrew
             - /Users/distiller/.rubies/ruby-*/bin/
-          key: ${{ runner.os }}-${{ env.cache-name }}-${GITHUB_SHA}    
+          key: ${{ runner.os }}-${{ env.cache-name }}-$GITHUB_SHA
   build:
     runs-on: macos-11
     needs: [dependencies]
@@ -71,7 +71,7 @@ jobs:
           cache-name: cache-workspace
         with:
           path: |
-            - /Users/runner/work/cwa-app-ios/cwa-app-ios
+            - /Users/runner/work/cwa-app-ios/cwa-app-ios/
           key: ${{ runner.os }}-${{ env.cache-name }}-$GITHUB_SHA
       - name: restore dependencies and tools cache
         uses: actions/cache@v2
@@ -85,7 +85,7 @@ jobs:
             - /Users/distiller/Library/Caches/Homebrew
             - /usr/local/Homebrew
             - /Users/distiller/.rubies/ruby-*/bin/
-          key: ${{ runner.os }}-${{ env.cache-name }}-${GITHUB_SHA}       
+          key: ${{ runner.os }}-${{ env.cache-name }}-$GITHUB_SHA
       - name: Show Workspace
         run: |
           pwd
@@ -109,7 +109,7 @@ jobs:
           cache-name: cache-workspace
         with:
           path: |
-            - /Users/runner/work/cwa-app-ios/cwa-app-ios
+            - /Users/runner/work/cwa-app-ios/cwa-app-ios/
           key: ${{ runner.os }}-${{ env.cache-name }}-$GITHUB_SHA
       - name: restore dependencies and tools cache
         uses: actions/cache@v2
@@ -123,7 +123,7 @@ jobs:
             - /Users/distiller/Library/Caches/Homebrew
             - /usr/local/Homebrew
             - /Users/distiller/.rubies/ruby-*/bin/
-          key: ${{ runner.os }}-${{ env.cache-name }}-${GITHUB_SHA}  
+          key: ${{ runner.os }}-${{ env.cache-name }}-$GITHUB_SHA
       - name: Show Workspace
         run: |
           pwd
