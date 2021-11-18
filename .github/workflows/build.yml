@@ -52,7 +52,7 @@ jobs:
           cache-name: cache-workspace
         with:
           path: |
-            - /Users/runner/work/
+            - ~/*
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
       - name: save dependencies and tools cache
         uses: actions/cache@v2
