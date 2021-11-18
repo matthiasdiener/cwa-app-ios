@@ -32,6 +32,16 @@ jobs:
         run: sudo gem install rake bundler:2.1.4 
       - name: Install dependencies
         run: cd src/xcode && bundle install --path=vendor --jobs=8
+      - name: Build for testing
+        run: |
+          cd src/xcode && bundle exec fastlane build_for_testing        
+      - name: Swiftlint
+        run: |
+          swiftlint --version
+          cd src/xcode && bundle exec fastlane lint        
+      - name: Run Fastlane tests
+        run: | 
+          cd src/xcode && bundle exec fastlane test_without_building testplan:AllTests    
       - name: Show Workspace
         run: |
           pwd
@@ -42,7 +52,7 @@ jobs:
           cache-name: cache-workspace
         with:
           path: |
-            - /Users/runner/work/cwa-app-ios/cwa-app-ios/
+            - /Users/runner/work/
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
       - name: save dependencies and tools cache
         uses: actions/cache@v2
@@ -57,80 +67,5 @@ jobs:
             - /usr/local/Homebrew
             - /Users/distiller/.rubies/ruby-*/bin/
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
-  build:
-    runs-on: macos-11
-    needs: [dependencies]
-    steps:
-      - name: Check MacOS and xCode version
-        run: |
-          sw_vers  
-          xcodebuild -version
-          ls -n /Applications/ | grep Xcode*
-      - name: Select Xcode 13.1
-        run: |
-           sudo xcode-select --switch /Applications/Xcode_13.1.app
-           xcodebuild -version 
-      - name: restore workspace
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-workspace
-        with:
-          path: |
-            - /Users/runner/work/cwa-app-ios/cwa-app-ios/
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
-      - name: restore dependencies and tools cache
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-dependencies-and-tools
-        with:
-          path: |
-            - /usr/local/Cellar/
-            - /usr/local/opt/
-            - /usr/local/bin/
-            - /Users/distiller/Library/Caches/Homebrew
-            - /usr/local/Homebrew
-            - /Users/distiller/.rubies/ruby-*/bin/
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
-      - name: Show Workspace
-        run: |
-          pwd
-          ls -la        
-  swiftlint:
-    runs-on: macos-11
-    needs: [dependencies]
-    steps:
-      - name: Check MacOS and xCode version
-        run: |
-          sw_vers  
-          xcodebuild -version
-          ls -n /Applications/ | grep Xcode*
-      - name: Select Xcode 13.1
-        run: |
-           sudo xcode-select --switch /Applications/Xcode_13.1.app
-           xcodebuild -version      
-      - name: restore workspace
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-workspace
-        with:
-          path: |
-            - /Users/runner/work/cwa-app-ios/cwa-app-ios/
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
-      - name: restore dependencies and tools cache
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-dependencies-and-tools
-        with:
-          path: |
-            - /usr/local/Cellar/
-            - /usr/local/opt/
-            - /usr/local/bin/
-            - /Users/distiller/Library/Caches/Homebrew
-            - /usr/local/Homebrew
-            - /Users/distiller/.rubies/ruby-*/bin/
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
-      - name: Show Workspace
-        run: |
-          pwd
-          ls -la             
+       
     
