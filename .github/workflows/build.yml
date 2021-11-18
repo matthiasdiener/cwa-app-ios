@@ -28,7 +28,9 @@ jobs:
       - name: Install dependencies
         run: cd src/xcode && bundle install --path=vendor --jobs=8
       - name: Show Workspace
-        run: ls -la
+        run: |
+          pwd
+          ls -la
       - name: save git repo cache
         uses: actions/cache@v2
         env:
@@ -85,10 +87,9 @@ jobs:
             - /Users/distiller/.rubies/ruby-*/bin/
           key: ${{ runner.os }}-${{ env.cache-name }}-${GITHUB_SHA}       
       - name: Show Workspace
-        run: ls -la          
-      - name: Build for testing
         run: |
-          cd src/xcode && bundle exec fastlane build_for_testing
+          pwd
+          ls -la        
   swiftlint:
     runs-on: macos-11
     needs: [dependencies]
@@ -124,9 +125,7 @@ jobs:
             - /Users/distiller/.rubies/ruby-*/bin/
           key: ${{ runner.os }}-${{ env.cache-name }}-${GITHUB_SHA}  
       - name: Show Workspace
-        run: ls -la          
-      - name: Swiftlint
         run: |
-          swiftlint --version
-          cd src/xcode && bundle exec fastlane lint          
+          pwd
+          ls -la             
     
