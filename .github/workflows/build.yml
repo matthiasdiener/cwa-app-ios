@@ -31,14 +31,14 @@ jobs:
         run: |
           pwd
           ls -la
-      - name: save git repo cache
+      - name: save workspace
         uses: actions/cache@v2
         env:
-          cache-name: cache-git-repo
+          cache-name: cache-workspace
         with:
           path: |
-            - ./
-          key: ${{ runner.os }}-${{ env.cache-name }}-${GITHUB_SHA}
+            - /Users/runner/work/cwa-app-ios/cwa-app-ios
+          key: ${{ runner.os }}-${{ env.cache-name }}-$GITHUB_SHA
       - name: save dependencies and tools cache
         uses: actions/cache@v2
         env:
@@ -65,14 +65,14 @@ jobs:
         run: |
            sudo xcode-select --switch /Applications/Xcode_13.1.app
            xcodebuild -version 
-      - name: restore git repo cache
+      - name: restore workspace
         uses: actions/cache@v2
         env:
-          cache-name: cache-git-repo
+          cache-name: cache-workspace
         with:
           path: |
-            - ./
-          key: ${{ runner.os }}-${{ env.cache-name }}-${GITHUB_SHA}
+            - /Users/runner/work/cwa-app-ios/cwa-app-ios
+          key: ${{ runner.os }}-${{ env.cache-name }}-$GITHUB_SHA
       - name: restore dependencies and tools cache
         uses: actions/cache@v2
         env:
@@ -103,14 +103,14 @@ jobs:
         run: |
            sudo xcode-select --switch /Applications/Xcode_13.1.app
            xcodebuild -version      
-      - name: restore git repo cache
+      - name: restore workspace
         uses: actions/cache@v2
         env:
-          cache-name: cache-git-repo
+          cache-name: cache-workspace
         with:
           path: |
-            - ./
-          key: ${{ runner.os }}-${{ env.cache-name }}-${GITHUB_SHA}
+            - /Users/runner/work/cwa-app-ios/cwa-app-ios
+          key: ${{ runner.os }}-${{ env.cache-name }}-$GITHUB_SHA
       - name: restore dependencies and tools cache
         uses: actions/cache@v2
         env:
