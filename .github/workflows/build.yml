@@ -10,6 +10,9 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
+      - name: get GitHub SHA
+        run: |
+          echo GITHUB_REF: $GITHUB_REF
       - name: Check MacOS and xCode version
         run: |
           sw_vers  
