@@ -35,16 +35,11 @@ jobs:
       - name: Build for testing
         run: |
           cd src/xcode && bundle exec fastlane build_for_testing        
-      - name: Swiftlint
-        run: |
-          swiftlint --version
-          cd src/xcode && bundle exec fastlane lint        
-      - name: Run Fastlane tests
-        run: | 
-          cd src/xcode && bundle exec fastlane test_without_building testplan:AllTests    
       - name: Show Workspace
         run: |
           pwd
+          ls -la
+          cd src/xcode
           ls -la
       - name: save workspace
         uses: actions/cache@v2
@@ -52,7 +47,7 @@ jobs:
           cache-name: cache-workspace
         with:
           path: |
-            - ~/*
+            - /Users/runner/work/cwa-app-ios/cwa-app-ios/src/xcode
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
       - name: save dependencies and tools cache
         uses: actions/cache@v2
@@ -67,5 +62,61 @@ jobs:
             - /usr/local/Homebrew
             - /Users/distiller/.rubies/ruby-*/bin/
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
-       
-    
+          
+  swiftlint:
+    runs-on: macos-11
+    steps:
+      - name: restore workspace
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-workspace
+        with:
+          path: |
+            - /Users/runner/work/cwa-app-ios/cwa-app-ios/src/xcode
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
+      - name: restore dependencies and tools cache
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-dependencies-and-tools
+        with:
+          path: |
+            - /usr/local/Cellar/
+            - /usr/local/opt/
+            - /usr/local/bin/
+            - /Users/distiller/Library/Caches/Homebrew
+            - /usr/local/Homebrew
+            - /Users/distiller/.rubies/ruby-*/bin/
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}        
+      - name: Swiftlint
+        run: |
+          swiftlint --version
+          cd src/xcode && bundle exec fastlane lint          
+
+
+  Run-all-Tests:
+    runs-on: macos-11
+    steps:
+      - name: restore workspace
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-workspace
+        with:
+          path: |
+            - /Users/runner/work/cwa-app-ios/cwa-app-ios/src/xcode
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
+      - name: restore dependencies and tools cache
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-dependencies-and-tools
+        with:
+          path: |
+            - /usr/local/Cellar/
+            - /usr/local/opt/
+            - /usr/local/bin/
+            - /Users/distiller/Library/Caches/Homebrew
+            - /usr/local/Homebrew
+            - /Users/distiller/.rubies/ruby-*/bin/
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}           
+      - name: Run Fastlane tests
+        run: | 
+          cd src/xcode && bundle exec fastlane test_without_building testplan:AllTests    
