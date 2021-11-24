@@ -65,6 +65,7 @@ jobs:
           
   swiftlint:
     runs-on: macos-11
+    needs: dependencies
     steps:
       - name: restore workspace
         uses: actions/cache@v2
@@ -95,6 +96,7 @@ jobs:
 
   Run-all-Tests:
     runs-on: macos-11
+    needs: dependencies
     steps:
       - name: restore workspace
         uses: actions/cache@v2
