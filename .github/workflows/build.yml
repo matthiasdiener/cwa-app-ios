@@ -77,7 +77,7 @@ jobs:
           cache-name: cache-workspace
         with:
           path: |
-            - /Users/runner/work/cwa-app-ios/cwa-app-ios/src/xcode
+            - /Users/runner/work/cwa-app-ios/cwa-app-ios/src/xcode/*
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
       - name: Show Workspace
         run: |
@@ -112,7 +112,7 @@ jobs:
           cache-name: cache-workspace
         with:
           path: |
-            - /Users/runner/work/cwa-app-ios/cwa-app-ios/src/xcode
+            - /Users/runner/work/cwa-app-ios/cwa-app-ios/src/xcode/*
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
       - name: restore dependencies and tools cache
         uses: actions/cache@v2
