@@ -9,57 +9,60 @@ trigger:
 pool:
   vmImage: macOS-11
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+jobs:
+- job: dependencies
+  steps:
+  - script: |
+      sw_vers  
+      xcodebuild -version
+      ls -n /Applications/ | grep Xcode*
+    displayName: 'Check MacOS and Xcode Version'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+  - script: |
+      pwd 
+      ls -la
+    displayName: 'Show Workspace'
 
-- script: |
-    sw_vers  
-    xcodebuild -version
-    ls -n /Applications/ | grep Xcode*
-  displayName: 'Check MacOS and Xcode Version'
+  - script: |
+      rm '/usr/local/bin/swiftlint'
+      brew bundle
+      swiftlint --version
+    displayName: 'Brew Bundle'
 
-- script: |
-    pwd 
-    ls -la
-  displayName: 'Show Workspace'
+  - script: |
+      sudo gem install rake bundler:2.1.4
+    displayName: 'Install Bundler'
 
-- script: |
-    rm '/usr/local/bin/swiftlint'
-    brew bundle
-    swiftlint --version
-  displayName: 'Brew Bundle'
+  - script: |
+      cd src/xcode && bundle install --path=vendor --jobs=8
+    displayName: 'Install Dependencies'
 
-- script: |
-    sudo gem install rake bundler:2.1.4
-  displayName: 'Install Bundler'
+- job: 'Build-for-Testing'
+  dependsOn: 'dependencies'
+  steps:
+  - script: |
+      cd src/xcode && bundle exec fastlane build_for_testing
+    displayName: 'Build for Testing'
 
-- script: |
-    cd src/xcode && bundle install --path=vendor --jobs=8
-  displayName: 'Install Dependencies'
+- job: 'Swiftlint'
+  dependsOn: 'dependencies'
+  steps:
+  - script: |
+      swiftlint --version
+      pwd
+      ls -la
+      cd src/xcode
+      ls -la    
+      bundle exec fastlane lint
+    displayName: 'SwiftLint'
 
-- script: |
-    cd src/xcode && bundle exec fastlane build_for_testing
-  displayName: 'Build for Testing'
-
-- script: |
-    swiftlint --version
-    pwd
-    ls -la
-    cd src/xcode
-    ls -la    
-    bundle exec fastlane lint
-  displayName: 'SwiftLint'
-
-- script: |
-    pwd
-    ls -la
-    cd src/xcode
-    ls -la
-    bundle exec fastlane test_without_building testplan:AllTests
-  displayName: 'Run AllTests'
+- job: 'Run-AllTests'
+  dependsOn: 'dependencies'
+  steps:
+  - script: |
+      pwd
+      ls -la
+      cd src/xcode
+      ls -la
+      bundle exec fastlane test_without_building testplan:AllTests
+    displayName: 'Run AllTests'
