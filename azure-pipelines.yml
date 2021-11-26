@@ -44,8 +44,8 @@ jobs:
     inputs:
       key: 'v2 | local_cellar_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
       restoreKeys: |
-        local_cellar_cache | "$(Agent.OS)"
-        local_cellar_cache
+        v2 | local_cellar_cache | "$(Agent.OS)"
+        v2 | local_cellar_cache
       path: $(LOCAL_CELLAR_CACHE_FOLDER)
       cacheHitVar: LOCAL_CELLAR_CACHE_RESTORED
 
@@ -117,11 +117,12 @@ jobs:
   - task: Cache@2
     displayName: 'Store /usr/local/cellar Cache'
     inputs:
-      key: 'local_cellar_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
+      key: 'v2 | local_cellar_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
       restoreKeys: |
-        local_cellar_cache | "$(Agent.OS)"
-        local_cellar_cache
+        v2 | local_cellar_cache | "$(Agent.OS)"
+        v2 | local_cellar_cache
       path: $(LOCAL_CELLAR_CACHE_FOLDER)
+      cacheHitVar: LOCAL_CELLAR_CACHE_RESTORED
 
   - task: Cache@2
     displayName: 'Store /usr/local/opt Cache'
