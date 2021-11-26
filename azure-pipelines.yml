@@ -30,6 +30,19 @@ steps:
   displayName: 'Show Workspace'
 
 - script: |
+    rm '/usr/local/bin/swiftlint'
     brew bundle
     swiftlint --version
   displayName: 'Brew Bundle'
+
+- script: |
+    sudo gem install rake bundler:2.1.4
+  displayName: 'Install Bundler'
+
+- script: |
+    cd src/xcode && bundle install --path=vendor --jobs=8
+  displayName: 'Install Dependencies'
+
+- script: 
+    cd src/xcode && bundle exec fastlane build_for_testing
+  displayName: 'Build for Testing'
