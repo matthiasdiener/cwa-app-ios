@@ -23,19 +23,48 @@ jobs:
       ls -la
     displayName: 'Show Workspace'
 
+  - task: Cache@2
+    inputs:
+      key: '"v12" | "$(Agent.OS)" | "src/xcode/Gemfile.lock"'
+      restoreKeys: |
+        v12 | "$(Agent.OS)"
+        v12
+      path: |
+        src/xcode/vendor/
+        /usr/local/Cellar/
+        /usr/local/opt/
+        /usr/local/bin/
+      cacheHitVar: CACHE_RESTORED
+
   - script: |
       rm '/usr/local/bin/swiftlint'
       brew bundle
       swiftlint --version
     displayName: 'Brew Bundle'
+    condition: ne(variables.CACHE_RESTORED, 'true')
 
   - script: |
       sudo gem install rake bundler:2.1.4
     displayName: 'Install Bundler'
+    condition: ne(variables.CACHE_RESTORED, 'true')
 
   - script: |
       cd src/xcode && bundle install --path=vendor --jobs=8
     displayName: 'Install Dependencies'
+    condition: ne(variables.CACHE_RESTORED, 'true')
+
+  - task: Cache@2
+    inputs:
+      key: '"v12" | "$(Agent.OS)" | "src/xcode/Gemfile.lock"'
+      restoreKeys: |
+        v12 | "$(Agent.OS)"
+        v12
+      path: |
+        src/xcode/vendor/
+        /usr/local/Cellar/
+        /usr/local/opt/
+        /usr/local/bin/
+      cacheHitVar: CACHE_RESTORED
 
 - job: 'BuildForTesting'
   dependsOn: 'dependencies'
