@@ -53,5 +53,9 @@ steps:
   displayName: 'SwiftLint'
 
 - script: 
-    cd src/xcode && bundle exec fastlane test_without_building testplan:AllTests
+    pwd
+    ls -la
+    cd src/xcode
+    ls -la
+    bundle exec fastlane test_without_building testplan:AllTests
   displayName: 'Run AllTests'
