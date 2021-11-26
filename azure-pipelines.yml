@@ -7,7 +7,7 @@ trigger:
 - admin/azure-pipelines
 
 pool:
-  vmImage: macOS-latest
+  vmImage: macOS-11
 
 steps:
 - script: echo Hello, world!
