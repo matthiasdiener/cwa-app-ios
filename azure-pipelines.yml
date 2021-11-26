@@ -11,6 +11,9 @@ pool:
 
 variables:
   VENDOR_CACHE_FOLDER: $(Build.SourcesDirectory)/src/xcode/vendor
+  LOCAL_CELLAR_CACHE_FOLDER:  /usr/local/Cellar
+  LOCAL_OPT_CACHE_FOLDER:  /usr/local/opt
+  LOCAL_BIN_CACHE_FOLDER:  /usr/local/bin
 
 jobs:
 - job: dependencies
@@ -31,36 +34,59 @@ jobs:
     inputs:
       key: 'vendor_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
       restoreKeys: |
-        v12 | "$(Agent.OS)"
-        v12
+        vendor_cache | "$(Agent.OS)"
+        vendor_cache
       path: $(VENDOR_CACHE_FOLDER)
       cacheHitVar: VENDOR_CACHE_RESTORED
 
+  - task: Cache@2
+    displayName: 'Restore /usr/local/cellar Cache'
+    inputs:
+      key: 'local_cellar_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
+      restoreKeys: |
+        local_cellar_cache | "$(Agent.OS)"
+        local_cellar_cache
+      path: $(LOCAL_CELLAR_CACHE_FOLDER)
+      cacheHitVar: LOCAL_CELLAR_CACHE_RESTORED
+
+  - script: |
+      echo VENDOR_CACHE_RESTORED: $(VENDOR_CACHE_RESTORED)
+      echo LOCAL_CELLAR_CACHE_RESTORED: $(LOCAL_CELLAR_CACHE_RESTORED)
+      
   - script: |
       rm '/usr/local/bin/swiftlint'
       brew bundle
       swiftlint --version
     displayName: 'Brew Bundle'
-    condition: ne(variables.VENDOR_CACHE_RESTORED, 'true')
+    condition: or(ne(variables.VENDOR_CACHE_RESTORED, 'true'), ne(variables.LOCAL_CELLAR_CACHE_RESTORED, 'true'))
 
   - script: |
       sudo gem install rake bundler:2.1.4
     displayName: 'Install Bundler'
-    condition: ne(variables.VENDOR_CACHE_RESTORED, 'true')
+    condition: or(ne(variables.VENDOR_CACHE_RESTORED, 'true'), ne(variables.LOCAL_CELLAR_CACHE_RESTORED, 'true'))
 
   - script: |
       cd src/xcode && bundle install --path=vendor --jobs=8
     displayName: 'Install Dependencies'
-    condition: ne(variables.VENDOR_CACHE_RESTORED, 'true')
+    condition: or(ne(variables.VENDOR_CACHE_RESTORED, 'true'), ne(variables.LOCAL_CELLAR_CACHE_RESTORED, 'true'))
 
   - task: Cache@2
-    displayName: 'Restore Vendor Cache'
+    displayName: 'Store Vendor Cache'
     inputs:
       key: 'vendor_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
       restoreKeys: |
-        v12 | "$(Agent.OS)"
-        v12
+        vendor_cache | "$(Agent.OS)"
+        vendor_cache
       path: $(VENDOR_CACHE_FOLDER)
+
+  - task: Cache@2
+    displayName: 'Store /usr/local/cellar Cache'
+    inputs:
+      key: 'local_cellar_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
+      restoreKeys: |
+        local_cellar_cache | "$(Agent.OS)"
+        local_cellar_cache
+      path: $(LOCAL_CELLAR_CACHE_FOLDER)
 
 - job: 'BuildForTesting'
   dependsOn: 'dependencies'
