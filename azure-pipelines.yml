@@ -49,7 +49,11 @@ steps:
 
 - script: 
     swiftlint --version
-    cd src/xcode && bundle exec fastlane lint
+    pwd
+    ls -la
+    cd src/xcode
+    ls -la    
+    bundle exec fastlane lint
   displayName: 'SwiftLint'
 
 - script: 
