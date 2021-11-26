@@ -23,13 +23,7 @@ jobs:
       - name: Select Xcode 13.1
         run: |
            sudo xcode-select --switch /Applications/Xcode_13.1.app
-           xcodebuild -version  
-      - name: Show Workspace
-        run: |
-          pwd
-          ls -la
-          cd src/xcode
-          ls -la           
+           xcodebuild -version            
       - name: Brew bundle
         run: |
            rm '/usr/local/bin/swiftlint'
@@ -48,13 +42,15 @@ jobs:
           ls -la
           cd /Users
           ls -la
+          cd ~
+          ls -la
       - name: save workspace
         uses: actions/cache@v2
         env:
           cache-name: cache-workspace
         with:
           path: |
-            /Users/runner/work/cwa-app-ios/cwa-app-ios
+            ~/work/*
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
       - name: save dependencies and tools cache
         uses: actions/cache@v2
@@ -84,7 +80,7 @@ jobs:
           cache-name: cache-workspace
         with:
           path: |
-            /Users/runner/work/cwa-app-ios/cwa-app-ios
+            ~/work/*
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
       - name: Show Workspace
         run: |
@@ -119,7 +115,7 @@ jobs:
           cache-name: cache-workspace
         with:
           path: |
-            /Users/runner/work/cwa-app-ios/cwa-app-ios
+            ~/work/*
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
       - name: Show Workspace
         run: |
