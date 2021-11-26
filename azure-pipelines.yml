@@ -42,7 +42,7 @@ jobs:
   - task: Cache@2
     displayName: 'Restore /usr/local/cellar Cache'
     inputs:
-      key: 'local_cellar_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
+      key: 'v2 | local_cellar_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
       restoreKeys: |
         local_cellar_cache | "$(Agent.OS)"
         local_cellar_cache
