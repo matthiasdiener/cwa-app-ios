@@ -37,7 +37,7 @@ jobs:
       cd src/xcode && bundle install --path=vendor --jobs=8
     displayName: 'Install Dependencies'
 
-- job: 'Build-for-Testing'
+- job: 'BuildForTesting'
   dependsOn: 'dependencies'
   steps:
   - script: |
@@ -56,7 +56,7 @@ jobs:
       bundle exec fastlane lint
     displayName: 'SwiftLint'
 
-- job: 'Run-AllTests'
+- job: 'RunAllTests'
   dependsOn: 'dependencies'
   steps:
   - script: |
