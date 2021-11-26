@@ -11,9 +11,9 @@ pool:
 
 variables:
   VENDOR_CACHE_FOLDER: $(Build.SourcesDirectory)/src/xcode/vendor
-  LOCAL_CELLAR_CACHE_FOLDER:  /usr/local/Cellar
-  LOCAL_OPT_CACHE_FOLDER:  /usr/local/opt
-  LOCAL_BIN_CACHE_FOLDER:  /usr/local/bin
+  LOCAL_CELLAR_CACHE_FOLDER: /usr/local/Cellar
+  LOCAL_OPT_CACHE_FOLDER: /usr/local/opt
+  LOCAL_BIN_CACHE_FOLDER: /usr/local/bin
 
 jobs:
 - job: dependencies
@@ -81,17 +81,29 @@ jobs:
       brew bundle
       swiftlint --version
     displayName: 'Brew Bundle'
-    condition: or(ne(variables.VENDOR_CACHE_RESTORED, 'true'), ne(variables.LOCAL_CELLAR_CACHE_RESTORED, 'true'))
 
   - script: |
       sudo gem install rake bundler:2.1.4
     displayName: 'Install Bundler'
-    condition: or(ne(variables.VENDOR_CACHE_RESTORED, 'true'), ne(variables.LOCAL_CELLAR_CACHE_RESTORED, 'true'))
 
   - script: |
       cd src/xcode && bundle install --path=vendor --jobs=8
     displayName: 'Install Dependencies'
-    condition: or(ne(variables.VENDOR_CACHE_RESTORED, 'true'), ne(variables.LOCAL_CELLAR_CACHE_RESTORED, 'true'))
+
+  - script: |
+      cd /usr/local/Cellar
+      ls -la
+    displayName: 'Show /usr/local/Cellar'
+
+  - script: |
+      cd /usr/local/opt
+      ls -la
+    displayName: 'Show /usr/local/opt'
+
+  - script: |
+      cd /usr/local/bin
+      ls -la
+    displayName: 'Show /usr/local/bin'
 
   - task: Cache@2
     displayName: 'Store Vendor Cache'
