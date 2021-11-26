@@ -46,3 +46,12 @@ steps:
 - script: 
     cd src/xcode && bundle exec fastlane build_for_testing
   displayName: 'Build for Testing'
+
+- script: 
+    swiftlint --version
+    cd src/xcode && bundle exec fastlane lint
+  displayName: 'SwiftLint'
+
+- script: 
+    cd src/xcode && bundle exec fastlane test_without_building testplan:AllTests
+  displayName: 'Run AllTests'
