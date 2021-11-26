@@ -28,3 +28,8 @@ steps:
     pwd 
     ls -la
   displayName: 'Show Workspace'
+
+- script: |
+    brew bundle
+    swiftlint --version
+  displayName: 'Brew Bundle'
