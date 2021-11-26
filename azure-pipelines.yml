@@ -43,11 +43,11 @@ steps:
     cd src/xcode && bundle install --path=vendor --jobs=8
   displayName: 'Install Dependencies'
 
-- script: 
+- script: |
     cd src/xcode && bundle exec fastlane build_for_testing
   displayName: 'Build for Testing'
 
-- script: 
+- script: |
     swiftlint --version
     pwd
     ls -la
@@ -56,7 +56,7 @@ steps:
     bundle exec fastlane lint
   displayName: 'SwiftLint'
 
-- script: 
+- script: |
     pwd
     ls -la
     cd src/xcode
