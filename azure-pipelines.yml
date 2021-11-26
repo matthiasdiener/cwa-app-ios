@@ -10,7 +10,7 @@ pool:
   vmImage: macOS-11
 
 variables:
-  VENDOR_CACHE_FOLDER: $(Pipeline.Workspace)/src/xcode/vendor
+  VENDOR_CACHE_FOLDER: $(Build.SourcesDirectory)/src/xcode/vendor
 
 jobs:
 - job: dependencies
