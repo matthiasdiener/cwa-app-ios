@@ -34,6 +34,7 @@ jobs:
         run: |
            rm '/usr/local/bin/swiftlint'
            brew bundle
+           swiftlint --version
       - name: Install Bundler
         run: sudo gem install rake bundler:2.1.4 
       - name: Install dependencies
@@ -53,7 +54,7 @@ jobs:
           cache-name: cache-workspace
         with:
           path: |
-            ~/*
+            /Users/runner/work/cwa-app-ios/cwa-app-ios
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
       - name: save dependencies and tools cache
         uses: actions/cache@v2
@@ -64,9 +65,9 @@ jobs:
             /usr/local/Cellar/
             /usr/local/opt/
             /usr/local/bin/
-            /Users/distiller/Library/Caches/Homebrew
+            /Users/runner/Library/Caches/Homebrew
             /usr/local/Homebrew
-            /Users/distiller/.rubies/ruby-*/bin/
+            /Users/runner/.rubies/ruby-*/bin/
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
           
   swiftlint:
@@ -83,7 +84,7 @@ jobs:
           cache-name: cache-workspace
         with:
           path: |
-            ~/*
+            /Users/runner/work/cwa-app-ios/cwa-app-ios
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
       - name: Show Workspace
         run: |
@@ -98,9 +99,9 @@ jobs:
             /usr/local/Cellar/
             /usr/local/opt/
             /usr/local/bin/
-            /Users/distiller/Library/Caches/Homebrew
+            /Users/runner/Library/Caches/Homebrew
             /usr/local/Homebrew
-            /Users/distiller/.rubies/ruby-*/bin/
+            /Users/runner/.rubies/ruby-*/bin/
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}        
       - name: Swiftlint
         run: |
@@ -118,7 +119,7 @@ jobs:
           cache-name: cache-workspace
         with:
           path: |
-            ~/*
+            /Users/runner/work/cwa-app-ios/cwa-app-ios
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
       - name: Show Workspace
         run: |
@@ -133,9 +134,9 @@ jobs:
             /usr/local/Cellar/
             /usr/local/opt/
             /usr/local/bin/
-            /Users/distiller/Library/Caches/Homebrew
+            /Users/runner/Library/Caches/Homebrew
             /usr/local/Homebrew
-            /Users/distiller/.rubies/ruby-*/bin/
+            /Users/runner/.rubies/ruby-*/bin/
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}           
       - name: Run Fastlane tests
         run: | 
