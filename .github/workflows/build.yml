@@ -45,7 +45,7 @@ jobs:
         run: |
           pwd
           ls -la
-          cd src/xcode
+          cd /Users
           ls -la
       - name: save workspace
         uses: actions/cache@v2
@@ -53,7 +53,7 @@ jobs:
           cache-name: cache-workspace
         with:
           path: |
-            - ./src/xcode
+            ~/*
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
       - name: save dependencies and tools cache
         uses: actions/cache@v2
@@ -61,12 +61,12 @@ jobs:
           cache-name: cache-dependencies-and-tools
         with:
           path: |
-            - /usr/local/Cellar/
-            - /usr/local/opt/
-            - /usr/local/bin/
-            - /Users/distiller/Library/Caches/Homebrew
-            - /usr/local/Homebrew
-            - /Users/distiller/.rubies/ruby-*/bin/
+            /usr/local/Cellar/
+            /usr/local/opt/
+            /usr/local/bin/
+            /Users/distiller/Library/Caches/Homebrew
+            /usr/local/Homebrew
+            /Users/distiller/.rubies/ruby-*/bin/
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
           
   swiftlint:
@@ -83,7 +83,7 @@ jobs:
           cache-name: cache-workspace
         with:
           path: |
-            - ./src/xcode
+            ~/*
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
       - name: Show Workspace
         run: |
@@ -95,12 +95,12 @@ jobs:
           cache-name: cache-dependencies-and-tools
         with:
           path: |
-            - /usr/local/Cellar/
-            - /usr/local/opt/
-            - /usr/local/bin/
-            - /Users/distiller/Library/Caches/Homebrew
-            - /usr/local/Homebrew
-            - /Users/distiller/.rubies/ruby-*/bin/
+            /usr/local/Cellar/
+            /usr/local/opt/
+            /usr/local/bin/
+            /Users/distiller/Library/Caches/Homebrew
+            /usr/local/Homebrew
+            /Users/distiller/.rubies/ruby-*/bin/
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}        
       - name: Swiftlint
         run: |
@@ -118,20 +118,24 @@ jobs:
           cache-name: cache-workspace
         with:
           path: |
-            - ./src/xcode
+            ~/*
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
+      - name: Show Workspace
+        run: |
+          pwd
+          ls -la             
       - name: restore dependencies and tools cache
         uses: actions/cache@v2
         env:
           cache-name: cache-dependencies-and-tools
         with:
           path: |
-            - /usr/local/Cellar/
-            - /usr/local/opt/
-            - /usr/local/bin/
-            - /Users/distiller/Library/Caches/Homebrew
-            - /usr/local/Homebrew
-            - /Users/distiller/.rubies/ruby-*/bin/
+            /usr/local/Cellar/
+            /usr/local/opt/
+            /usr/local/bin/
+            /Users/distiller/Library/Caches/Homebrew
+            /usr/local/Homebrew
+            /Users/distiller/.rubies/ruby-*/bin/
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}           
       - name: Run Fastlane tests
         run: | 
