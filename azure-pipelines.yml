@@ -49,9 +49,32 @@ jobs:
       path: $(LOCAL_CELLAR_CACHE_FOLDER)
       cacheHitVar: LOCAL_CELLAR_CACHE_RESTORED
 
+  - task: Cache@2
+    displayName: 'Restore /usr/local/opt Cache'
+    inputs:
+      key: 'local_opt_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
+      restoreKeys: |
+        local_opt_cache | "$(Agent.OS)"
+        local_opt_cache
+      path: $(LOCAL_OPT_CACHE_FOLDER)
+      cacheHitVar: LOCAL_OPT_CACHE_RESTORED
+
+  - task: Cache@2
+    displayName: 'Restore /usr/local/bin Cache'
+    inputs:
+      key: 'local_bin_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
+      restoreKeys: |
+        local_bin_cache | "$(Agent.OS)"
+        local_bin_cache
+      path: $(LOCAL_BIN_CACHE_FOLDER)
+      cacheHitVar: LOCAL_BIN_CACHE_RESTORED
+
   - script: |
       echo VENDOR_CACHE_RESTORED: $(VENDOR_CACHE_RESTORED)
       echo LOCAL_CELLAR_CACHE_RESTORED: $(LOCAL_CELLAR_CACHE_RESTORED)
+      echo LOCAL_OPT_CACHE_RESTORED: $(LOCAL_OPT_CACHE_RESTORED)
+      echo LOCAL_BIN_CACHE_RESTORED: $(LOCAL_BIN_CACHE_RESTORED)
+    displayName: 'Check Result of Restoring Caches'
       
   - script: |
       rm '/usr/local/bin/swiftlint'
@@ -87,6 +110,24 @@ jobs:
         local_cellar_cache | "$(Agent.OS)"
         local_cellar_cache
       path: $(LOCAL_CELLAR_CACHE_FOLDER)
+
+  - task: Cache@2
+    displayName: 'Store /usr/local/opt Cache'
+    inputs:
+      key: 'local_opt_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
+      restoreKeys: |
+        local_opt_cache | "$(Agent.OS)"
+        local_opt_cache
+      path: $(LOCAL_OPT_CACHE_FOLDER)
+
+  - task: Cache@2
+    displayName: 'Restore /usr/local/bin Cache'
+    inputs:
+      key: 'local_bin_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
+      restoreKeys: |
+        local_bin_cache | "$(Agent.OS)"
+        local_bin_cache
+      path: $(LOCAL_BIN_CACHE_FOLDER)
 
 - job: 'BuildForTesting'
   dependsOn: 'dependencies'
