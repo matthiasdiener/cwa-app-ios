@@ -4,7 +4,7 @@
 # https://aka.ms/yaml
 
 trigger:
-- admin/ci-cd-pipelines
+- admin/azure-pipelines
 
 pool:
   vmImage: macOS-latest
