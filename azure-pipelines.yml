@@ -44,11 +44,11 @@ jobs:
 - job: 'Swiftlint'
   dependsOn: 'dependencies'
 
+  steps:
   - script: |
       cd src/xcode && bundle install --jobs=8
     displayName: 'Install Dependencies'
 
-  steps:
   - script: |
       swiftlint --version
       pwd
