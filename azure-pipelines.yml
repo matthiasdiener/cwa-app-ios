@@ -28,19 +28,19 @@ jobs:
       ls -la
     displayName: 'Show Workspace'
 
-#  - task: Cache@2
-#    displayName: 'Restore Vendor Cache'
-#    inputs:
-#      key: 'vendor_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
-#      restoreKeys: |
-#        vendor_cache | "$(Agent.OS)"
-#        vendor_cache
-#      path: $(VENDOR_CACHE_FOLDER)
-#      cacheHitVar: VENDOR_CACHE_RESTORED
+  - task: Cache@2
+    displayName: 'Restore Vendor Cache'
+    inputs:
+      key: 'v2 | vendor_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
+      restoreKeys: |
+        v2 | vendor_cache | "$(Agent.OS)"
+        v2 | vendor_cache
+      path: $(VENDOR_CACHE_FOLDER)
+      cacheHitVar: VENDOR_CACHE_RESTORED
 
-#  - script: |
-#      echo VENDOR_CACHE_RESTORED: $(VENDOR_CACHE_RESTORED)
-#    displayName: 'Check Result of Restoring Caches'
+  - script: |
+      echo VENDOR_CACHE_RESTORED: $(VENDOR_CACHE_RESTORED)
+    displayName: 'Check Result of Restoring Caches'
       
   - script: |
       sudo gem install rake bundler:2.1.4
@@ -84,6 +84,13 @@ jobs:
   - script: |
       echo VENDOR_CACHE_RESTORED: $(VENDOR_CACHE_RESTORED)
     displayName: 'Check Result of Restoring Caches'
+
+  - script: |
+      pwd 
+      ls -la
+      cd src/xcode
+      ls -la
+    displayName: 'Show Workspace'
 
   - script: |
       cd src/xcode && bundle exec fastlane build_for_testing
