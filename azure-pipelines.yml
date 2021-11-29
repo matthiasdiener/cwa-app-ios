@@ -82,7 +82,7 @@ jobs:
 
   - task: Cache@2
     displayName: 'Restore Gems Cache'
-   inputs:
+    inputs:
       key: 'v1 | gems_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
       restoreKeys: |
         v1 | gems_cache | "$(Agent.OS)"
