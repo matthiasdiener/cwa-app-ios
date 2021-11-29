@@ -43,16 +43,6 @@ jobs:
       cacheHitVar: VENDOR_CACHE_RESTORED
 
   - task: Cache@2
-    displayName: 'Restore /usr/local/cellar Cache'
-    inputs:
-      key: 'v2 | local_cellar_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
-      restoreKeys: |
-        v2 | local_cellar_cache | "$(Agent.OS)"
-        v2 | local_cellar_cache
-      path: $(LOCAL_CELLAR_CACHE_FOLDER)
-      cacheHitVar: LOCAL_CELLAR_CACHE_RESTORED
-
-  - task: Cache@2
     displayName: 'Restore /usr/local/opt Cache'
     inputs:
       key: 'local_opt_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
@@ -74,52 +64,45 @@ jobs:
 
   - script: |
       echo VENDOR_CACHE_RESTORED: $(VENDOR_CACHE_RESTORED)
-      echo LOCAL_CELLAR_CACHE_RESTORED: $(LOCAL_CELLAR_CACHE_RESTORED)
       echo LOCAL_OPT_CACHE_RESTORED: $(LOCAL_OPT_CACHE_RESTORED)
       echo LOCAL_BIN_CACHE_RESTORED: $(LOCAL_BIN_CACHE_RESTORED)
     displayName: 'Check Result of Restoring Caches'
       
-  - task: Cache@2
-    displayName: 'Restore /usr/local/Homebrew Tools Cache'
-    inputs:
-      key: 'local_homebrew_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/Brewfile.lock.json"'
-      restoreKeys: |
-        local_homebrew_cache | "$(Agent.OS)"
-        local_homebrew_cache
-      path: $(LOCAL_HOMEBREW_CACHE_FOLDER)
-      cacheHitVar: LOCAL_HOMEBREW_CACHE_RESTORED
+#  - task: Cache@2
+#    displayName: 'Restore /usr/local/Homebrew Tools Cache'
+#    inputs:
+#      key: 'local_homebrew_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/Brewfile.lock.json"'
+#      restoreKeys: |
+#        local_homebrew_cache | "$(Agent.OS)"
+#        local_homebrew_cache
+#      path: $(LOCAL_HOMEBREW_CACHE_FOLDER)
+#      cacheHitVar: LOCAL_HOMEBREW_CACHE_RESTORED
 
-  - task: Cache@2
-    displayName: 'Restore /Users/runner/Library/Caches/Homebrew Tools Cache'
-    inputs:
-      key: 'runner_homebrew_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/Brewfile.lock.json"'
-      restoreKeys: |
-        runner_homebrew_cache | "$(Agent.OS)"
-        runner_homebrew_cache
-      path: $(RUNNER_HOMEBREW_CACHE_FOLDER)
-      cacheHitVar: RUNNER_HOMEBREW_CACHE_RESTORED
+#  - task: Cache@2
+#    displayName: 'Restore /Users/runner/Library/Caches/Homebrew Tools Cache'
+#    inputs:
+#      key: 'runner_homebrew_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/Brewfile.lock.json"'
+#      restoreKeys: |
+#        runner_homebrew_cache | "$(Agent.OS)"
+#        runner_homebrew_cache
+#      path: $(RUNNER_HOMEBREW_CACHE_FOLDER)
+#      cacheHitVar: RUNNER_HOMEBREW_CACHE_RESTORED
 
-  - task: Cache@2
-    displayName: 'Restore /Users/runner/.rubies/ruby-*/bin Tools Cache'
-    inputs:
-      key: 'runner_ruby_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/Brewfile.lock.json"'
-      restoreKeys: |
-        runner_ruby_cache | "$(Agent.OS)"
-        runner_ruby_cache
-      path: $(RUNNER_RUBY_CACHE_FOLDER)
-      cacheHitVar: RUNNER_RUBY_CACHE_RESTORED
+#  - task: Cache@2
+#    displayName: 'Restore /Users/runner/.rubies/ruby-*/bin Tools Cache'
+#    inputs:
+#      key: 'runner_ruby_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/Brewfile.lock.json"'
+#      restoreKeys: |
+#        runner_ruby_cache | "$(Agent.OS)"
+#        runner_ruby_cache
+#      path: $(RUNNER_RUBY_CACHE_FOLDER)
+#      cacheHitVar: RUNNER_RUBY_CACHE_RESTORED
 
-  - script: |
-      echo LOCAL_HOMEBREW_CACHE_RESTORED: $(LOCAL_HOMEBREW_CACHE_RESTORED)
-      echo RUNNER_HOMEBREW_CACHE_RESTORED: $(RUNNER_HOMEBREW_CACHE_RESTORED)
-      echo RUNNER_RUBY_CACHE_RESTORED: $(RUNNER_RUBY_CACHE_RESTORED)      
-    displayName: 'Check Result of Restoring Tools Caches'
-
-  - script: |
-      rm '/usr/local/bin/swiftlint'
-      brew bundle
-      swiftlint --version
-    displayName: 'Brew Bundle'
+#  - script: |
+#      echo LOCAL_HOMEBREW_CACHE_RESTORED: $(LOCAL_HOMEBREW_CACHE_RESTORED)
+#      echo RUNNER_HOMEBREW_CACHE_RESTORED: $(RUNNER_HOMEBREW_CACHE_RESTORED)
+#      echo RUNNER_RUBY_CACHE_RESTORED: $(RUNNER_RUBY_CACHE_RESTORED)      
+#    displayName: 'Check Result of Restoring Tools Caches'
 
   - script: |
       sudo gem install rake bundler:2.1.4
@@ -128,11 +111,6 @@ jobs:
   - script: |
       cd src/xcode && bundle install --path=vendor --jobs=8
     displayName: 'Install Dependencies'
-
-  - script: |
-      cd /usr/local/Cellar
-      ls -la
-    displayName: 'Show /usr/local/Cellar'
 
   - script: |
       cd /usr/local/opt
@@ -167,16 +145,6 @@ jobs:
         vendor_cache | "$(Agent.OS)"
         vendor_cache
       path: $(VENDOR_CACHE_FOLDER)
-
-  - task: Cache@2
-    displayName: 'Store /usr/local/cellar Cache'
-    inputs:
-      key: 'v2 | local_cellar_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
-      restoreKeys: |
-        v2 | local_cellar_cache | "$(Agent.OS)"
-        v2 | local_cellar_cache
-      path: $(LOCAL_CELLAR_CACHE_FOLDER)
-      cacheHitVar: LOCAL_CELLAR_CACHE_RESTORED
 
   - task: Cache@2
     displayName: 'Store /usr/local/opt Cache'
@@ -241,16 +209,6 @@ jobs:
       cacheHitVar: VENDOR_CACHE_RESTORED
 
   - task: Cache@2
-    displayName: 'Restore /usr/local/cellar Cache'
-    inputs:
-      key: 'v2 | local_cellar_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
-      restoreKeys: |
-        v2 | local_cellar_cache | "$(Agent.OS)"
-        v2 | local_cellar_cache
-      path: $(LOCAL_CELLAR_CACHE_FOLDER)
-      cacheHitVar: LOCAL_CELLAR_CACHE_RESTORED
-
-  - task: Cache@2
     displayName: 'Restore /usr/local/opt Cache'
     inputs:
       key: 'local_opt_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
@@ -272,7 +230,6 @@ jobs:
 
   - script: |
       echo VENDOR_CACHE_RESTORED: $(VENDOR_CACHE_RESTORED)
-      echo LOCAL_CELLAR_CACHE_RESTORED: $(LOCAL_CELLAR_CACHE_RESTORED)
       echo LOCAL_OPT_CACHE_RESTORED: $(LOCAL_OPT_CACHE_RESTORED)
       echo LOCAL_BIN_CACHE_RESTORED: $(LOCAL_BIN_CACHE_RESTORED)
     displayName: 'Check Result of Restoring Caches'
