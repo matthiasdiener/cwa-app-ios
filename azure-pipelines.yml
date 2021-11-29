@@ -9,9 +9,6 @@ trigger:
 pool:
   vmImage: macOS-11
 
-variables:
-  GEMS_CACHE_FOLDER: /usr/local/lib/ruby/gems
-
 jobs:
 - job: dependencies
   steps:
@@ -28,71 +25,17 @@ jobs:
       ls -la
     displayName: 'Show Workspace'
 
-#  - task: Cache@2
-#    displayName: 'Restore Gems Cache'
-#   inputs:
-#      key: 'v1 | gems_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
-#     restoreKeys: |
-#        v1 | gems_cache | "$(Agent.OS)"
-#        v1 | gems_cache
-#      path: $(GEMS_CACHE_FOLDER)
-#      cacheHitVar: GEMS_CACHE_RESTORED
-
-#  - script: |
-#      echo GEMS_CACHE_RESTORED: $(VENDOR_CACHE_RESTORED)
-#    displayName: 'Check Result of Restoring Caches'
-
   - script: |
       cd src/xcode && bundle install --jobs=8
     displayName: 'Install Dependencies'
-
-  - script: |
-      pwd 
-      ls -la
-      cd src/xcode
-      ls -la
-    displayName: 'Show Workspace'
-
-  - script: |
-      cd src/xcode
-      bundle info fastlane
-      bundle info xcode-install
-      bundle info fastlane-plugin-appcenter
-    displayName: 'Where are dependencies installed?'
-
-  - task: Cache@2
-    displayName: 'Store Gems Cache'
-    inputs:
-      key: 'v1 | gems_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
-      restoreKeys: |
-        v1 | gems_cache | "$(Agent.OS)"
-        v1 | gems_cache
-      path: $(GEMS_CACHE_FOLDER)
 
 - job: 'BuildForTesting'
   dependsOn: 'dependencies'
   steps:
 
   - script: |
-      pwd 
-      ls -la
-      cd src/xcode
-      ls -la
-    displayName: 'Show Workspace'
-
-  - task: Cache@2
-    displayName: 'Restore Gems Cache'
-    inputs:
-      key: 'v1 | gems_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
-      restoreKeys: |
-        v1 | gems_cache | "$(Agent.OS)"
-        v1 | gems_cache
-      path: $(GEMS_CACHE_FOLDER)
-      cacheHitVar: GEMS_CACHE_RESTORED
-
-  - script: |
-      echo GEMS_CACHE_RESTORED: $(VENDOR_CACHE_RESTORED)
-    displayName: 'Check Result of Restoring Caches'
+      cd src/xcode && bundle install --jobs=8
+    displayName: 'Install Dependencies'
 
   - script: |
       cd src/xcode && bundle exec fastlane build_for_testing
@@ -100,6 +43,11 @@ jobs:
 
 - job: 'Swiftlint'
   dependsOn: 'dependencies'
+
+  - script: |
+      cd src/xcode && bundle install --jobs=8
+    displayName: 'Install Dependencies'
+
   steps:
   - script: |
       swiftlint --version
