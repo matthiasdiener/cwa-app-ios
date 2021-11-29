@@ -10,8 +10,7 @@ pool:
   vmImage: macOS-11
 
 variables:
-  VENDOR_CACHE_FOLDER: $(Build.SourcesDirectory)/src/xcode/vendor
-  BUNDLE_CONFIG_FOLDER: $(Build.SourcesDirectory)/src/xcode/.bundle
+  GEMS_CACHE_FOLDER: /usr/local/lib/ruby/gems
 
 jobs:
 - job: dependencies
@@ -30,17 +29,17 @@ jobs:
     displayName: 'Show Workspace'
 
 #  - task: Cache@2
-#    displayName: 'Restore Vendor Cache'
-#    inputs:
-#      key: 'v2 | vendor_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
-#      restoreKeys: |
-#        v2 | vendor_cache | "$(Agent.OS)"
-#        v2 | vendor_cache
-#      path: $(VENDOR_CACHE_FOLDER)
-#      cacheHitVar: VENDOR_CACHE_RESTORED
+#    displayName: 'Restore Gems Cache'
+#   inputs:
+#      key: 'v1 | gems_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
+#     restoreKeys: |
+#        v1 | gems_cache | "$(Agent.OS)"
+#        v1 | gems_cache
+#      path: $(GEMS_CACHE_FOLDER)
+#      cacheHitVar: GEMS_CACHE_RESTORED
 
 #  - script: |
-#      echo VENDOR_CACHE_RESTORED: $(VENDOR_CACHE_RESTORED)
+#      echo GEMS_CACHE_RESTORED: $(VENDOR_CACHE_RESTORED)
 #    displayName: 'Check Result of Restoring Caches'
 
   - script: |
@@ -61,6 +60,15 @@ jobs:
       bundle info fastlane-plugin-appcenter
     displayName: 'Where are dependencies installed?'
 
+  - task: Cache@2
+    displayName: 'Store Gems Cache'
+    inputs:
+      key: 'v1 | gems_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
+      restoreKeys: |
+        v1 | gems_cache | "$(Agent.OS)"
+        v1 | gems_cache
+      path: $(GEMS_CACHE_FOLDER)
+
 - job: 'BuildForTesting'
   dependsOn: 'dependencies'
   steps:
@@ -71,6 +79,20 @@ jobs:
       cd src/xcode
       ls -la
     displayName: 'Show Workspace'
+
+  - task: Cache@2
+    displayName: 'Restore Gems Cache'
+   inputs:
+      key: 'v1 | gems_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
+      restoreKeys: |
+        v1 | gems_cache | "$(Agent.OS)"
+        v1 | gems_cache
+      path: $(GEMS_CACHE_FOLDER)
+      cacheHitVar: GEMS_CACHE_RESTORED
+
+  - script: |
+      echo GEMS_CACHE_RESTORED: $(VENDOR_CACHE_RESTORED)
+    displayName: 'Check Result of Restoring Caches'
 
   - script: |
       cd src/xcode && bundle exec fastlane build_for_testing
