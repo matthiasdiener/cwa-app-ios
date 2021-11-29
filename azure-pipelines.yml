@@ -144,6 +144,21 @@ jobs:
       ls -la
     displayName: 'Show /usr/local/bin'
 
+  - script: |
+      cd /usr/local/Homebrew
+      ls -la
+    displayName: 'Show /usr/local/Homebrew'
+
+  - script: |
+      cd /Users/runner/Library/Caches/Homebrew
+      ls -la
+    displayName: 'Show /Users/runner/Library/Caches/Homebrew'
+  
+  - script: |
+      cd /Users/runner/.rubies
+      ls -la
+    displayName: 'Show /Users/runner/.rubies'
+
   - task: Cache@2
     displayName: 'Store Vendor Cache'
     inputs:
