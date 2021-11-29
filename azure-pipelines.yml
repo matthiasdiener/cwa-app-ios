@@ -167,7 +167,7 @@ jobs:
   - task: Cache@2
     displayName: 'Store /usr/local/Homebrew Tools Cache'
     inputs:
-      key: 'local_homebrew_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/Brewfile.lock.json"'
+      key: 'local_homebrew_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/Brewfile.lock.json'
       restoreKeys: |
         local_homebrew_cache | "$(Agent.OS)"
         local_homebrew_cache
@@ -177,7 +177,7 @@ jobs:
   - task: Cache@2
     displayName: 'Store /Users/runner/Library/Caches/Homebrew Tools Cache'
     inputs:
-      key: 'runner_homebrew_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/Brewfile.lock.json"'
+      key: 'runner_homebrew_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/Brewfile.lock.json'
       restoreKeys: |
         runner_homebrew_cache | "$(Agent.OS)"
         runner_homebrew_cache
@@ -187,7 +187,7 @@ jobs:
   - task: Cache@2
     displayName: 'Store /Users/runner/.rubies/ruby-*/bin Tools Cache'
     inputs:
-      key: 'runner_ruby_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/Brewfile.lock.json"'
+      key: 'runner_ruby_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/Brewfile.lock.json'
       restoreKeys: |
         runner_ruby_cache | "$(Agent.OS)"
         runner_ruby_cache
