@@ -55,6 +55,7 @@ jobs:
     displayName: 'Show Workspace'
 
   - script: |
+      cd src/xcode
       bundle info fastlane
       bundle info xcode-install
       bundle info fastlane-plugin-appcenter
