@@ -11,6 +11,7 @@ pool:
 
 variables:
   VENDOR_CACHE_FOLDER: $(Build.SourcesDirectory)/src/xcode/vendor
+  BUNDLE_CONFIG_FOLDER: $(Build.SourcesDirectory)/src/xcode/.bundle
 
 jobs:
 - job: dependencies
@@ -28,26 +29,22 @@ jobs:
       ls -la
     displayName: 'Show Workspace'
 
-  - task: Cache@2
-    displayName: 'Restore Vendor Cache'
-    inputs:
-      key: 'v2 | vendor_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
-      restoreKeys: |
-        v2 | vendor_cache | "$(Agent.OS)"
-        v2 | vendor_cache
-      path: $(VENDOR_CACHE_FOLDER)
-      cacheHitVar: VENDOR_CACHE_RESTORED
+#  - task: Cache@2
+#    displayName: 'Restore Vendor Cache'
+#    inputs:
+#      key: 'v2 | vendor_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
+#      restoreKeys: |
+#        v2 | vendor_cache | "$(Agent.OS)"
+#        v2 | vendor_cache
+#      path: $(VENDOR_CACHE_FOLDER)
+#      cacheHitVar: VENDOR_CACHE_RESTORED
+
+#  - script: |
+#      echo VENDOR_CACHE_RESTORED: $(VENDOR_CACHE_RESTORED)
+#    displayName: 'Check Result of Restoring Caches'
 
   - script: |
-      echo VENDOR_CACHE_RESTORED: $(VENDOR_CACHE_RESTORED)
-    displayName: 'Check Result of Restoring Caches'
-      
-  - script: |
-      sudo gem install rake bundler:2.1.4
-    displayName: 'Install Bundler'
-
-  - script: |
-      cd src/xcode && bundle install --path=vendor --jobs=8
+      cd src/xcode && bundle install --jobs=8
     displayName: 'Install Dependencies'
 
   - script: |
@@ -57,33 +54,9 @@ jobs:
       ls -la
     displayName: 'Show Workspace'
 
-  - task: Cache@2
-    displayName: 'Store Vendor Cache'
-    inputs:
-      key: 'v2 | vendor_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
-      restoreKeys: |
-        v2 | vendor_cache | "$(Agent.OS)"
-        v2 | vendor_cache
-      path: $(VENDOR_CACHE_FOLDER)
-
-
 - job: 'BuildForTesting'
   dependsOn: 'dependencies'
   steps:
-
-  - task: Cache@2
-    displayName: 'Restore Vendor Cache'
-    inputs:
-      key: 'v2 | vendor_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/xcode/Gemfile.lock'
-      restoreKeys: |
-        v2 | vendor_cache | "$(Agent.OS)"
-        v2 | vendor_cache
-      path: $(VENDOR_CACHE_FOLDER)
-      cacheHitVar: VENDOR_CACHE_RESTORED
-
-  - script: |
-      echo VENDOR_CACHE_RESTORED: $(VENDOR_CACHE_RESTORED)
-    displayName: 'Check Result of Restoring Caches'
 
   - script: |
       pwd 
