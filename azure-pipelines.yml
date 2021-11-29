@@ -68,25 +68,25 @@ jobs:
       echo LOCAL_BIN_CACHE_RESTORED: $(LOCAL_BIN_CACHE_RESTORED)
     displayName: 'Check Result of Restoring Caches'
       
-#  - task: Cache@2
-#    displayName: 'Restore /usr/local/Homebrew Tools Cache'
-#    inputs:
-#      key: 'local_homebrew_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/Brewfile.lock.json"'
-#      restoreKeys: |
-#        local_homebrew_cache | "$(Agent.OS)"
-#        local_homebrew_cache
-#      path: $(LOCAL_HOMEBREW_CACHE_FOLDER)
-#      cacheHitVar: LOCAL_HOMEBREW_CACHE_RESTORED
+  - task: Cache@2
+    displayName: 'Restore /usr/local/Homebrew Tools Cache'
+    inputs:
+      key: 'local_homebrew_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/Brewfile.lock.json"'
+      restoreKeys: |
+        local_homebrew_cache | "$(Agent.OS)"
+        local_homebrew_cache
+      path: $(LOCAL_HOMEBREW_CACHE_FOLDER)
+      cacheHitVar: LOCAL_HOMEBREW_CACHE_RESTORED
 
-#  - task: Cache@2
-#    displayName: 'Restore /Users/runner/Library/Caches/Homebrew Tools Cache'
-#    inputs:
-#      key: 'runner_homebrew_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/Brewfile.lock.json"'
-#      restoreKeys: |
-#        runner_homebrew_cache | "$(Agent.OS)"
-#        runner_homebrew_cache
-#      path: $(RUNNER_HOMEBREW_CACHE_FOLDER)
-#      cacheHitVar: RUNNER_HOMEBREW_CACHE_RESTORED
+  - task: Cache@2
+    displayName: 'Restore /Users/runner/Library/Caches/Homebrew Tools Cache'
+    inputs:
+      key: 'runner_homebrew_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/Brewfile.lock.json"'
+      restoreKeys: |
+        runner_homebrew_cache | "$(Agent.OS)"
+        runner_homebrew_cache
+      path: $(RUNNER_HOMEBREW_CACHE_FOLDER)
+      cacheHitVar: RUNNER_HOMEBREW_CACHE_RESTORED
 
 #  - task: Cache@2
 #    displayName: 'Restore /Users/runner/.rubies/ruby-*/bin Tools Cache'
@@ -98,11 +98,11 @@ jobs:
 #      path: $(RUNNER_RUBY_CACHE_FOLDER)
 #      cacheHitVar: RUNNER_RUBY_CACHE_RESTORED
 
-#  - script: |
-#      echo LOCAL_HOMEBREW_CACHE_RESTORED: $(LOCAL_HOMEBREW_CACHE_RESTORED)
-#      echo RUNNER_HOMEBREW_CACHE_RESTORED: $(RUNNER_HOMEBREW_CACHE_RESTORED)
+  - script: |
+      echo LOCAL_HOMEBREW_CACHE_RESTORED: $(LOCAL_HOMEBREW_CACHE_RESTORED)
+      echo RUNNER_HOMEBREW_CACHE_RESTORED: $(RUNNER_HOMEBREW_CACHE_RESTORED)
 #      echo RUNNER_RUBY_CACHE_RESTORED: $(RUNNER_RUBY_CACHE_RESTORED)      
-#    displayName: 'Check Result of Restoring Tools Caches'
+    displayName: 'Check Result of Restoring Tools Caches'
 
   - script: |
       sudo gem install rake bundler:2.1.4
@@ -133,9 +133,9 @@ jobs:
     displayName: 'Show /Users/runner/Library/Caches/Homebrew'
   
   - script: |
-      cd /Users/runner/.rubies
+      cd /Users/runner/
       ls -la
-    displayName: 'Show /Users/runner/.rubies'
+    displayName: 'Show /Users/runner'
 
   - task: Cache@2
     displayName: 'Store Vendor Cache'
@@ -184,15 +184,15 @@ jobs:
       path: $(RUNNER_HOMEBREW_CACHE_FOLDER)
       cacheHitVar: RUNNER_HOMEBREW_CACHE_RESTORED
 
-  - task: Cache@2
-    displayName: 'Store /Users/runner/.rubies/ruby-*/bin Tools Cache'
-    inputs:
-      key: 'runner_ruby_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/Brewfile.lock.json'
-      restoreKeys: |
-        runner_ruby_cache | "$(Agent.OS)"
-        runner_ruby_cache
-      path: $(RUNNER_RUBY_CACHE_FOLDER)
-      cacheHitVar: RUNNER_RUBY_CACHE_RESTORED
+#  - task: Cache@2
+#    displayName: 'Store /Users/runner/.rubies/ruby-*/bin Tools Cache'
+#    inputs:
+#      key: 'runner_ruby_cache | "$(Agent.OS)" | $(Build.SourcesDirectory)/Brewfile.lock.json'
+#      restoreKeys: |
+#        runner_ruby_cache | "$(Agent.OS)"
+#        runner_ruby_cache
+#      path: $(RUNNER_RUBY_CACHE_FOLDER)
+#      cacheHitVar: RUNNER_RUBY_CACHE_RESTORED
 
 - job: 'BuildForTesting'
   dependsOn: 'dependencies'
