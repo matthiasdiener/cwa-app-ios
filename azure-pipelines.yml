@@ -54,6 +54,12 @@ jobs:
       ls -la
     displayName: 'Show Workspace'
 
+  - script: |
+      bundle info fastlane
+      bundle info xcode-install
+      bundle info fastlane-plugin-appcenter
+    displayName: 'Where are dependencies installed?'
+
 - job: 'BuildForTesting'
   dependsOn: 'dependencies'
   steps:
