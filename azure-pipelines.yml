@@ -23,7 +23,7 @@ jobs:
       cd src/xcode && bundle exec fastlane build_for_testing
     displayName: 'Build for Testing'
 
-- job: 'test-AllTests'
+- job: 'testAllTests'
   dependsOn: 'BuildForTesting'
   steps:
 
