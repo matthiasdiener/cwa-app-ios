@@ -11,7 +11,7 @@ pool:
 
 variables:
   DERIVED_DATA_CACHE_FOLDER: $(Build.SourcesDirectory)/src/xcode/DerivedData
-  TEST_OUTPUT_CACHE_FOLDER: $(Build.SourcesDirectory)/src/xcode/fastlane_output
+  TEST_OUTPUT_CACHE_FOLDER: $(Build.SourcesDirectory)/src/xcode/fastlane/test_output
 
 jobs:
 
