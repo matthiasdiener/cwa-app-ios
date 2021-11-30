@@ -21,14 +21,53 @@ jobs:
            xcodebuild -version            
       - name: Install dependencies
         run: cd src/xcode && bundle install --jobs=8
-      - name: Show where dependencies are installed
-        run: |
-          cd src/xcode
-          bundle info fastlane
-          bundle info fastlane-plugin-appcenter
-          bundle info xcov
       - name: Build for testing
         run: |
-          cd src/xcode && bundle exec fastlane build_for_testing        
-
+          cd src/xcode && bundle exec fastlane build_for_testing
+      - name: Save DerivedData folder
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-derived-data
+        with:
+          path: src/xcode/DerivedData
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
+  
+  swiftLint:
+    runs-on: macos-11
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Select Xcode 13.1
+        run: |
+           sudo xcode-select --switch /Applications/Xcode_13.1.app
+           xcodebuild -version            
+      - name: Install dependencies
+        run: cd src/xcode && bundle install --jobs=8      
+      - name: swift Lint
+        run: |
+          cd src/xcode
+          bundle exec fastlane lint
           
+  runAllTests:
+    runs-on: macos-11
+    needs: buildForTesting
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Select Xcode 13.1
+        run: |
+           sudo xcode-select --switch /Applications/Xcode_13.1.app
+           xcodebuild -version            
+      - name: Install dependencies
+        run: cd src/xcode && bundle install --jobs=8      
+      - name: Restore DerivedData folder
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-derived-data
+        with:
+          path: src/xcode/DerivedData
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}        
+      - name: Run AllTests
+        run: |
+          cd src/xcode
+          bundle exec fastlane test_without_building testplan:AllTests
