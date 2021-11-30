@@ -43,6 +43,12 @@ jobs:
     displayName: 'Compress Derived Data'
 
   - task: Cache@2
+    displayName: 'Store Derived Data Archive'
+    inputs:
+      key: 'v1 | derived_data_archive| "$(Agent.OS)" | $(Build.SourceVersion)'
+      path: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-DerivedData.tgz'
+
+  - task: Cache@2
     displayName: 'Store Derived Data Cache'
     inputs:
       key: 'v1 | derived_data_cache | "$(Agent.OS)" | $(Build.SourceVersion)'
@@ -56,11 +62,31 @@ jobs:
       cd src/xcode && bundle install --jobs=8
     displayName: 'Install Dependencies'
 
+  - script: |
+      cd src/xcode
+      ls -la
+      cd DerivedData
+      ls -la
+    displayName: 'Show Derived Data'
+
   - task: Cache@2
     displayName: 'Restore Derived Data Cache'
     inputs:
       key: 'v1 | derived_data_cache | "$(Agent.OS)" | $(Build.SourceVersion)'
       path: $(DERIVED_DATA_CACHE_FOLDER)
+
+  - script: |
+      cd src/xcode
+      ls -la
+      cd DerivedData
+      ls -la
+    displayName: 'Show Derived Data'
+
+  - task: Cache@2
+    displayName: 'Store Derived Data Archive'
+    inputs:
+      key: 'v1 | derived_data_archive| "$(Agent.OS)" | $(Build.SourceVersion)'
+      path: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-DerivedData.tgz'
 
   - script: |
       cd src/xcode
