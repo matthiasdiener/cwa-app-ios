@@ -46,7 +46,7 @@ jobs:
     displayName: 'Store Derived Data Archive'
     inputs:
       key: 'v1 | derived_data_archive| "$(Agent.OS)" | $(Build.SourceVersion)'
-      path: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-DerivedData.tgz'
+      path: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-DerivedData.tgz
 
   - task: Cache@2
     displayName: 'Store Derived Data Cache'
@@ -86,7 +86,7 @@ jobs:
     displayName: 'Store Derived Data Archive'
     inputs:
       key: 'v1 | derived_data_archive| "$(Agent.OS)" | $(Build.SourceVersion)'
-      path: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-DerivedData.tgz'
+      path: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)-DerivedData.tgz
 
   - script: |
       cd src/xcode
