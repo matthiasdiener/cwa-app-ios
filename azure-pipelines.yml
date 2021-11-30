@@ -25,6 +25,10 @@ jobs:
       cd src/xcode && bundle exec fastlane build_for_testing
     displayName: 'Build for Testing'
 
+  - script: |
+      cd src/xcode && bundle exec fastlane test_without_building testplan:AllTests
+    displayName: 'test-AllTests'
+
   - task: Cache@2
     displayName: 'Store Derived Data Cache'
     inputs:
@@ -54,8 +58,11 @@ jobs:
       cacheHitVar: DERIVED_DATA_CACHE_RESTORED
 
   - script: |
-      cd src/xcode && bundle exec fastlane test_without_building testplan:AllTests
-    displayName: 'test-AllTests'
+      cd src/xcode
+      ls -la
+      cd DerivedData
+      ls -la
+    displayName: 'Show Derived Data'
 
 - job: 'Swiftlint'
 
