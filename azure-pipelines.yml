@@ -73,10 +73,23 @@ jobs:
       targetPath: $(DERIVED_DATA_FOLDER)
 
   - script: |
-      cd $(Build.SourcesDirectory)/src/xcode
+      cd $(Build.SourcesDirectory)/src/xcode/DerivedData
       ls -la
       cd $(Build.SourcesDirectory)
-    displayName: 'Show test_output folder'
+    displayName: 'Show DerivedData folder'
+
+  - task: ExtractFiles@1
+    inputs:
+      archiveFilePatterns: '$(Build.SourcesDirectory)/src/xcode/DerivedData/$(Build.BuildId)-DerivedData.tgz'
+      destinationFolder: '$(Build.SourcesDirectory)/src/xcode/DerivedData'
+      cleanDestinationFolder: false
+      overwriteExistingFiles: true
+
+  - script: |
+      cd $(Build.SourcesDirectory)/src/xcode/DerivedData
+      ls -la
+      cd $(Build.SourcesDirectory)
+    displayName: 'Show DerivedData folder'
 
   - script: |
       cd $(Build.SourcesDirectory)/src/xcode/fastlane/test_output
