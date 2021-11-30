@@ -32,6 +32,13 @@ jobs:
       ls -la
     displayName: 'Show Derived Data'
 
+  - script: |
+      cd src/xcode
+      ls -la
+      cd fastlane
+      ls -la
+    displayName: 'Show Fastlane Folder'
+
   - task: ArchiveFiles@2
     inputs:
       rootFolderOrFile: '$(Build.SourcesDirectory)/src/xcode/DerivedData'
@@ -46,7 +53,7 @@ jobs:
     displayName: 'Store Derived Data Archive'
     inputs:
       key: 'v1 | derived_data_archive| "$(Agent.OS)" | $(Build.SourceVersion)'
-      path: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)
+      path: $(Build.ArtifactStagingDirectory)
 
   - task: Cache@2
     displayName: 'Store Derived Data Cache'
@@ -86,7 +93,7 @@ jobs:
     displayName: 'Store Derived Data Archive'
     inputs:
       key: 'v1 | derived_data_archive| "$(Agent.OS)" | $(Build.SourceVersion)'
-      path: $(Build.ArtifactStagingDirectory)/$(Build.BuildId)
+      path: $(Build.ArtifactStagingDirectory)
 
   - script: |
       cd src/xcode
