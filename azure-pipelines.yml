@@ -10,8 +10,8 @@ pool:
   vmImage: macOS-11
 
 variables:
-  DERIVED_DATA_CACHE_FOLDER: $(Build.SourcesDirectory)/src/xcode/DerivedData
-  TEST_OUTPUT_CACHE_FOLDER: $(Build.SourcesDirectory)/src/xcode/fastlane/test_output
+  DERIVED_DATA_FOLDER: $(Build.SourcesDirectory)/src/xcode/DerivedData
+  TEST_OUTPUT_FOLDER: $(Build.SourcesDirectory)/src/xcode/fastlane/test_output
 
 jobs:
 
@@ -26,39 +26,23 @@ jobs:
       cd src/xcode && bundle exec fastlane build_for_testing
     displayName: 'Build for Testing'
 
-  - task: ArchiveFiles@2
-    inputs:
-      rootFolderOrFile: '$(Build.SourcesDirectory)/src/xcode/DerivedData'
-      includeRootFolder: true
-      archiveType: 'tar'
-      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-DerivedData.tgz'
-      replaceExistingArchive: true
-      verbose: true
-    displayName: 'Compress Derived Data'
-
-  - task: Cache@2
-    displayName: 'Store Derived Data Archive'
-    inputs:
-      key: 'v1 | derived_data_archive| "$(Agent.OS)" | $(Build.SourceVersion)'
-      path: $(Build.ArtifactStagingDirectory)
-
-  - task: Cache@2
-    displayName: 'Store Derived Data Cache'
-    inputs:
-      key: 'v1 | derived_data_cache | "$(Agent.OS)" | $(Build.SourceVersion)'
-      path: $(DERIVED_DATA_CACHE_FOLDER)
-
   - script: |
       cd $(Build.SourcesDirectory)/src/xcode/fastlane/test_output
       ls -la
       cd $(Build.SourcesDirectory)
     displayName: 'Show test_output folder'
-    
-  - task: Cache@2
-    displayName: 'Store test_output Cache'
+
+  - task: PublishPipelineArtifact@1
     inputs:
-      key: 'v1 | test_output_cache | "$(Agent.OS)" | $(Build.SourceVersion)'
-      path: $(TEST_OUTPUT_CACHE_FOLDER)
+      targetPath: $(DERIVED_DATA_FOLDER)
+      artifact: 'derivedData'
+      publishLocation: 'pipeline'
+
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: $(TEST_OUTPUT_FOLDER)
+      artifact: 'testOutput'
+      publishLocation: 'pipeline'
 
 - job: 'testAllTests'
   dependsOn: 'BuildForTesting'
@@ -67,18 +51,6 @@ jobs:
   - script: |
       cd src/xcode && bundle install --jobs=8
     displayName: 'Install Dependencies'
-
-  - task: Cache@2
-    displayName: 'Restore Derived Data Cache'
-    inputs:
-      key: 'v1 | derived_data_cache | "$(Agent.OS)" | $(Build.SourceVersion)'
-      path: $(DERIVED_DATA_CACHE_FOLDER)
-
-  - task: Cache@2
-    displayName: 'Restore test_output Cache'
-    inputs:
-      key: 'v1 | test_output_cache | "$(Agent.OS)" | $(Build.SourceVersion)'
-      path: $(TEST_OUTPUT_CACHE_FOLDER)
 
   - script: |
       cd $(Build.SourcesDirectory)/src/xcode/fastlane/test_output
