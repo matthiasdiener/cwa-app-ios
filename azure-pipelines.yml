@@ -10,24 +10,6 @@ pool:
   vmImage: macOS-11
 
 jobs:
-- job: dependencies
-  steps:
-  - script: |
-      sw_vers  
-      xcodebuild -version
-      ls -n /Applications/ | grep Xcode*
-    displayName: 'Check MacOS and Xcode Version'
-
-  - script: |
-      pwd 
-      ls -la
-      cd src/xcode
-      ls -la
-    displayName: 'Show Workspace'
-
-  - script: |
-      cd src/xcode && bundle install --jobs=8
-    displayName: 'Install Dependencies'
 
 - job: 'BuildForTesting'
   dependsOn: 'dependencies'
@@ -40,6 +22,18 @@ jobs:
   - script: |
       cd src/xcode && bundle exec fastlane build_for_testing
     displayName: 'Build for Testing'
+
+- job: 'test-AllTests'
+  dependsOn: 'BuildForTesting'
+  steps:
+
+  - script: |
+      cd src/xcode && bundle install --jobs=8
+    displayName: 'Install Dependencies'
+
+  - script: |
+      cd src/xcode && bundle exec fastlane test_without_building testplan:AllTests
+    displayName: 'test-AllTests'
 
 - job: 'Swiftlint'
   dependsOn: 'dependencies'
