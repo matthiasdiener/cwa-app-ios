@@ -91,9 +91,9 @@ jobs:
   - script: |
       cd src/xcode
       ls -la
-      cd DerivedData
+      cd fastlane
       ls -la
-    displayName: 'Show Derived Data'
+    displayName: 'Show Fastlane Folder'
 
   - script: |
       cd src/xcode && bundle exec fastlane test_without_building testplan:AllTests
