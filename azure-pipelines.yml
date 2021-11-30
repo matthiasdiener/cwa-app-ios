@@ -26,20 +26,6 @@ jobs:
       cd src/xcode && bundle exec fastlane build_for_testing
     displayName: 'Build for Testing'
 
-  - script: |
-      cd src/xcode
-      ls -la
-      cd DerivedData
-      ls -la
-    displayName: 'Show Derived Data'
-
-  - script: |
-      cd src/xcode
-      ls -la
-      cd fastlane
-      ls -la
-    displayName: 'Show Fastlane Folder'
-
   - task: ArchiveFiles@2
     inputs:
       rootFolderOrFile: '$(Build.SourcesDirectory)/src/xcode/DerivedData'
@@ -76,13 +62,6 @@ jobs:
       cd src/xcode && bundle install --jobs=8
     displayName: 'Install Dependencies'
 
-  - script: |
-      cd src/xcode
-      ls -la
-      cd DerivedData
-      ls -la
-    displayName: 'Show Derived Data'
-
   - task: Cache@2
     displayName: 'Restore Derived Data Cache'
     inputs:
@@ -94,15 +73,6 @@ jobs:
     inputs:
       key: 'v1 | test_output_cache | "$(Agent.OS)" | $(Build.SourceVersion)'
       path: $(TEST_OUTPUT_CACHE_FOLDER)
-
-  - script: |
-      cd src/xcode
-      ls -la
-      cd DerivedData
-      ls -la
-      cd ..
-      cd fastlane
-    displayName: 'Show Derived Data and fastlane folder'
 
   - script: |
       cd src/xcode && bundle exec fastlane test_without_building testplan:AllTests
