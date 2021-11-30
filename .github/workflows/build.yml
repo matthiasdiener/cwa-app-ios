@@ -31,6 +31,13 @@ jobs:
         with:
           path: src/xcode/DerivedData
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
+      - name: Save test_output folder
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-test-output
+        with:
+          path: src/xcode/fastlane/test_output
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
   
   swiftLint:
     runs-on: macos-11
@@ -66,7 +73,14 @@ jobs:
           cache-name: cache-derived-data
         with:
           path: src/xcode/DerivedData
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}        
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
+      - name: Restore test_output folder
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-test-output
+        with:
+          path: src/xcode/fastlane/test_output
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}          
       - name: Run AllTests
         run: |
           cd src/xcode
