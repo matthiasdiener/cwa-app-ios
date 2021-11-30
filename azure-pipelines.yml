@@ -48,6 +48,12 @@ jobs:
       key: 'v1 | derived_data_cache | "$(Agent.OS)" | $(Build.SourceVersion)'
       path: $(DERIVED_DATA_CACHE_FOLDER)
 
+  - script: |
+      cd $(Build.SourcesDirectory)/src/xcode/fastlane/test_output
+      ls -la
+      cd $(Build.SourcesDirectory)
+    displayName: 'Show test_output folder'
+    
   - task: Cache@2
     displayName: 'Store test_output Cache'
     inputs:
@@ -75,6 +81,12 @@ jobs:
       path: $(TEST_OUTPUT_CACHE_FOLDER)
 
   - script: |
+      cd $(Build.SourcesDirectory)/src/xcode/fastlane/test_output
+      ls -la
+      cd $(Build.SourcesDirectory)
+    displayName: 'Show test_output folder'
+
+  - script: |
       cd src/xcode && bundle exec fastlane test_without_building testplan:AllTests
     displayName: 'test-AllTests'
 
@@ -86,10 +98,6 @@ jobs:
     displayName: 'Install Dependencies'
 
   - script: |
-      swiftlint --version
-      pwd
-      ls -la
       cd src/xcode
-      ls -la    
       bundle exec fastlane lint
     displayName: 'SwiftLint'
