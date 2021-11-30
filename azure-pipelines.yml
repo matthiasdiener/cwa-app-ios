@@ -32,9 +32,17 @@ jobs:
       cd $(Build.SourcesDirectory)
     displayName: 'Show test_output folder'
 
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: '$(DERIVED_DATA_FOLDER)'
+      includeRootFolder: true
+      archiveType: 'tar'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-DerivedData.tgz'
+      replaceExistingArchive: true
+
   - task: PublishPipelineArtifact@1
     inputs:
-      targetPath: $(DERIVED_DATA_FOLDER)
+      targetPath: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-DerivedData.tgz'
       artifact: 'derivedData'
       publishLocation: 'pipeline'
 
@@ -55,7 +63,7 @@ jobs:
   - task: DownloadPipelineArtifact@2
     inputs:
       buildType: 'current'
-      artifactName: 'test_output'
+      artifactName: 'testOutput'
       targetPath: $(TEST_OUTPUT_FOLDER)
 
   - task: DownloadPipelineArtifact@2
@@ -63,6 +71,12 @@ jobs:
       buildType: 'current'
       artifactName: 'derivedData'
       targetPath: $(DERIVED_DATA_FOLDER)
+
+  - script: |
+      cd $(Build.SourcesDirectory)/src/xcode
+      ls -la
+      cd $(Build.SourcesDirectory)
+    displayName: 'Show test_output folder'
 
   - script: |
       cd $(Build.SourcesDirectory)/src/xcode/fastlane/test_output
