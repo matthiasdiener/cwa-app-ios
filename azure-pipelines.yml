@@ -26,18 +26,27 @@ jobs:
     displayName: 'Build for Testing'
 
   - script: |
-      cd src/xcode && bundle exec fastlane test_without_building testplan:AllTests
-    displayName: 'test-AllTests'
+      cd src/xcode
+      ls -la
+      cd DerivedData
+      ls -la
+    displayName: 'Show Derived Data'
+
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: '$(Build.SourcesDirectory)/src/xcode/DerivedData'
+      includeRootFolder: true
+      archiveType: 'tar'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-DerivedData.tgz'
+      replaceExistingArchive: true
+      verbose: true
+    displayName: 'Compress Derived Data'
 
   - task: Cache@2
     displayName: 'Store Derived Data Cache'
     inputs:
       key: 'v1 | derived_data_cache | "$(Agent.OS)" | $(Build.SourceVersion)'
-      restoreKeys: |
-        v1 | derived_data_cache | "$(Agent.OS)"
-        v1 | derived_data_cache
       path: $(DERIVED_DATA_CACHE_FOLDER)
-      cacheHitVar: DERIVED_DATA_CACHE_RESTORED
 
 - job: 'testAllTests'
   dependsOn: 'BuildForTesting'
@@ -51,11 +60,7 @@ jobs:
     displayName: 'Restore Derived Data Cache'
     inputs:
       key: 'v1 | derived_data_cache | "$(Agent.OS)" | $(Build.SourceVersion)'
-      restoreKeys: |
-        v1 | derived_data_cache | "$(Agent.OS)"
-        v1 | derived_data_cache
       path: $(DERIVED_DATA_CACHE_FOLDER)
-      cacheHitVar: DERIVED_DATA_CACHE_RESTORED
 
   - script: |
       cd src/xcode
@@ -63,6 +68,10 @@ jobs:
       cd DerivedData
       ls -la
     displayName: 'Show Derived Data'
+
+  - script: |
+      cd src/xcode && bundle exec fastlane test_without_building testplan:AllTests
+    displayName: 'test-AllTests'
 
 - job: 'Swiftlint'
 
