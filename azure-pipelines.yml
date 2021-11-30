@@ -12,7 +12,6 @@ pool:
 jobs:
 
 - job: 'BuildForTesting'
-  dependsOn: 'dependencies'
   steps:
 
   - script: |
@@ -36,7 +35,6 @@ jobs:
     displayName: 'test-AllTests'
 
 - job: 'Swiftlint'
-  dependsOn: 'dependencies'
 
   steps:
   - script: |
