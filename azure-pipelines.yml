@@ -52,6 +52,18 @@ jobs:
       cd src/xcode && bundle install --jobs=8
     displayName: 'Install Dependencies'
 
+  - task: DownloadPipelineArtifact@2
+    inputs:
+      buildType: 'current'
+      artifactName: 'test_output'
+      targetPath: $(TEST_OUTPUT_FOLDER)
+
+  - task: DownloadPipelineArtifact@2
+    inputs:
+      buildType: 'current'
+      artifactName: 'derivedData'
+      targetPath: $(DERIVED_DATA_FOLDER)
+
   - script: |
       cd $(Build.SourcesDirectory)/src/xcode/fastlane/test_output
       ls -la
