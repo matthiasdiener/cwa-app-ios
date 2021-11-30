@@ -9,16 +9,7 @@ jobs:
     runs-on: macos-11
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
-      - name: Check MacOS and xCode version
-        run: |
-          sw_vers  
-          xcodebuild -version
-          ls -n /Applications/ | grep Xcode*
-      - name: Select Xcode 13.1
-        run: |
-           sudo xcode-select --switch /Applications/Xcode_13.1.app
-           xcodebuild -version            
+        uses: actions/checkout@v2     
       - name: Install dependencies
         run: cd src/xcode && bundle install --jobs=8
       - name: Build for testing
@@ -43,11 +34,7 @@ jobs:
     runs-on: macos-11
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
-      - name: Select Xcode 13.1
-        run: |
-           sudo xcode-select --switch /Applications/Xcode_13.1.app
-           xcodebuild -version            
+        uses: actions/checkout@v2       
       - name: Install dependencies
         run: cd src/xcode && bundle install --jobs=8      
       - name: swift Lint
@@ -55,16 +42,23 @@ jobs:
           cd src/xcode
           bundle exec fastlane lint
           
+  communityBuild:
+    runs-on: macos-11
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2            
+      - name: Install dependencies
+        run: cd src/xcode && bundle install --jobs=8            
+      - name: Community Build
+        run: |
+          cd src/xcode && bundle exec fastlane build_community
+        
   runAllTests:
     runs-on: macos-11
     needs: buildForTesting
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
-      - name: Select Xcode 13.1
-        run: |
-           sudo xcode-select --switch /Applications/Xcode_13.1.app
-           xcodebuild -version            
+        uses: actions/checkout@v2          
       - name: Install dependencies
         run: cd src/xcode && bundle install --jobs=8      
       - name: Restore DerivedData folder
