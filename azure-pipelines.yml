@@ -9,6 +9,9 @@ trigger:
 pool:
   vmImage: macOS-11
 
+variables:
+  DERIVED_DATA_CACHE_FOLDER:  $(Build.SourcesDirectory)/src/xcode/DerivedData
+
 jobs:
 
 - job: 'BuildForTesting'
@@ -22,6 +25,16 @@ jobs:
       cd src/xcode && bundle exec fastlane build_for_testing
     displayName: 'Build for Testing'
 
+  - task: Cache@2
+    displayName: 'Store Derived Data Cache'
+    inputs:
+      key: 'v1 | derived_data_cache | "$(Agent.OS)" | $(Build.SourceVersion)'
+      restoreKeys: |
+        v1 | derived_data_cache | "$(Agent.OS)"
+        v1 | derived_data_cache
+      path: $(DERIVED_DATA_CACHE_FOLDER)
+      cacheHitVar: DERIVED_DATA_CACHE_RESTORED
+
 - job: 'testAllTests'
   dependsOn: 'BuildForTesting'
   steps:
@@ -29,6 +42,16 @@ jobs:
   - script: |
       cd src/xcode && bundle install --jobs=8
     displayName: 'Install Dependencies'
+
+  - task: Cache@2
+    displayName: 'Restore Derived Data Cache'
+    inputs:
+      key: 'v1 | derived_data_cache | "$(Agent.OS)" | $(Build.SourceVersion)'
+      restoreKeys: |
+        v1 | derived_data_cache | "$(Agent.OS)"
+        v1 | derived_data_cache
+      path: $(DERIVED_DATA_CACHE_FOLDER)
+      cacheHitVar: DERIVED_DATA_CACHE_RESTORED
 
   - script: |
       cd src/xcode && bundle exec fastlane test_without_building testplan:AllTests
