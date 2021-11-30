@@ -5,16 +5,11 @@ on:
       - admin/ci-cd-pipelines
 
 jobs:
-  dependencies:
+  buildForTesting:
     runs-on: macos-11
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
-      - name: get GitHub SHA
-        run: |
-          echo GITHUB_SHA: $GITHUB_SHA
-          echo github.sha: ${{ github.sha }}
-          echo github.workspace: ${{ github.workspace }}
       - name: Check MacOS and xCode version
         run: |
           sw_vers  
@@ -24,116 +19,16 @@ jobs:
         run: |
            sudo xcode-select --switch /Applications/Xcode_13.1.app
            xcodebuild -version            
-      - name: Brew bundle
-        run: |
-           rm '/usr/local/bin/swiftlint'
-           brew bundle
-           swiftlint --version
-      - name: Install Bundler
-        run: sudo gem install rake bundler:2.1.4 
       - name: Install dependencies
-        run: cd src/xcode && bundle install --path=vendor --jobs=8
+        run: cd src/xcode && bundle install --jobs=8
+      - name: Show where dependencies are installed
+        run: |
+          cd src/xcode
+          bundle info fastlane
+          bundle info fastlane-plugin-appcenter
+          bundle info xcov
       - name: Build for testing
         run: |
           cd src/xcode && bundle exec fastlane build_for_testing        
-      - name: Show Workspace
-        run: |
-          pwd
-          ls -la
-          cd /Users
-          ls -la
-          cd ~
-          ls -la
-      - name: save workspace
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-workspace
-        with:
-          path: |
-            ~/work/*
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
-      - name: save dependencies and tools cache
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-dependencies-and-tools
-        with:
-          path: |
-            /usr/local/Cellar/
-            /usr/local/opt/
-            /usr/local/bin/
-            /Users/runner/Library/Caches/Homebrew
-            /usr/local/Homebrew
-            /Users/runner/.rubies/ruby-*/bin/
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
+
           
-  swiftlint:
-    runs-on: macos-11
-    needs: dependencies
-    steps:
-      - name: Show Workspace
-        run: |
-          pwd
-          ls -la    
-      - name: restore workspace
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-workspace
-        with:
-          path: |
-            ~/work/*
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
-      - name: Show Workspace
-        run: |
-          pwd
-          ls -la          
-      - name: restore dependencies and tools cache
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-dependencies-and-tools
-        with:
-          path: |
-            /usr/local/Cellar/
-            /usr/local/opt/
-            /usr/local/bin/
-            /Users/runner/Library/Caches/Homebrew
-            /usr/local/Homebrew
-            /Users/runner/.rubies/ruby-*/bin/
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}        
-      - name: Swiftlint
-        run: |
-          swiftlint --version
-          cd src/xcode && bundle exec fastlane lint          
-
-
-  Run-all-Tests:
-    runs-on: macos-11
-    needs: dependencies
-    steps:
-      - name: restore workspace
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-workspace
-        with:
-          path: |
-            ~/work/*
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
-      - name: Show Workspace
-        run: |
-          pwd
-          ls -la             
-      - name: restore dependencies and tools cache
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-dependencies-and-tools
-        with:
-          path: |
-            /usr/local/Cellar/
-            /usr/local/opt/
-            /usr/local/bin/
-            /Users/runner/Library/Caches/Homebrew
-            /usr/local/Homebrew
-            /Users/runner/.rubies/ruby-*/bin/
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}           
-      - name: Run Fastlane tests
-        run: | 
-          cd src/xcode && bundle exec fastlane test_without_building testplan:AllTests    
