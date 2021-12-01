@@ -59,7 +59,21 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v2            
       - name: Install dependencies
-        run: cd src/xcode && bundle install --jobs=8            
+        run: cd src/xcode && bundle install --jobs=8
+      - name: Restore DerivedData folder
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-derived-data
+        with:
+          path: src/xcode/DerivedData
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
+      - name: Restore test_output folder
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-test-output
+        with:
+          path: src/xcode/fastlane/test_output
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}              
       - name: Snapshot DE-light
         run: |
           cd src/xcode && bundle exec fastlane screenshot languages:de-DE mode:light
