@@ -113,6 +113,7 @@ jobs:
 
 - job: 'Snapshot'
   displayName: 'Snapshot'
+  dependsOn: 'BuildForTesting'
   steps:
     - script: |
         cd src/xcode && bundle install --jobs=8
