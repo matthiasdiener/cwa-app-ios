@@ -52,6 +52,17 @@ jobs:
       - name: Community Build
         run: |
           cd src/xcode && bundle exec fastlane build_community
+          
+  snapshot:
+    runs-on: macos-11
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2            
+      - name: Install dependencies
+        run: cd src/xcode && bundle install --jobs=8            
+      - name: Snapshot DE-light
+        run: |
+          cd src/xcode && bundle exec fastlane screenshot languages:de-DE mode:light
         
   runAllTests:
     runs-on: macos-11
