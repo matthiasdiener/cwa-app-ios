@@ -19,6 +19,9 @@ ENV["LC_ALL"] = "de_DE.UTF-8"
 ENV["LANG"] = "de_DE.UTF-8"
 
 ENV["FASTLANE_SKIP_UPDATE_CHECK"] = "True"
+ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "180"
+ENV["FASTLANE_XCODE_LIST_TIMEOUT"] = "180"
+ENV["FASTLANE_XCODEBUILD_SETTINGS_RETRIES"] = "10"
 
 default_platform(:ios)
 
@@ -162,6 +165,8 @@ platform :ios do
       output_dir = "screenshots/screenshots-#{options[:languages]}-#{options[:mode]}"
 
       capture_ios_screenshots(
+        derived_data_path: "./DerivedData",
+        test_without_building: true,
         languages:  options[:languages],
         dark_mode: options[:mode] == "dark",
         output_directory: output_dir,

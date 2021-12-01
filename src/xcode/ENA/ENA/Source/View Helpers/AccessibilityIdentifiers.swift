@@ -263,13 +263,23 @@ enum AccessibilityIdentifiers {
 	enum UniversalQRScanner {
 		static let flash = "ExposureSubmissionQRScanner_flash"
 		static let file = "QRScanner_file"
+		static let info = "QRScanner_info"
+
+		enum Info {
+			static let title = "QRScanner_Info_title"
+			static let dataPrivacy = "QRScanner_Info_dataPrivacy"
+		}
+
+		#if targetEnvironment(simulator)
 		static let fakeHC1 = "QRScanner_FAKE_HC1"
 		static let fakeHC2 = "QRScanner_FAKE_HC2"
 		static let fakePCR = "QRScanner_FAKE_PCR"
 		static let fakePCR2 = "QRScanner_FAKE_PCR2"
 		static let fakeEvent = "QRScanner_FAKE_EVENT"
+		static let fakeTicketValidation = "QRScanner_FAKE_TICKET_VALIDATION"
 		static let other = "QRScanner_OTHER"
 		static let cancel = "QRScanner_CANCEL"
+		#endif
 	}
 
 	enum FileScanner {
@@ -750,6 +760,20 @@ enum AccessibilityIdentifiers {
 		}
 
 		static let qrCodeCell = "HealthCertificate.qrCodeCell"
+	}
+	
+	enum TicketValidation {
+		
+		enum FirstConsent {
+			static let image = "TicketValidation.FirstConsent.image"
+			static let legalBox = "TicketValidation.FirstConsent.legalBox"
+			static let dataPrivacy = "TicketValidation.FirstConsent.dataPrivacy"
+		}
+		
+		enum SecondConsent {
+			static let legalBox = "TicketValidation.SecondConsent.legalBox"
+			static let dataPrivacy = "TicketValidation.SecondConsent.dataPrivacy"
+		}
 	}
 
 }
