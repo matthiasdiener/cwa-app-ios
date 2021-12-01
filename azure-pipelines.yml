@@ -17,6 +17,7 @@ variables:
 jobs:
 
 - job: 'BuildForTesting'
+  displayName: ' Build for Testing'
   steps:
 
   - script: |
@@ -26,12 +27,6 @@ jobs:
   - script: |
       cd src/xcode && bundle exec fastlane build_for_testing
     displayName: 'Build for Testing'
-
-  - script: |
-      cd $(Build.SourcesDirectory)/src/xcode/fastlane/test_output
-      ls -la
-      cd $(Build.SourcesDirectory)
-    displayName: 'Show test_output folder'
 
   - task: ArchiveFiles@2
     inputs:
@@ -55,6 +50,7 @@ jobs:
 
 - job: 'testAllTests'
   dependsOn: 'BuildForTesting'
+  displayName: 'Test - All Tests'
   steps:
 
   - script: |
@@ -73,12 +69,6 @@ jobs:
       artifactName: 'derivedData'
       targetPath: $(SRC_XCODE_FOLDER)
 
-  - script: |
-      cd $(Build.SourcesDirectory)/src/xcode
-      ls -la
-      cd $(Build.SourcesDirectory)
-    displayName: 'Show DerivedData folder'
-
   - task: ExtractFiles@1
     inputs:
       archiveFilePatterns: '$(Build.SourcesDirectory)/src/xcode/$(Build.BuildId)-DerivedData.tgz'
@@ -93,25 +83,24 @@ jobs:
       RemoveDotFiles: true
 
   - script: |
-      cd $(Build.SourcesDirectory)/src/xcode
-      ls -la
-      cd $(Build.SourcesDirectory)/src/xcode/DerivedData
-      ls -la
-      cd $(Build.SourcesDirectory)
-    displayName: 'Show DerivedData folder'
-
-  - script: |
-      cd $(Build.SourcesDirectory)/src/xcode/fastlane/test_output
-      ls -la
-      cd $(Build.SourcesDirectory)
-    displayName: 'Show test_output folder'
-
-  - script: |
       cd src/xcode && bundle exec fastlane test_without_building testplan:AllTests
     displayName: 'test-AllTests'
 
-- job: 'Swiftlint'
+- job: 'CommunityBuild'
+  displayName: 'Community Build'
 
+  steps:
+    - script: |
+        cd src/xcode && bundle install --jobs=8
+      displayName: 'Install Dependencies'
+
+    - script: |
+        cd src/xcode 
+        bundle exec fastlane build_community
+      displayName: 'Community Build'
+
+- job: 'Swiftlint'
+  displayName: ' Run Swift Lint'
   steps:
   - script: |
       cd src/xcode && bundle install --jobs=8
@@ -120,4 +109,16 @@ jobs:
   - script: |
       cd src/xcode
       bundle exec fastlane lint
-    displayName: 'SwiftLint'
+    displayName: 'Run Swift Lint'
+
+- job: 'Snapshot'
+  displayName: 'Snapshot'
+  steps:
+    - script: |
+        cd src/xcode && bundle install --jobs=8
+      displayName: 'Install Dependencies'
+
+    - script: |
+        cd src/xcode
+        bundle exec fastlane screenshot languages:de-DE mode:light
+      displayName: 'Snapshot de-DE light'
