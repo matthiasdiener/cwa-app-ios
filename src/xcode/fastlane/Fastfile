@@ -162,6 +162,8 @@ platform :ios do
       output_dir = "screenshots/screenshots-#{options[:languages]}-#{options[:mode]}"
 
       capture_ios_screenshots(
+        derived_data_path: "./DerivedData",
+        test_without_building: true,
         languages:  options[:languages],
         dark_mode: options[:mode] == "dark",
         output_directory: output_dir,
