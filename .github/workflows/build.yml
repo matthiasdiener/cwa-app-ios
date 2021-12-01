@@ -55,6 +55,7 @@ jobs:
           
   snapshot:
     runs-on: macos-11
+    needs: buildForTesting
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2            
