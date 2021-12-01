@@ -10,6 +10,7 @@ pool:
   vmImage: macOS-11
 
 variables:
+  SRC_XCODE_FOLDER: $(Build.SourcesDirectory)/src/xcode
   DERIVED_DATA_FOLDER: $(Build.SourcesDirectory)/src/xcode/DerivedData
   TEST_OUTPUT_FOLDER: $(Build.SourcesDirectory)/src/xcode/fastlane/test_output
 
@@ -70,22 +71,24 @@ jobs:
     inputs:
       buildType: 'current'
       artifactName: 'derivedData'
-      targetPath: $(DERIVED_DATA_FOLDER)
+      targetPath: $(SRC_XCODE_FOLDER)
 
   - script: |
-      cd $(Build.SourcesDirectory)/src/xcode/DerivedData
+      cd $(Build.SourcesDirectory)/src/xcode
       ls -la
       cd $(Build.SourcesDirectory)
     displayName: 'Show DerivedData folder'
 
   - task: ExtractFiles@1
     inputs:
-      archiveFilePatterns: '$(Build.SourcesDirectory)/src/xcode/DerivedData/$(Build.BuildId)-DerivedData.tgz'
-      destinationFolder: '$(Build.SourcesDirectory)/src/xcode/DerivedData'
+      archiveFilePatterns: '$(Build.SourcesDirectory)/src/xcode/$(Build.BuildId)-DerivedData.tgz'
+      destinationFolder: '$(Build.SourcesDirectory)/src/xcode'
       cleanDestinationFolder: false
       overwriteExistingFiles: true
 
   - script: |
+      cd $(Build.SourcesDirectory)/src/xcode
+      ls -la
       cd $(Build.SourcesDirectory)/src/xcode/DerivedData
       ls -la
       cd $(Build.SourcesDirectory)
