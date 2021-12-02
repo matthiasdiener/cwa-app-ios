@@ -19,13 +19,17 @@ parameters:
   - name: snapshotConfig
     type: object
     default:
-    - language: 'de-DE'
+    - id: 'deDEDark'
+      language: 'de-DE'
       displaymode: 'dark'
-    - language: 'en-EN'
+    - id: 'enENDark'
+      language: 'en-EN'
       displaymode: 'dark'
-    - language: 'en-EN'
+    - id: 'enENLight'
+      language: 'en-EN'
       displaymode: 'light'
-    - language: 'de-DE'
+    - id: 'deDELight'
+      language: 'de-DE'
       displaymode: 'light'
 
 jobs:
@@ -126,7 +130,7 @@ jobs:
     displayName: 'Run Swift Lint'
 
 - ${{ each config in parameters.snapshotConfig }}:
-  - job: Snapshot${{config.language}}${{config.displaymode}}
+  - job: Snapshot${{config.id}}
     displayName: 'Snapshot-${{ config.language }}-${{ config.displaymode }}'
     dependsOn: 'BuildForTesting'
 
@@ -179,7 +183,9 @@ jobs:
 
 - job: 'CollectSnapshots'
   displayName: 'Collect Snapshots'
-  dependsOn: 'Snapshot'
+  dependsOn: 
+  - ${{ each config in parameters.snapshotConfig }}:
+    -  Snapshot${{config.id}}
   
   steps:
   - ${{ each config in parameters.snapshotConfig }}:
