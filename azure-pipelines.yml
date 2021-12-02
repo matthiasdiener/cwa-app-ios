@@ -131,7 +131,7 @@ jobs:
 
 - ${{ each config in parameters.snapshotConfig }}:
   - job: Snapshot${{config.id}}
-    displayName: 'Snapshot-${{ config.language }}-${{ config.displaymode }}'
+    displayName: 'Snapshot ${{ config.language }} ${{ config.displaymode }}'
     dependsOn: 'BuildForTesting'
 
     steps:
@@ -166,7 +166,7 @@ jobs:
 
       - script: |
           cd src/xcode
-          bundle exec fastlane screenshot languages:$(language) mode:$(displaymode)
+          bundle exec fastlane screenshot languages:${{config.language}} mode:${{config.displaymode}}
         displayName: 'Snapshot ${{config.language}} ${{config.displaymode}}'
 
       - script: |
