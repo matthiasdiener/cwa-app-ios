@@ -56,6 +56,10 @@ jobs:
   snapshot:
     runs-on: macos-11
     needs: buildForTesting
+    strategy:
+      matrix:
+       language: ["de-DE", "en-EN"]
+       displaymode: ["dark", "light"]
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2            
@@ -77,7 +81,7 @@ jobs:
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}              
       - name: Snapshot DE-light
         run: |
-          cd src/xcode && bundle exec fastlane screenshot languages:de-DE mode:light
+          cd src/xcode && bundle exec fastlane screenshot languages:${{ matrix.language }} mode:${{ matrix.dsiplymode }}
         
   runAllTests:
     runs-on: macos-11
