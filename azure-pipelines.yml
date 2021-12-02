@@ -13,6 +13,7 @@ variables:
   SRC_XCODE_FOLDER: $(Build.SourcesDirectory)/src/xcode
   DERIVED_DATA_FOLDER: $(Build.SourcesDirectory)/src/xcode/DerivedData
   TEST_OUTPUT_FOLDER: $(Build.SourcesDirectory)/src/xcode/fastlane/test_output
+  SCREENSHOTS_FOLDER: $(Build.SourcesDirectory)/src/xcode/screenshots
 
 jobs:
 
@@ -163,3 +164,23 @@ jobs:
         cd src/xcode
         bundle exec fastlane screenshot languages:$(language) mode:$(displaymode)
       displayName: 'Snapshot $(language) $(displaymode)'
+
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: $(SCREENSHOT_FOLDER)
+        artifact: 'screenshots'
+        publishLocation: 'pipeline'
+
+- job: 'CollectSnapshots'
+  displayName: 'Collect Snapshots'
+  dependsOn: 'Snapshot'
+  steps:
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        buildType: 'current'
+        artifactName: 'screenshots'
+        targetPath: $(Pipeline.Workspace)/screenshots
+
+    - script: 
+        pwd
+        ls -la
