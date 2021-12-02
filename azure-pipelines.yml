@@ -114,6 +114,21 @@ jobs:
 - job: 'Snapshot'
   displayName: 'Snapshot'
   dependsOn: 'BuildForTesting'
+  strategy:
+    matrix:
+      Dark-DE:
+        language: 'de-DE'
+        displaymode: 'dark'
+      Dark-EN:
+        language: 'en-EN'
+        displaymode: 'dark'
+      Light-EN:
+        language: 'en-EN'
+        displaymode: 'light'
+      Light-DE:
+        language: 'de-DE'
+        displaymode: 'light'
+
   steps:
     - script: |
         cd src/xcode && bundle install --jobs=8
@@ -146,5 +161,5 @@ jobs:
 
     - script: |
         cd src/xcode
-        bundle exec fastlane screenshot languages:de-DE mode:light
-      displayName: 'Snapshot de-DE light'
+        bundle exec fastlane screenshot languages:$(language) mode:$(displaymode)
+      displayName: 'Snapshot $(language) $(displaymode)'
