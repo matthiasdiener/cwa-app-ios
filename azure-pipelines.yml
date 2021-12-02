@@ -167,7 +167,7 @@ jobs:
 
     - task: PublishPipelineArtifact@1
       inputs:
-        targetPath: $(SCREENSHOT_FOLDER)
+        targetPath: $(SCREENSHOTS_FOLDER)
         artifact: 'screenshots'
         publishLocation: 'pipeline'
 
