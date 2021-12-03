@@ -194,8 +194,11 @@ jobs:
         buildType: 'current'
         artifactName: 'screenshots-${{ config.language }}-${{ config.displaymode }}'
         targetPath: $(Pipeline.Workspace)/screenshots
+    - script: |
+        cd $(Pipeline.Workspace)/screenshots
+        ls -la        
 
-  - script: 
+  - script: |
       cd $(Pipeline.Workspace)/screenshots
       ls -la
   
