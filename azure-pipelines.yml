@@ -202,4 +202,10 @@ jobs:
       archiveType: 'tar'
       archiveFile: '$(Build.ArtifactStagingDirectory)/screenshots.tar.gz'
       replaceExistingArchive: true
-  
+
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: '$(Build.ArtifactStagingDirectory)/screenshots.tar.gz'
+      artifact: 'Screenshots Archive'
+      publishLocation: 'pipeline'
+
