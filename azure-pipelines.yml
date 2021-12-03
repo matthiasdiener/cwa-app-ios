@@ -171,9 +171,7 @@ jobs:
 
       - script: |
           cd src/xcode/screenshots/screenshots-${{config.language}}-${{config.displaymode}}
-          ls -la
           rm -r test_output
-          ls -la
         displayName: 'Remove test_output folder'
       - task: PublishPipelineArtifact@1
         inputs:
@@ -208,4 +206,3 @@ jobs:
       targetPath: '$(Build.ArtifactStagingDirectory)/screenshots.tar.gz'
       artifact: 'Screenshots Archive'
       publishLocation: 'pipeline'
-
