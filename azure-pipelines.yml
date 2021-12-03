@@ -194,17 +194,10 @@ jobs:
         buildType: 'current'
         artifactName: 'screenshots-${{ config.language }}-${{ config.displaymode }}'
         targetPath: $(Pipeline.Workspace)/screenshots
-    - script: |
-        cd $(Pipeline.Workspace)/screenshots
-        ls -la        
-
-  - script: |
-      cd $(Pipeline.Workspace)/screenshots
-      ls -la
   
   - task: ArchiveFiles@2
     inputs:
-      rootFolderOrFile: '$(Pipeline.Workspace)/screenshots)'
+      rootFolderOrFile: '$(Pipeline.Workspace)/screenshots'
       includeRootFolder: false
       archiveType: 'tar'
       archiveFile: '$(Build.ArtifactStagingDirectory)/screenshots.tar.gz'
