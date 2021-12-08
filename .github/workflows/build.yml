@@ -83,7 +83,7 @@ jobs:
         run: |
           cd src/xcode && bundle exec fastlane screenshot languages:${{ matrix.language }} mode:${{ matrix.displaymode }}
       - name: Remove test_output folder
-      - run: |
+        run: |
           cd src/xcode/screenshots/screenshots-${{ matrix.language }}-${{ matrix.displaymode }}
           rm -r test_output
       - uses: actions/upload-artifact@v2
