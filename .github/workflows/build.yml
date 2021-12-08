@@ -81,8 +81,30 @@ jobs:
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}              
       - name: Snapshot DE-light
         run: |
-          cd src/xcode && bundle exec fastlane screenshot languages:${{ matrix.language }} mode:${{ matrix.dsiplymode }}
-        
+          cd src/xcode && bundle exec fastlane screenshot languages:${{ matrix.language }} mode:${{ matrix.displaymode }}
+      - name: Remove test_output folder
+      - run: |
+          cd src/xcode/screenshots/screenshots-${{ matrix.language }}-${{ matrix.displaymode }}
+          rm -r test_output
+      - uses: actions/upload-artifact@v2
+        with:
+          name: screenshots-${{ github.sha }}
+          path: src/xcode/screenshots/screenshots-${{ matrix.language }}-${{ matrix.displaymode }}
+
+  collectSnapshots:
+    runs-on: macos-11
+    needs: snapshot
+    steps:
+      - uses: actions/download-artifact@v2
+        id: download
+        with:
+          name: screenshots-${{ github.sha }}
+      - name: Echo download path
+        run: echo ${{steps.download.outputs.download-path}}
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: ${{steps.download.outputs.download-path}}
+    
   runAllTests:
     runs-on: macos-11
     needs: buildForTesting
