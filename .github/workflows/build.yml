@@ -111,8 +111,15 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2            
-      - name: Install dependencies
-        run: cd src/xcode && bundle install --jobs=8
+      - name: Restore Dependencies
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-dependencies
+        with:
+          path: |
+            src/xcode/vendor
+            src/xcode/.bundle
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}   
       - name: Restore DerivedData folder
         uses: actions/cache@v2
         env:
@@ -127,6 +134,9 @@ jobs:
         with:
           path: src/xcode/fastlane/test_output
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}              
+      - name: Reset Simulators
+        run: |
+          cd src/xcode && arch -arm64 fastlane snapshot reset_simulators                
       - name: Snapshot DE-light
         run: |
           cd src/xcode && bundle exec fastlane screenshot languages:${{ matrix.language }} mode:${{ matrix.displaymode }}
@@ -159,8 +169,15 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2          
-      - name: Install dependencies
-        run: cd src/xcode && bundle install --jobs=8      
+      - name: Restore Dependencies
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-dependencies
+        with:
+          path: |
+            src/xcode/vendor
+            src/xcode/.bundle
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}         
       - name: Restore DerivedData folder
         uses: actions/cache@v2
         env:
@@ -175,6 +192,9 @@ jobs:
         with:
           path: src/xcode/fastlane/test_output
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}          
+      - name: Reset Simulators
+        run: |
+          cd src/xcode && arch -arm64 fastlane snapshot reset_simulators                
       - name: Run AllTests
         run: |
           cd src/xcode
