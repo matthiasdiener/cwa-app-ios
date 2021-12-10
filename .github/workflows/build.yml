@@ -1,4 +1,4 @@
-name: Build on macOS
+name: Build on macOS M1
 on:
   push:
     branches:
