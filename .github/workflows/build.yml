@@ -11,7 +11,7 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v2     
       - name: Install dependencies
-        run: cd src/xcode && arch -arm64 bundle install
+        run: cd src/xcode && arch -arm64 bundle install --path=vendor
       - name: Build for testing
         run: |
           cd src/xcode && arch -arm64 bundle exec fastlane build_for_testing
@@ -36,7 +36,7 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v2       
       - name: Install dependencies
-        run: cd src/xcode && arch -arm64 bundle install    
+        run: cd src/xcode && arch -arm64 bundle install --path=vendor
       - name: swift Lint
         run: |
           cd src/xcode
@@ -48,7 +48,7 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v2            
       - name: Install dependencies
-        run: cd src/xcode && arch -arm64 bundle install        
+        run: cd src/xcode && arch -arm64 bundle install --path=vendor     
       - name: Community Build
         run: |
           cd src/xcode && arch -arm64 bundle exec fastlane build_community
