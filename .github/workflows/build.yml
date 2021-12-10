@@ -10,17 +10,29 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2     
-      - name: Install dependencies
-        run: cd src/xcode && arch -arm64 bundle install --path=vendor
       - name: Save Dependencies
         uses: actions/cache@v2
+        id: cache-dependcies
         env:
           cache-name: cache-dependencies
         with:
           path: |
             src/xcode/vendor
             src/xcode/.bundle
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('src/xcode/Gemfile.lock') }}        
+      - name: Install dependencies
+        if: steps.cache-dependcies.outputs.cache-hit != 'true'
+        run: cd src/xcode && arch -arm64 bundle install --path=vendor
+      - name: Save Dependencies
+        uses: actions/cache@v2
+        if: steps.cache-dependcies.outputs.cache-hit != 'true'
+        env:
+          cache-name: cache-dependencies
+        with:
+          path: |
+            src/xcode/vendor
+            src/xcode/.bundle
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('src/xcode/Gemfile.lock') }}
 
           
   buildForTesting:
@@ -37,10 +49,12 @@ jobs:
           path: |
             src/xcode/vendor
             src/xcode/.bundle
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}        
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('src/xcode/Gemfile.lock') }}     
       - name: Reset Simulators
         run: |
-          cd src/xcode && arch -arm64 bundle exec fastlane snapshot reset_simulators
+          sudo xcode-select -switch /Applications/Xcode_13_1.app/
+          cd src/xcode 
+          arch -arm64 bundle exec fastlane snapshot reset_simulators
       - name: Build for testing
         run: |
           cd src/xcode && arch -arm64 bundle exec fastlane build_for_testing
@@ -73,7 +87,7 @@ jobs:
           path: |
             src/xcode/vendor
             src/xcode/.bundle
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}           
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('src/xcode/Gemfile.lock') }}
       - name: swift Lint
         run: |
           cd src/xcode
@@ -93,7 +107,7 @@ jobs:
           path: |
             src/xcode/vendor
             src/xcode/.bundle
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}   
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('src/xcode/Gemfile.lock') }}
       - name: Reset Simulators
         run: |
           cd src/xcode && arch -arm64 bundle exec fastlane snapshot reset_simulators          
@@ -119,7 +133,7 @@ jobs:
           path: |
             src/xcode/vendor
             src/xcode/.bundle
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}   
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('src/xcode/Gemfile.lock') }}
       - name: Restore DerivedData folder
         uses: actions/cache@v2
         env:
@@ -177,7 +191,7 @@ jobs:
           path: |
             src/xcode/vendor
             src/xcode/.bundle
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}         
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('src/xcode/Gemfile.lock') }}
       - name: Restore DerivedData folder
         uses: actions/cache@v2
         env:
