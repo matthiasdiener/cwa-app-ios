@@ -246,11 +246,15 @@ enum AccessibilityIdentifiers {
 		static let lowRiskExposureSection = "AppStrings.ExposureDetection.lowRiskExposureSection"
 		static let infectionRiskExplanationSection = "AppStrings.ExposureDetection.infectionRiskExplanationSection"
 		
-		static let guideFAQ = "AppStrings.ExposureDetection.guideFAQ"
-		
 		static let surveyCardCell = "AppStrings.ExposureDetection.surveyCardCell"
 		static let surveyCardButton = "AppStrings.ExposureDetection.surveyCardButton"
 		static let surveyStartButton = "AppStrings.ExposureDetection.surveyStartButton"
+
+		static let closeButtonSuffix = "HygieneRulesCloseButton"
+		static let hygieneRulesTitle = "AppStrings.ExposureDetection.hygieneRulesTitle"
+		static let contagionTitle = "AppStrings.ExposureDetection.contagionTitle"
+		static let detailsGuideHygiene = "AppStrings.ExposureDetection.guideHygiene"
+		static let detailsGuideHome = "AppStrings.ExposureDetection.guideHome"
 	}
 	
 	enum SurveyConsent {
@@ -270,7 +274,6 @@ enum AccessibilityIdentifiers {
 			static let dataPrivacy = "QRScanner_Info_dataPrivacy"
 		}
 
-		#if targetEnvironment(simulator)
 		static let fakeHC1 = "QRScanner_FAKE_HC1"
 		static let fakeHC2 = "QRScanner_FAKE_HC2"
 		static let fakePCR = "QRScanner_FAKE_PCR"
@@ -279,7 +282,6 @@ enum AccessibilityIdentifiers {
 		static let fakeTicketValidation = "QRScanner_FAKE_TICKET_VALIDATION"
 		static let other = "QRScanner_OTHER"
 		static let cancel = "QRScanner_CANCEL"
-		#endif
 	}
 
 	enum FileScanner {

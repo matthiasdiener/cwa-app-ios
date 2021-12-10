@@ -29,6 +29,7 @@ class QRScannerCoordinator {
 	init(
 		store: Store,
 		client: Client,
+		restServiceProvider: RestServiceProviding,
 		eventStore: EventStoringProviding,
 		appConfiguration: AppConfigurationProviding,
 		eventCheckoutService: EventCheckoutService,
@@ -42,6 +43,7 @@ class QRScannerCoordinator {
 	) {
 		self.store = store
 		self.client = client
+		self.restServiceProvider = restServiceProvider
 		self.eventStore = eventStore
 		self.appConfiguration = appConfiguration
 		self.eventCheckoutService = eventCheckoutService
@@ -81,6 +83,7 @@ class QRScannerCoordinator {
 	
 	private let store: Store
 	private let client: Client
+	private let restServiceProvider: RestServiceProviding
 	private let eventStore: EventStoringProviding
 	private let appConfiguration: AppConfigurationProviding
 	private let eventCheckoutService: EventCheckoutService
@@ -97,7 +100,7 @@ class QRScannerCoordinator {
 	
 	private var presenter: QRScannerPresenter!
 	private weak var parentViewController: UIViewController?
-	private weak var qrScannerViewController: UIViewController?
+	private weak var qrScannerViewController: QRScannerViewController?
 	private var healthCertificateCoordinator: HealthCertificateCoordinator?
 	private var traceLocationCheckinCoordinator: TraceLocationCheckinCoordinator?
 	private var onBehalfCheckinCoordinator: OnBehalfCheckinSubmissionCoordinator?
@@ -106,7 +109,7 @@ class QRScannerCoordinator {
 
 	private func qrScannerViewController(
 		markCertificateAsNew: Bool
-	) -> UIViewController {
+	) -> QRScannerViewController {
 		let qrCodeParser = QRCodeParser(
 			appConfigurationProvider: appConfiguration,
 			healthCertificateService: healthCertificateService,
@@ -195,15 +198,7 @@ class QRScannerCoordinator {
 		case let .traceLocation(traceLocation):
 			showScannedCheckin(traceLocation)
 		case let .ticketValidation(ticketValidationInitializationData):
-			#if DEBUG
-			if isUITesting {
-				showMockScannedTicketValidation(ticketValidationInitializationData)
-			} else {
-				evaluateScannedTicketValidation(ticketValidationInitializationData)
-			}
-			#else
 			evaluateScannedTicketValidation(ticketValidationInitializationData)
-			#endif
 		}
 	}
 
@@ -263,7 +258,7 @@ class QRScannerCoordinator {
 			return
 		}
 
-		showRestoredFromBinAlertIfNeeded(for: certificateResult, from: qrScannerViewController) { [weak self] in
+		showCertificateRegistrationDetailAlertIfNeeded(for: certificateResult, from: qrScannerViewController) { [weak self] in
 			guard let self = self else { return }
 
 			self.qrScannerViewController?.dismiss(animated: true) {
@@ -372,9 +367,33 @@ class QRScannerCoordinator {
 		_ initializationData: TicketValidationInitializationData
 	) {
 		showActivityIndicator()
-		let ticketValidation = TicketValidation(with: initializationData)
 
-		ticketValidation.initialize { [weak self] result in
+		var ticketValidation: TicketValidating = TicketValidation(
+			with: initializationData,
+			restServiceProvider: restServiceProvider,
+			serviceIdentityProcessor: TicketValidationServiceIdentityDocumentProcessor(),
+			store: store
+		)
+
+		#if DEBUG
+		if isUITesting {
+			let mockTicketValidation = MockTicketValidation(with: initializationData)
+			mockTicketValidation.firstConsentResult = .success(.fake(fnt: "SCHNEIDER", gnt: "ANDREA", dob: "1989-12-12", type: ["v", "r", "tp", "tr"]))
+
+			if LaunchArguments.ticketValidation.result.isFailed.boolValue {
+				mockTicketValidation.validationResult = .success(.fake(result: .failed, results: [.fake(identifier: "TR-002", result: .failed, type: "", details: "Ein Testzertifikat muss von einem zertifizierten Testzentrum ausgestellt werden.")]))
+			} else if LaunchArguments.ticketValidation.result.isOpen.boolValue {
+				mockTicketValidation.validationResult = .success(.fake(result: .open, results: [.fake(identifier: "TR-002", result: .open, type: "", details: "Ein Antigentest ist maximal 48h gültig.")]))
+			} else {
+				// set the default to passed
+				mockTicketValidation.validationResult = .success(.fake())
+			}
+
+			ticketValidation = mockTicketValidation
+		}
+		#endif
+
+		ticketValidation.initialize(appFeatureProvider: appConfiguration.featureProvider) { [weak self] result in
 			DispatchQueue.main.async {
 				self?.hideActivityIndicator()
 
@@ -382,25 +401,47 @@ class QRScannerCoordinator {
 				case .success:
 					self?.showScannedTicketValidation(ticketValidation)
 				case .failure(let error):
-					self?.showErrorAlert(error: error)
+					self?.showErrorAlert(error: error, serviceProvider: initializationData.serviceProvider)
 				}
 			}
 		}
 	}
 
-	private func showErrorAlert(error: TicketValidationError) {
+	private func showErrorAlert(error: TicketValidationError, serviceProvider: String) {
+		let title: String
+		if case .allowListError(.SP_ALLOWLIST_NO_MATCH) = error {
+			title = AppStrings.TicketValidation.Error.serviceProviderErrorNoMatchTitle
+		} else {
+			title = AppStrings.TicketValidation.Error.title
+		}
+		
 		let alert = UIAlertController(
-			title: AppStrings.TicketValidation.Error.title,
-			message: error.localizedDescription,
+			title: title,
+			message: error.errorDescription(serviceProvider: serviceProvider),
 			preferredStyle: .alert
 		)
 
 		alert.addAction(
 			UIAlertAction(
 				title: AppStrings.Common.alertActionOk,
-				style: .default
+				style: .default,
+				handler: { [weak self] _ in
+					self?.qrScannerViewController?.activateScanning()
+				}
 			)
 		)
+		
+		if case .versionError = error {
+			alert.addAction(
+				UIAlertAction(
+					title: AppStrings.TicketValidation.Error.updateApp,
+					style: .default,
+					handler: { _ in
+						LinkHelper.open(urlString: "https://apps.apple.com/de/app/corona-warn-app/id1512595757?mt=8")
+					}
+				)
+			)
+		}
 
 		DispatchQueue.main.async {
 			self.qrScannerViewController?.present(alert, animated: true)
@@ -447,20 +488,83 @@ class QRScannerCoordinator {
 		}
 	}
 
-	private func showRestoredFromBinAlertIfNeeded(
+	private func showCertificateRegistrationDetailAlertIfNeeded(
 		for certificateResult: CertificateResult,
 		from presentationController: UIViewController,
 		completion: @escaping () -> Void
 	) {
-		guard certificateResult.restoredFromBin else {
+		guard let registrationDetail = certificateResult.registrationDetail else {
 			completion()
 			return
 		}
 
+		switch registrationDetail {
+		case .restoredFromBin:
+			showRestoredFromBinAlert(
+				from: presentationController,
+				completion: completion
+			)
+		case .personWarnThresholdReached:
+			showPersonThresholdReachedAlert(
+				from: presentationController,
+				completion: completion
+			)
+		}
+	}
+
+	private func showRestoredFromBinAlert(
+		from presentationController: UIViewController,
+		completion: @escaping () -> Void
+	) {
 		let alert = UIAlertController(
 			title: AppStrings.UniversalQRScanner.certificateRestoredFromBinAlertTitle,
 			message: AppStrings.UniversalQRScanner.certificateRestoredFromBinAlertMessage,
 			preferredStyle: .alert
+		)
+		alert.addAction(
+			UIAlertAction(
+				title: AppStrings.Common.alertActionOk,
+				style: .default,
+				handler: { _ in
+					completion()
+				}
+			)
+		)
+
+		presentationController.present(alert, animated: true)
+	}
+
+	private func showPersonThresholdReachedAlert(
+		from presentationController: UIViewController,
+		completion: @escaping () -> Void
+	) {
+		let alert = UIAlertController(
+			title: AppStrings.UniversalQRScanner.MaxPersonAmountAlert.warningTitle,
+			message: String(
+				format: AppStrings.UniversalQRScanner.MaxPersonAmountAlert.warningMessage,
+				appConfiguration.featureProvider.intValue(for: .dccPersonCountMax)
+			),
+			preferredStyle: .alert
+		)
+		alert.addAction(
+			UIAlertAction(
+				title: AppStrings.UniversalQRScanner.MaxPersonAmountAlert.covPassCheckButton,
+				style: .default,
+				handler: { _ in
+					LinkHelper.open(urlString: AppStrings.UniversalQRScanner.MaxPersonAmountAlert.covPassCheckLink)
+					completion()
+				}
+			)
+		)
+		alert.addAction(
+			UIAlertAction(
+				title: AppStrings.UniversalQRScanner.MaxPersonAmountAlert.faqButton,
+				style: .default,
+				handler: { _ in
+					LinkHelper.open(urlString: AppStrings.UniversalQRScanner.MaxPersonAmountAlert.faqLink)
+					completion()
+				}
+			)
 		)
 		alert.addAction(
 			UIAlertAction(
@@ -613,35 +717,6 @@ class QRScannerCoordinator {
 		}
 		animator.startAnimation()
 	}
-
-	#if DEBUG
-	private func showMockScannedTicketValidation(_ initializationData: TicketValidationInitializationData) {
-		let ticketValidation = MockTicketValidation(with: initializationData)
-		ticketValidation.firstConsentResult = .success(.fake(fnt: "SCHNEIDER", gnt: "ANDREA", dob: "1989-12-12", type: ["v", "r", "tp", "tr"]))
-		
-		if LaunchArguments.ticketValidation.result.isFailed.boolValue {
-			ticketValidation.validationResult = .success(.fake(result: .failed, results: [.fake(identifier: "TR-002", result: .failed, type: "", details: "Ein Testzertifikat muss von einem zertifizierten Testzentrum ausgestellt werden.")]))
-		} else if LaunchArguments.ticketValidation.result.isOpen.boolValue {
-			ticketValidation.validationResult = .success(.fake(result: .open, results: [.fake(identifier: "TR-002", result: .open, type: "", details: "Ein Antigentest ist maximal 48h gültig.")]))
-		} else {
-			// set the default to passed
-			ticketValidation.validationResult = .success(.fake())
-		}
-
-		ticketValidation.initialize { [weak self] result in
-			DispatchQueue.main.async {
-				self?.hideActivityIndicator()
-
-				switch result {
-				case .success:
-					self?.showScannedTicketValidation(ticketValidation)
-				case .failure(let error):
-					self?.showErrorAlert(error: error)
-				}
-			}
-		}
-	}
-	#endif
 
 	// MARK: Helpers
 

@@ -6,18 +6,16 @@ import Foundation
 
 protocol TicketValidating {
 
-	init(
-		with initializationData: TicketValidationInitializationData
-	)
-
 	var initializationData: TicketValidationInitializationData { get }
-
+	var allowList: TicketValidationAllowList { get }
+	
 	func initialize(
+		appFeatureProvider: AppFeatureProviding,
 		completion: @escaping (Result<Void, TicketValidationError>) -> Void
 	)
 
 	func grantFirstConsent(
-		completion: @escaping (Result<ValidationConditions, TicketValidationError>) -> Void
+		completion: @escaping (Result<TicketValidationConditions, TicketValidationError>) -> Void
 	)
 
 	func selectCertificate(
@@ -25,7 +23,7 @@ protocol TicketValidating {
 	)
 
 	func validate(
-		completion: @escaping (Result<TicketValidationResult, TicketValidationError>) -> Void
+		completion: @escaping (Result<TicketValidationResultToken, TicketValidationError>) -> Void
 	)
 
 	func cancel()

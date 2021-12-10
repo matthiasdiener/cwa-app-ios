@@ -16,7 +16,7 @@ final class TicketValidationCoordinator {
 		self.parentViewController = parentViewController
 		self.healthCertificateService = healthCertificateService
 	}
-	
+
 	// MARK: - Internal
 
 	func start(ticketValidation: TicketValidating) {
@@ -96,7 +96,9 @@ final class TicketValidationCoordinator {
 		navigationController.pushViewController(detailViewController, animated: true)
 	}
 
-	private func showCertificateSelectionScreen(validationConditions: ValidationConditions) {
+	private func showCertificateSelectionScreen(
+        validationConditions: TicketValidationConditions
+    ) {
 		let certificateSelectionViewController = TicketValidationCertificateSelectionViewController(
 			viewModel: TicketValidationCertificateSelectionViewModel(
 				validationConditions: validationConditions,
@@ -129,7 +131,7 @@ final class TicketValidationCoordinator {
 	) {
 		let secondConsentViewController = SecondTicketValidationConsentViewController(
 			viewModel: SecondTicketValidationConsentViewModel(
-				serviceIdentity: ticketValidation.initializationData.serviceIdentity,
+				serviceIdentity: ticketValidation.allowList.validationServiceAllowList.first?.serviceProvider ?? "",
 				serviceProvider: ticketValidation.initializationData.serviceProvider,
 				healthCertificate: selectedCertificate,
 				healthCertifiedPerson: selectedCertifiedPerson,
@@ -178,21 +180,24 @@ final class TicketValidationCoordinator {
 		navigationController.pushViewController(topBottomContainerViewController, animated: true)
 	}
 
-	private func showResultScreen(for result: TicketValidationResult) {
+	private func showResultScreen(for result: TicketValidationResultToken) {
 		let viewModel: TicketValidationResultViewModel
 
 		switch result.result {
 		case .passed:
 			viewModel = TicketValidationPassedViewModel(
+				validationDate: result.iat ?? Date(),
 				serviceProvider: ticketValidation.initializationData.serviceProvider
 			)
 		case .open:
 			viewModel = TicketValidationOpenViewModel(
+				validationDate: result.iat ?? Date(),
 				serviceProvider: ticketValidation.initializationData.serviceProvider,
 				validationResultItems: result.results
 			)
 		case .failed:
 			viewModel = TicketValidationFailedViewModel(
+				validationDate: result.iat ?? Date(),
 				serviceProvider: ticketValidation.initializationData.serviceProvider,
 				validationResultItems: result.results
 			)
@@ -211,7 +216,7 @@ final class TicketValidationCoordinator {
 	private func showErrorAlert(error: TicketValidationError) {
 		let alert = UIAlertController(
 			title: AppStrings.TicketValidation.Error.title,
-			message: error.localizedDescription,
+			message: error.errorDescription(serviceProvider: ticketValidation.initializationData.serviceProvider),
 			preferredStyle: .alert
 		)
 
