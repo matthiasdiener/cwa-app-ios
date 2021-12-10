@@ -38,6 +38,9 @@ jobs:
             src/xcode/vendor
             src/xcode/.bundle
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}        
+      - name: Reset Simulators
+        run: |
+          cd src/xcode && arch -arm64 fastlane snapshot reset_simulators
       - name: Build for testing
         run: |
           cd src/xcode && arch -arm64 bundle exec fastlane build_for_testing
@@ -91,6 +94,9 @@ jobs:
             src/xcode/vendor
             src/xcode/.bundle
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}   
+      - name: Reset Simulators
+        run: |
+          cd src/xcode && arch -arm64 fastlane snapshot reset_simulators          
       - name: Community Build
         run: |
           cd src/xcode && arch -arm64 bundle exec fastlane build_community
