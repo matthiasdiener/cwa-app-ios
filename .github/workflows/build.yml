@@ -40,7 +40,7 @@ jobs:
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}        
       - name: Reset Simulators
         run: |
-          cd src/xcode && arch -arm64 fastlane snapshot reset_simulators
+          cd src/xcode && arch -arm64 bundle exec fastlane snapshot reset_simulators
       - name: Build for testing
         run: |
           cd src/xcode && arch -arm64 bundle exec fastlane build_for_testing
@@ -96,7 +96,7 @@ jobs:
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}   
       - name: Reset Simulators
         run: |
-          cd src/xcode && arch -arm64 fastlane snapshot reset_simulators          
+          cd src/xcode && arch -arm64 bundle exec fastlane snapshot reset_simulators          
       - name: Community Build
         run: |
           cd src/xcode && arch -arm64 bundle exec fastlane build_community
@@ -136,7 +136,7 @@ jobs:
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}              
       - name: Reset Simulators
         run: |
-          cd src/xcode && arch -arm64 fastlane snapshot reset_simulators                
+          cd src/xcode && arch -arm64 bundle exec fastlane snapshot reset_simulators                
       - name: Snapshot DE-light
         run: |
           cd src/xcode && bundle exec fastlane screenshot languages:${{ matrix.language }} mode:${{ matrix.displaymode }}
@@ -194,7 +194,7 @@ jobs:
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}          
       - name: Reset Simulators
         run: |
-          cd src/xcode && arch -arm64 fastlane snapshot reset_simulators                
+          cd src/xcode && arch -arm64 bundle exec fastlane snapshot reset_simulators                
       - name: Run AllTests
         run: |
           cd src/xcode
