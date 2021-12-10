@@ -17,7 +17,9 @@ jobs:
         env:
           cache-name: cache-dependencies
         with:
-          path: src/xcode/vendor
+          path: |
+            src/xcode/vendor
+            src/xcode/.bundle
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
 
           
