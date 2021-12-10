@@ -11,10 +11,10 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v2     
       - name: Install dependencies
-        run: cd src/xcode && bundle install --jobs=8
+        run: cd src/xcode && arch -arm64 bundle install
       - name: Build for testing
         run: |
-          cd src/xcode && bundle exec fastlane build_for_testing
+          cd src/xcode && arch -arm64 bundle exec fastlane build_for_testing
       - name: Save DerivedData folder
         uses: actions/cache@v2
         env:
@@ -36,11 +36,11 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v2       
       - name: Install dependencies
-        run: cd src/xcode && bundle install --jobs=8      
+        run: cd src/xcode && arch -arm64 bundle install    
       - name: swift Lint
         run: |
           cd src/xcode
-          bundle exec fastlane lint
+          arch -arm64 bundle exec fastlane lint
           
   communityBuild:
     runs-on: self-hosted
@@ -48,10 +48,10 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v2            
       - name: Install dependencies
-        run: cd src/xcode && bundle install --jobs=8            
+        run: cd src/xcode && arch -arm64 bundle install        
       - name: Community Build
         run: |
-          cd src/xcode && bundle exec fastlane build_community
+          cd src/xcode && arch -arm64 bundle exec fastlane build_community
           
   snapshot:
     runs-on: self-hosted
