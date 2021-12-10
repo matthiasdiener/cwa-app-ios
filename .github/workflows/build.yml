@@ -5,13 +5,35 @@ on:
       - admin/ci-cd-pipelines
 
 jobs:
-  buildForTesting:
+  dependencies:
     runs-on: self-hosted
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2     
       - name: Install dependencies
         run: cd src/xcode && arch -arm64 bundle install --path=vendor
+      - name: Save Dependencies
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-dependencies
+        with:
+          path: src/xcode/vendor
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
+
+          
+  buildForTesting:
+    runs-on: self-hosted
+    needs: dependencies
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2     
+      - name: Restore Dependencies
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-dependencies
+        with:
+          path: src/xcode/vendor
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}        
       - name: Build for testing
         run: |
           cd src/xcode && arch -arm64 bundle exec fastlane build_for_testing
@@ -32,11 +54,17 @@ jobs:
   
   swiftLint:
     runs-on: self-hosted
+    needs: dependencies
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2       
-      - name: Install dependencies
-        run: cd src/xcode && arch -arm64 bundle install --path=vendor
+      - name: Restore Dependencies
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-dependencies
+        with:
+          path: src/xcode/vendor
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}           
       - name: swift Lint
         run: |
           cd src/xcode
@@ -44,11 +72,17 @@ jobs:
           
   communityBuild:
     runs-on: self-hosted
+    needs: dependencies
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2            
-      - name: Install dependencies
-        run: cd src/xcode && arch -arm64 bundle install --path=vendor     
+      - name: Restore Dependencies
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-dependencies
+        with:
+          path: src/xcode/vendor
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}   
       - name: Community Build
         run: |
           cd src/xcode && arch -arm64 bundle exec fastlane build_community
