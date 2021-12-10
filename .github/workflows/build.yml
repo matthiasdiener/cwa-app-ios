@@ -6,7 +6,7 @@ on:
 
 jobs:
   buildForTesting:
-    runs-on: macos-11
+    runs-on: self-hosted
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2     
@@ -31,7 +31,7 @@ jobs:
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
   
   swiftLint:
-    runs-on: macos-11
+    runs-on: self-hosted
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2       
@@ -43,7 +43,7 @@ jobs:
           bundle exec fastlane lint
           
   communityBuild:
-    runs-on: macos-11
+    runs-on: self-hosted
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2            
@@ -54,7 +54,7 @@ jobs:
           cd src/xcode && bundle exec fastlane build_community
           
   snapshot:
-    runs-on: macos-11
+    runs-on: self-hosted
     needs: buildForTesting
     strategy:
       matrix:
@@ -92,7 +92,7 @@ jobs:
           path: src/xcode/screenshots/screenshots-${{ matrix.language }}-${{ matrix.displaymode }}
 
   collectSnapshots:
-    runs-on: macos-11
+    runs-on: self-hosted
     needs: snapshot
     steps:
       - uses: actions/download-artifact@v2
@@ -106,7 +106,7 @@ jobs:
         working-directory: ${{steps.download.outputs.download-path}}
     
   runAllTests:
-    runs-on: macos-11
+    runs-on: self-hosted
     needs: buildForTesting
     steps:
       - name: Check out repository code
