@@ -37,7 +37,11 @@ jobs:
           path: |
             src/xcode/vendor
             src/xcode/.bundle
+<<<<<<< HEAD
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
+=======
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}        
+>>>>>>> parent of fb058cd668... Update build.yml
       - name: Build for testing
         run: |
           cd src/xcode && arch -arm64 bundle exec fastlane build_for_testing
@@ -90,7 +94,11 @@ jobs:
           path: |
             src/xcode/vendor
             src/xcode/.bundle
+<<<<<<< HEAD
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
+=======
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}   
+>>>>>>> parent of fb058cd668... Update build.yml
       - name: Community Build
         run: |
           cd src/xcode && arch -arm64 bundle exec fastlane build_community
