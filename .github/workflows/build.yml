@@ -10,6 +10,13 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
+      - name: Check Ruby Versions
+        run: |
+          ruby v
+          rvm list
+          cd src/xcode
+          ruby v
+          rvm list
       - name: Install dependencies
         run: cd src/xcode && arch -arm64 bundle install --path=vendor
       - name: Save Dependencies
