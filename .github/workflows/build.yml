@@ -9,33 +9,38 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
-      - name: Check Ruby Versions
-        run: |
-          ruby -v
-          rvm list
-          cd src/xcode
-          ruby -v
-          rvm list
-      - name: Install dependencies
-        run: cd src/xcode && arch -arm64 bundle install --path=vendor
+        uses: actions/checkout@v2     
       - name: Save Dependencies
         uses: actions/cache@v2
+        id: cache-dependencies
         env:
           cache-name: cache-dependencies
         with:
           path: |
             src/xcode/vendor
             src/xcode/.bundle
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('src/xcode/Gemfile.lock') }}        
+      - name: Install dependencies
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
+        run: cd src/xcode && arch -arm64 bundle install --path=vendor
+      - name: Save Dependencies
+        uses: actions/cache@v2
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
+        env:
+          cache-name: cache-dependencies
+        with:
+          path: |
+            src/xcode/vendor
+            src/xcode/.bundle
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('src/xcode/Gemfile.lock') }}
 
-
+          
   buildForTesting:
     runs-on: self-hosted
     needs: dependencies
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2     
       - name: Restore Dependencies
         uses: actions/cache@v2
         env:
@@ -44,7 +49,7 @@ jobs:
           path: |
             src/xcode/vendor
             src/xcode/.bundle
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('src/xcode/Gemfile.lock') }}     
       - name: Build for testing
         run: |
           cd src/xcode && arch -arm64 bundle exec fastlane build_for_testing
@@ -62,13 +67,13 @@ jobs:
         with:
           path: src/xcode/fastlane/test_output
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
-
+  
   swiftLint:
     runs-on: self-hosted
     needs: dependencies
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2       
       - name: Restore Dependencies
         uses: actions/cache@v2
         env:
@@ -77,18 +82,18 @@ jobs:
           path: |
             src/xcode/vendor
             src/xcode/.bundle
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('src/xcode/Gemfile.lock') }}
       - name: swift Lint
         run: |
           cd src/xcode
           arch -arm64 bundle exec fastlane lint
-
+          
   communityBuild:
     runs-on: self-hosted
     needs: dependencies
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2            
       - name: Restore Dependencies
         uses: actions/cache@v2
         env:
@@ -97,11 +102,11 @@ jobs:
           path: |
             src/xcode/vendor
             src/xcode/.bundle
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('src/xcode/Gemfile.lock') }}       
       - name: Community Build
         run: |
           cd src/xcode && arch -arm64 bundle exec fastlane build_community
-
+          
   snapshot:
     runs-on: self-hosted
     needs: buildForTesting
@@ -111,9 +116,16 @@ jobs:
        displaymode: ["dark", "light"]
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
-      - name: Install dependencies
-        run: cd src/xcode && bundle install --jobs=8
+        uses: actions/checkout@v2            
+      - name: Restore Dependencies
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-dependencies
+        with:
+          path: |
+            src/xcode/vendor
+            src/xcode/.bundle
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('src/xcode/Gemfile.lock') }}
       - name: Restore DerivedData folder
         uses: actions/cache@v2
         env:
@@ -127,7 +139,7 @@ jobs:
           cache-name: cache-test-output
         with:
           path: src/xcode/fastlane/test_output
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}                         
       - name: Snapshot DE-light
         run: |
           cd src/xcode && bundle exec fastlane screenshot languages:${{ matrix.language }} mode:${{ matrix.displaymode }}
@@ -153,15 +165,22 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R
         working-directory: ${{steps.download.outputs.download-path}}
-
+    
   runAllTests:
     runs-on: self-hosted
     needs: buildForTesting
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
-      - name: Install dependencies
-        run: cd src/xcode && bundle install --jobs=8
+        uses: actions/checkout@v2          
+      - name: Restore Dependencies
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-dependencies
+        with:
+          path: |
+            src/xcode/vendor
+            src/xcode/.bundle
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('src/xcode/Gemfile.lock') }}
       - name: Restore DerivedData folder
         uses: actions/cache@v2
         env:
@@ -175,7 +194,7 @@ jobs:
           cache-name: cache-test-output
         with:
           path: src/xcode/fastlane/test_output
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}                       
       - name: Run AllTests
         run: |
           cd src/xcode
