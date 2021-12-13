@@ -140,9 +140,9 @@ jobs:
         with:
           path: src/xcode/fastlane/test_output
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.sha }}                         
-      - name: Snapshot DE-light
+      - name: Snapshot ${{ matrix.language }}-${{ matrix.displaymode }}
         run: |
-          cd src/xcode && bundle exec fastlane screenshot languages:${{ matrix.language }} mode:${{ matrix.displaymode }}
+          cd src/xcode && arch -arm64 bundle exec fastlane screenshot languages:${{ matrix.language }} mode:${{ matrix.displaymode }}
       - name: Remove test_output folder
         run: |
           cd src/xcode/screenshots/screenshots-${{ matrix.language }}-${{ matrix.displaymode }}
@@ -151,20 +151,6 @@ jobs:
         with:
           name: screenshots-${{ github.sha }}
           path: src/xcode/screenshots/screenshots-${{ matrix.language }}-${{ matrix.displaymode }}
-
-  collectSnapshots:
-    runs-on: self-hosted
-    needs: snapshot
-    steps:
-      - uses: actions/download-artifact@v2
-        id: download
-        with:
-          name: screenshots-${{ github.sha }}
-      - name: Echo download path
-        run: echo ${{steps.download.outputs.download-path}}
-      - name: Display structure of downloaded files
-        run: ls -R
-        working-directory: ${{steps.download.outputs.download-path}}
     
   runAllTests:
     runs-on: self-hosted
@@ -198,4 +184,4 @@ jobs:
       - name: Run AllTests
         run: |
           cd src/xcode
-          bundle exec fastlane test_without_building testplan:AllTests
+          arch -arm64 bundle exec fastlane test_without_building testplan:AllTests
