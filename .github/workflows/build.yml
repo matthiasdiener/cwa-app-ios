@@ -12,10 +12,10 @@ jobs:
         uses: actions/checkout@v2
       - name: Check Ruby Versions
         run: |
-          ruby v
+          ruby -v
           rvm list
           cd src/xcode
-          ruby v
+          ruby -v
           rvm list
       - name: Install dependencies
         run: cd src/xcode && arch -arm64 bundle install --path=vendor
