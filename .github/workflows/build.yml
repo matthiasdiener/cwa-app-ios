@@ -150,7 +150,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: screenshots-${{ github.sha }}
-          path: src/xcode/screenshots/screenshots-${{ matrix.language }}-${{ matrix.displaymode }}
+          path: src/xcode/screenshots
     
   runAllTests:
     runs-on: self-hosted
