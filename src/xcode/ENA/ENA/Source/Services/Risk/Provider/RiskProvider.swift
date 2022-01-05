@@ -155,7 +155,6 @@ final class RiskProvider: RiskProviding {
 	private let coronaTestService: CoronaTestService
 	
 	private let queue = DispatchQueue(label: "com.sap.RiskProvider")
-	private let consumersQueue = DispatchQueue(label: "com.sap.RiskProvider.consumer")
 
 	private var keyPackageDownload: KeyPackageDownloadProtocol
 	private var traceWarningPackageDownload: TraceWarningPackageDownloading
@@ -166,11 +165,7 @@ final class RiskProvider: RiskProviding {
 	private var traceWarningDownloadStatus: TraceWarningDownloadStatus
 	private var rateLimitLogger: RateLimitLogger
 	
-	private var _consumers: Set<RiskConsumer> = Set<RiskConsumer>()
-	private var consumers: Set<RiskConsumer> {
-		get { consumersQueue.sync { _consumers } }
-		set { consumersQueue.sync { _consumers = newValue } }
-	}
+	@SerialAccess private var consumers: Set<RiskConsumer> = Set<RiskConsumer>()
 
 	private var riskCalculationDate: Date? {
 		if let enfRiskCalculationResult = store.enfRiskCalculationResult,

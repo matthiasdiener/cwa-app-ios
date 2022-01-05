@@ -111,8 +111,6 @@ final class CachedAppConfiguration: AppConfigurationProviding {
 		let etag: String?
 	}
 
-	private static let queue = DispatchQueue(label: "fetchAppConfiguration queue", qos: .userInitiated, attributes: .concurrent)
-
 	/// Most likely a HTTP client
 	private let client: AppConfigurationFetching
 
@@ -120,9 +118,11 @@ final class CachedAppConfiguration: AppConfigurationProviding {
 	private let store: AppConfigCaching & DeviceTimeCheckStoring & AppFeaturesStoring
 
 	private var subscriptions = [AnyCancellable]()
-	private var promises = [(Result<CachedAppConfiguration.AppConfigResponse, Never>) -> Void]()
-	private var requestIsRunning: Bool { !promises.isEmpty }
 
+	@SerialAccess private var promises = [(Result<CachedAppConfiguration.AppConfigResponse, Never>) -> Void]()
+	
+	private var requestIsRunning: Bool { !promises.isEmpty }
+	
 	/// The location of the default app configuration.
 	private static var defaultAppConfigPath: URL {
 		guard let url = Bundle.main.url(forResource: "default_app_config_270", withExtension: "") else {
@@ -157,78 +157,71 @@ final class CachedAppConfiguration: AppConfigurationProviding {
 
 	private func getAppConfig(with etag: String? = nil) -> Future<AppConfigResponse, Never> {
 		return Future { promise in
-			Self.queue.sync(flags: .barrier) {
-				guard !self.requestIsRunning else {
-					Log.debug("Return immediately because request already running.", log: .appConfig)
-					Log.debug("Append promise.", log: .appConfig)
-					self.promises.append(promise)
-					return
-				}
-
+			guard !self.requestIsRunning else {
+				Log.debug("Return immediately because request already running.", log: .appConfig)
 				Log.debug("Append promise.", log: .appConfig)
 				self.promises.append(promise)
-
-				self.client.fetchAppConfiguration(etag: etag) { [weak self] result in
-					guard let self = self else { return }
-                    var updatedSuccessful = true
-
-					switch result.0 {
-					case .success(let response):
-						self.store.appConfigMetadata = AppConfigMetadata(
-							lastAppConfigETag: response.eTag ?? "\"ReloadMe\"",
-							lastAppConfigFetch: Date(),
-							appConfig: response.config
-						)
-
-						Log.debug("Fetched config: \(response.config).", log: .appConfig)
-
-						// update revocation list
-						let revocationList = self.store.appConfigMetadata?.appConfig.revokationEtags ?? []
-						self.packageStore?.revokationList = revocationList // for future package-operations
-						// validate currently stored key packages
-						do {
-							try self.packageStore?.validateCachedKeyPackages(revokationList: revocationList)
-						} catch {
-							Log.error("Error while removing invalidated key packages.", log: .localData, error: error)
-							// no further action - yet
-						}
-						self.resolvePromises(with: .success(AppConfigResponse(config: response.config, etag: response.eTag)))
-
-					case .failure(let error):
-						switch error {
-						case URLSessionError.notModified where self.store.appConfigMetadata != nil:
-							Log.error("config not modified", log: .api)
-							// server is not modified and we have a cached config
-							guard let meta = self.store.appConfigMetadata else {
-								fatalError("App configuration cache broken!") // in `where` we trust
-							}
-							// server response HTTP 304 is considered a 'successful fetch'
-							self.store.appConfigMetadata?.refeshLastAppConfigFetchDate()
-							self.resolvePromises(with: .success(AppConfigResponse(config: meta.appConfig, etag: meta.lastAppConfigETag)))
-						default:
-							self.defaultFailureHandler()
-                            updatedSuccessful = false
-						}
+				return
+			}
+			
+			Log.debug("Append promise.", log: .appConfig)
+			self.promises.append(promise)
+			
+			self.client.fetchAppConfiguration(etag: etag) { [weak self] result in
+				guard let self = self else { return }
+				var updatedSuccessful = true
+				
+				switch result.0 {
+				case .success(let response):
+					self.store.appConfigMetadata = AppConfigMetadata(
+						lastAppConfigETag: response.eTag ?? "\"ReloadMe\"",
+						lastAppConfigFetch: Date(),
+						appConfig: response.config
+					)
+					
+					Log.debug("Fetched config: \(response.config).", log: .appConfig)
+					
+					// update revocation list
+					let revocationList = self.store.appConfigMetadata?.appConfig.revokationEtags ?? []
+					self.packageStore?.revokationList = revocationList // for future package-operations
+					// validate currently stored key packages
+					do {
+						try self.packageStore?.validateCachedKeyPackages(revokationList: revocationList)
+					} catch {
+						Log.error("Error while removing invalidated key packages.", log: .localData, error: error)
+						// no further action - yet
 					}
-
-					// time check ⌚️
-					if let serverTime = result.1 {
-						self.deviceTimeCheck.updateDeviceTimeFlags(
-							serverTime: serverTime,
-							deviceTime: Date(),
-							configUpdateSuccessful: updatedSuccessful
-						)
-					} else {
-						self.deviceTimeCheck.resetDeviceTimeFlags(configUpdateSuccessful: false)
+					self.resolvePromises(with: .success(AppConfigResponse(config: response.config, etag: response.eTag)))
+					
+				case .failure(let error):
+					switch error {
+					case URLSessionError.notModified where self.store.appConfigMetadata != nil:
+						Log.error("config not modified", log: .api)
+						// server is not modified and we have a cached config
+						guard let meta = self.store.appConfigMetadata else {
+							fatalError("App configuration cache broken!") // in `where` we trust
+						}
+						// server response HTTP 304 is considered a 'successful fetch'
+						self.store.appConfigMetadata?.refeshLastAppConfigFetchDate()
+						self.resolvePromises(with: .success(AppConfigResponse(config: meta.appConfig, etag: meta.lastAppConfigETag)))
+					default:
+						self.resolvePromises(with: .success(self.cachedOrDefaultAppConfigResponse))
+						updatedSuccessful = false
 					}
-				} // eo fetch
-			} // eo async
+				}
+				
+				// time check ⌚️
+				if let serverTime = result.1 {
+					self.deviceTimeCheck.updateDeviceTimeFlags(
+						serverTime: serverTime,
+						deviceTime: Date(),
+						configUpdateSuccessful: updatedSuccessful
+					)
+				} else {
+					self.deviceTimeCheck.resetDeviceTimeFlags(configUpdateSuccessful: false)
+				}
+			} // eo fetch
 		}
-	}
-
-	private func defaultFailureHandler() {
-		// wrap things into a promise
-		resolvePromises(with: .success(cachedOrDefaultAppConfigResponse))
 	}
 
 	private func resolvePromises(with result: Result<CachedAppConfiguration.AppConfigResponse, Never>) {

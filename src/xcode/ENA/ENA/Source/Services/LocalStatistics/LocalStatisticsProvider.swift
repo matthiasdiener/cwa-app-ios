@@ -41,17 +41,8 @@ class LocalStatisticsProvider: LocalStatisticsProviding {
 	func updateLocalStatistics(completion: ((Result<Void, Error>) -> Void)? = nil) {
 		let fetchedLocalStatisticsQueue = DispatchQueue(label: "com.sap.LocalStatisticsProvider.fetchedLocalStatistics")
 
-		var _fetchedLocalStatistics = [LocalStatisticsMetadata]()
-		var fetchedLocalStatistics: [LocalStatisticsMetadata] {
-			get { fetchedLocalStatisticsQueue.sync { _fetchedLocalStatistics } }
-			set { fetchedLocalStatisticsQueue.sync { _fetchedLocalStatistics = newValue } }
-		}
-
-		var _errors = [Error]()
-		var errors: [Error] {
-			get { fetchedLocalStatisticsQueue.sync { _errors } }
-			set { fetchedLocalStatisticsQueue.sync { _errors = newValue } }
-		}
+		@SerialAccess var fetchedLocalStatistics = [LocalStatisticsMetadata]()
+		@SerialAccess var errors = [Error]()
 
 		// We need to fetch local statistics for N saved districts, so we use dispatch group
 		// to make sure we get the data for N saved districts
