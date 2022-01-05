@@ -113,6 +113,7 @@ class HealthCertifiedPerson: Codable, Equatable, Comparable {
 			// States and subscriptions only need to be updated if certificates were added or removed
 			if healthCertificates.map({ $0.uniqueCertificateIdentifier }) != oldValue.map({ $0.uniqueCertificateIdentifier }) {
 				updateVaccinationState()
+				updateAdmissionState()
 				updateMostRelevantHealthCertificate()
 				updateHealthCertificateSubscriptions(for: healthCertificates)
 			}
@@ -142,6 +143,14 @@ class HealthCertifiedPerson: Codable, Equatable, Comparable {
 		}
 	}
 
+	@DidSetPublished var admissionState: HealthCertifiedPersonAdmissionState = .other {
+		didSet {
+			if admissionState != oldValue {
+				objectDidChange.send(self)
+			}
+		}
+	}
+
 	@DidSetPublished var mostRelevantHealthCertificate: HealthCertificate? {
 		didSet {
 			if mostRelevantHealthCertificate != oldValue {
@@ -150,7 +159,7 @@ class HealthCertifiedPerson: Codable, Equatable, Comparable {
 		}
 	}
 
-	@DidSetPublished var gradientType: GradientView.GradientType = .lightBlue(withStars: true)
+	@DidSetPublished var gradientType: GradientView.GradientType = .lightBlue
 
 	@DidSetPublished var boosterRule: Rule? {
 		didSet {
@@ -245,6 +254,7 @@ class HealthCertifiedPerson: Codable, Equatable, Comparable {
 
 	private func setup() {
 		updateVaccinationState()
+		updateAdmissionState()
 		updateMostRelevantHealthCertificate()
 		updateHealthCertificateSubscriptions(for: healthCertificates)
 
@@ -261,6 +271,7 @@ class HealthCertifiedPerson: Codable, Equatable, Comparable {
 					guard let self = self else { return }
 
 					self.updateVaccinationState()
+					self.updateAdmissionState()
 					self.updateMostRelevantHealthCertificate()
 
 					self.objectDidChange.send(self)
@@ -289,11 +300,16 @@ class HealthCertifiedPerson: Codable, Equatable, Comparable {
 		}
 	}
 
+	private func updateAdmissionState() {
+		admissionState = healthCertificates.admissionState
+	}
+
 	private func subscribeToNotifications() {
 		NotificationCenter.default.ocombine
 			.publisher(for: UIApplication.didBecomeActiveNotification)
 			.sink { [weak self] _ in
 				self?.updateVaccinationState()
+				self?.updateAdmissionState()
 			}
 			.store(in: &subscriptions)
 
@@ -301,6 +317,7 @@ class HealthCertifiedPerson: Codable, Equatable, Comparable {
 			.publisher(for: UIApplication.significantTimeChangeNotification)
 			.sink { [weak self] _ in
 				self?.updateVaccinationState()
+				self?.updateAdmissionState()
 				self?.scheduleMostRelevantCertificateTimer()
 			}
 			.store(in: &subscriptions)

@@ -2,7 +2,6 @@
 // 🦠 Corona-Warn-App
 //
 
-import Foundation
 import ExposureNotification
 import UIKit
 import OpenCombine
@@ -100,44 +99,50 @@ final class RiskProvider: RiskProviding {
 			// Keep downloading key packages and trace warning packages for plausible deniability
 			updateActivityState(.onlyDownloadsRequested)
 
-			downloadKeyPackages { [weak self] _ in
+			downloadKeyPackages { [weak self] result in
 				guard let self = self else {
 					return
 				}
+				
+				switch result {
+				case .success:
+					self.appConfigurationProvider.appConfiguration().sink { appConfiguration in
+						self.downloadTraceWarningPackages(with: appConfiguration) { result in
+							self.updateActivityState(.idle)
 
-				self.appConfigurationProvider.appConfiguration().sink { appConfiguration in
-					self.downloadTraceWarningPackages(with: appConfiguration) { result in
-						self.updateActivityState(.idle)
-
-						// Check that the shown positive or submitted test wasn't deleted in the meantime.
-						// If it was deleted, start a new risk detection.
-						guard self.coronaTestService.hasAtLeastOneShownPositiveOrSubmittedTest else {
-							self.requestRisk(userInitiated: userInitiated, timeoutInterval: timeoutInterval)
-							return
-						}
-
-						switch result {
-						case .success:
-							// Try to obtain already calculated risk.
-							if let risk = self.previousRiskIfExistingAndNotExpired(userInitiated: userInitiated) {
-								Log.info("RiskProvider: Using risk from previous detection", log: .riskDetection)
-
-								self.successOnTargetQueue(risk: risk)
-							} else {
-								self.failOnTargetQueue(error: .deactivatedDueToActiveTest)
+							// Check that the shown positive or submitted test wasn't deleted in the meantime.
+							// If it was deleted, start a new risk detection.
+							guard self.coronaTestService.hasAtLeastOneShownPositiveOrSubmittedTest else {
+								self.requestRisk(userInitiated: userInitiated, timeoutInterval: timeoutInterval)
+								return
 							}
-						case .failure(let error):
-							self.failOnTargetQueue(error: error)
+
+							switch result {
+							case .success:
+								// Try to obtain already calculated risk.
+								if let risk = self.previousRiskIfExistingAndNotExpired(userInitiated: userInitiated) {
+									Log.info("RiskProvider: Using risk from previous detection", log: .riskDetection)
+
+									self.successOnTargetQueue(risk: risk)
+								} else {
+									self.failOnTargetQueue(error: .deactivatedDueToActiveTest)
+								}
+							case .failure(let error):
+								self.failOnTargetQueue(error: error)
+							}
 						}
-					}
-				}.store(in: &self.subscriptions)
+					}.store(in: &self.subscriptions)
+				case .failure(let error):
+					Log.info("RiskProvider: Failed to download key packages", log: .riskDetection)
+					self.failOnTargetQueue(error: error)
+				}
 			}
 
 			return
 		}
 
 		queue.async {
-			self.updateActivityState(.riskRequested)
+			self.updateActivityState(userInitiated ? .riskManuallyRequested : .riskRequested)
 			self._requestRiskLevel(userInitiated: userInitiated, timeoutInterval: timeoutInterval)
 		}
 	}
@@ -202,7 +207,7 @@ final class RiskProvider: RiskProviding {
 				self.updateRiskProvidingConfiguration(with: appConfiguration)
 
 				// First, download the diagnosis keys
-				self.downloadKeyPackages {result in
+				self.downloadKeyPackages { result in
 					switch result {
 					case .success:
 						// If key download succeeds, continue with the download of the trace warning packages
@@ -253,12 +258,15 @@ final class RiskProvider: RiskProviding {
 	}
 
 	private func downloadDayPackages(completion: @escaping (Result<Void, RiskProviderError>) -> Void) {
-		keyPackageDownload.startDayPackagesDownload(completion: { result in
+		keyPackageDownload.startDayPackagesDownload(completion: { [weak self] result in
 			switch result {
 			case .success:
 				completion(.success(()))
 			case .failure(let error):
-				completion(.failure(.failedKeyPackageDownload(error)))
+				// we need this delay so the user can see something happened
+				self?.targetQueue.asyncAfter(deadline: .now() + 1.0) {
+					completion(.failure(.failedKeyPackageDownload(error)))
+				}
 			}
 		})
 	}
@@ -415,6 +423,7 @@ final class RiskProvider: RiskProviding {
 		store.enfRiskCalculationResult = enfRiskCalculationResult
 		store.checkinRiskCalculationResult = checkinRiskCalculationResult
 
+		checkIfRiskLevelHasChangedForNotifications(risk)
 		checkIfRiskStatusLoweredAlertShouldBeShown(risk)
 		Analytics.collect(.riskExposureMetadata(.update))
 		completion(.success(risk))
@@ -433,6 +442,18 @@ final class RiskProvider: RiskProviding {
 		#endif
 		
 		consumer?.provideRiskCalculationResult(result)
+	}
+	
+	private func checkIfRiskLevelHasChangedForNotifications(_ risk: Risk) {
+		/// Triggers a notification for every risk level change.
+		if risk.riskLevelHasChanged {
+			Log.info("Trigger notification about changed risk level", log: .riskDetection)
+			UNUserNotificationCenter.current().presentNotification(
+				title: AppStrings.LocalNotifications.detectExposureTitle,
+				body: AppStrings.LocalNotifications.detectExposureBody,
+				identifier: ActionableNotificationIdentifier.riskDetection.identifier
+			)
+		}
 	}
 
 	private func checkIfRiskStatusLoweredAlertShouldBeShown(_ risk: Risk) {

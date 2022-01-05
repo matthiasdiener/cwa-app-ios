@@ -8,7 +8,6 @@ import OpenCombine
 #if !RELEASE
 
 final class MockTestStore: Store, PPAnalyticsData {
-
 	var firstPlaybookExecution: Date?
 	var lastBackgroundFakeRequest: Date = .init()
 	var hasSeenBackgroundFetchAlert: Bool = false
@@ -96,6 +95,8 @@ final class MockTestStore: Store, PPAnalyticsData {
 
 	// MARK: - ErrorLogProviding
 
+	var lastLoggedAppVersionNumber: Version?
+	var lastLoggedAppVersionTimestamp: Date?
 	var ppacApiTokenEls: TimestampedToken?
 	var otpTokenEls: OTPToken?
 	var otpElsAuthorizationDate: Date?
@@ -124,7 +125,6 @@ final class MockTestStore: Store, PPAnalyticsData {
 
 	var pcrTest: PCRTest?
 	var antigenTest: AntigenTest?
-	var unseenTestsCount: Int = 0
 
 	// MARK: - AntigenTestProfileStoring
 
@@ -198,6 +198,10 @@ final class MockTestStore: Store, PPAnalyticsData {
 			recycleBinItemsSubject.value = recycleBinItems
 		}
 	}
+
+	// MARK: - HomeBadgeStoring
+	var badgesData: [HomeBadgeWrapper.BadgeType: Int?] = [:]
+
 }
 
 #endif

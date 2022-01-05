@@ -53,8 +53,10 @@ enum AppStrings {
 		static let notificationSettingsFAQ = NSLocalizedString("NotificationSettings_FAQLink", tableName: "Localizable.links", comment: "")
 		static let ticketValidationNoValidDCCFAQ = NSLocalizedString("TicketValidation_NoValidDCC_FAQLink", tableName: "Localizable.links", comment: "")
 		static let ticketValidationServiceResultFAQ = NSLocalizedString("TicketValidation_ServiceResult_FAQLink", tableName: "Localizable.links", comment: "")
+		static let healthCertificateAdmissionPolicyFAQ = NSLocalizedString("HealthCertificate_AdmissionPolicy_FAQLink", tableName: "Localizable.links", comment: "")
 		static let selfQuarantineFAQ = NSLocalizedString("Risk_Voluntary_Self_Quarantine_FAQ_URL", tableName: "Localizable.links", comment: "")
 		static let quarantineMeasuresFAQ = NSLocalizedString("Risk_Quarantine_Measures_FAQ_URL", tableName: "Localizable.links", comment: "")
+		static let coronaWarnAppStoreLink = NSLocalizedString("TicketValidation_CoronaWarnAppLink", tableName: "Localizable.links", comment: "")
 	}
 
 	enum QuickActions {
@@ -274,10 +276,10 @@ enum AppStrings {
 		static let deleteButton = NSLocalizedString("ExposureSubmissionResult_deleteButton", comment: "")
 		static let refreshButton = NSLocalizedString("ExposureSubmissionResult_refreshButton", comment: "")
 		static let furtherInfos_Title = NSLocalizedString("ExposureSubmissionResult_testNegative_furtherInfos_title", comment: "")
+		static let furtherInfos_Desc = NSLocalizedString("ExposureSubmissionResult_testNegative_furtherInfos_desc", comment: "")
 		static let furtherInfos_ListItem1 = NSLocalizedString("ExposureSubmissionResult_testNegative_furtherInfos_listItem1", comment: "")
 		static let furtherInfos_ListItem2 = NSLocalizedString("ExposureSubmissionResult_testNegative_furtherInfos_listItem2", comment: "")
 		static let furtherInfos_ListItem3 = NSLocalizedString("ExposureSubmissionResult_testNegative_furtherInfos_listItem3", comment: "")
-		static let furtherInfos_TestAgain = NSLocalizedString("ExposureSubmissionResult_furtherInfos_hint_testAgain", comment: "")
 		static let removeAlert_Title = NSLocalizedString("ExposureSubmissionResult_RemoveAlert_Title", comment: "")
 		static let removeAlert_Text = NSLocalizedString("ExposureSubmissionResult_RemoveAlert_Text", comment: "")
 		static let removeAlert_ConfirmButtonTitle = NSLocalizedString("ExposureSubmissionResult_RemoveAlert_ConfirmButtonTitle", comment: "")
@@ -843,21 +845,13 @@ enum AppStrings {
 	}
 
 	enum ExposureNotificationError {
-
 		static let generalErrorTitle = NSLocalizedString("ExposureNotificationSetting_GeneralError_Title", comment: "")
-
 		static let learnMoreActionTitle = NSLocalizedString("ExposureNotificationSetting_GeneralError_LearnMore_Action", comment: "")
-
 		static let enAuthorizationError = NSLocalizedString("ExposureNotificationSetting_AuthenticationError", comment: "")
-
 		static let enActivationRequiredError = NSLocalizedString("ExposureNotificationSetting_exposureNotification_Required", comment: "")
-
 		static let enUnavailableError = NSLocalizedString("ExposureNotificationSetting_exposureNotification_unavailable", comment: "")
-
 		static let enUnknownError = NSLocalizedString("ExposureNotificationSetting_unknownError", comment: "")
-
 		static let apiMisuse = NSLocalizedString("ExposureNotificationSetting_apiMisuse", comment: "")
-		
 		static let notResponding = NSLocalizedString("ExposureNotificationSetting_notResponding", comment: "")
 	}
 
@@ -1148,41 +1142,32 @@ enum AppStrings {
 	
 	enum NewVersionFeatures {
 		static let accImageLabel = NSLocalizedString("DeltaOnboarding_NewVersionFeatures_AccessibilityImageLabel", comment: "")
-		
 		static let title = NSLocalizedString("DeltaOnboarding_NewVersionFeatures_Title", comment: "")
-		
 		static let release = NSLocalizedString("DeltaOnboarding_NewVersionFeatures_Release", comment: "")
-		
 		static let buttonContinue = NSLocalizedString("DeltaOnboarding_NewVersionFeatures_Button_Continue", comment: "")
-		
 		static let generalDescription = NSLocalizedString("DeltaOnboarding_NewVersionFeatures_Description", comment: "")
-		
 		static let aboutAppInformation = NSLocalizedString("NewVersionFeatures_Info_about_abb_information", comment: "")
 		
-		/* Version 2.15 */
+		/* Version 2.16 */
 		
-		static let feature215TicketValidationTitle = NSLocalizedString("NewVersionFeature_215_ticketValidation_title", comment: "")
-		
-		static let feature215TicketValidationDescription = NSLocalizedString("NewVersionFeature_215_ticketValidation_description", comment: "")
+		static let feature2162GTitle = NSLocalizedString("NewVersionFeature_216_2g_title", comment: "")
+		static let feature2162GDescription = NSLocalizedString("NewVersionFeature_216_2g_description", comment: "")
+		static let feature216NegativeTestNoticeTitle = NSLocalizedString("NewVersionFeature_216_negativeTestNotice_title", comment: "")
+		static let feature216NegativeTestNoticeDescription = NSLocalizedString("NewVersionFeature_216_negativeTestNotice_description", comment: "")
+		static let feature216HighRiskNotificationTitle = NSLocalizedString("NewVersionFeature_216_highRiskNotification_title", comment: "")
+		static let feature216HighRiskNotificationDescription = NSLocalizedString("NewVersionFeature_216_highRiskNotification_description", comment: "")
 	}
 	
 	enum DeltaOnboarding {
 		static let accImageLabel = NSLocalizedString("DeltaOnboarding_AccessibilityImageLabel", comment: "")
-		
 		static let title = NSLocalizedString("DeltaOnboarding_Headline", comment: "")
-		
 		static let description = NSLocalizedString("DeltaOnboarding_Description", comment: "")
 		static let participatingCountries = NSLocalizedString("DeltaOnboarding_ParticipatingCountries", comment: "")
-		
 		static let participatingCountriesListUnavailableTitle = NSLocalizedString("DeltaOnboarding_ParticipatingCountriesList_Unavailable_Title", comment: "")
 		static let participatingCountriesListUnavailable = NSLocalizedString("DeltaOnboarding_ParticipatingCountriesList_Unavailable", comment: "")
-		
 		static let primaryButton = NSLocalizedString("DeltaOnboarding_PrimaryButton_Continue", comment: "")
-		
 		static let legalDataProcessingInfoTitle = NSLocalizedString("DeltaOnboarding_DataProcessing_Info_title", tableName: "Localizable.legal", comment: "")
-		
 		static let legalDataProcessingInfoContent = NSLocalizedString("DeltaOnboarding_DataProcessing_Info_content", tableName: "Localizable.legal", comment: "")
-
 		static let termsDescription1 = NSLocalizedString("DeltaOnboarding_Terms_Description1", comment: "")
 		static let termsButtonTitle = NSLocalizedString("DeltaOnboarding_Terms_Button", comment: "")
 		static let termsDescription2 = NSLocalizedString("DeltaOnboarding_Terms_Description2", comment: "")
@@ -2038,6 +2023,9 @@ enum AppStrings {
 			static let emptyImageDescription = NSLocalizedString("HealthCertificate_Overview_EmptyImageDescription", comment: "")
 			static let covidTitle = NSLocalizedString("HealthCertificate_Overview_Covid_Title", comment: "")
 			static let covidDescription = NSLocalizedString("HealthCertificate_Overview_Covid_Certificate_Description", comment: "")
+			static let admissionStateTitle = NSLocalizedString("HealthCertificate_Overview_AdmissionState_Title", comment: "")
+			static let twoGCertificate = NSLocalizedString("HealthCertificate_Overview_TwoGCertificate", comment: "")
+			static let testCertificate = NSLocalizedString("HealthCertificate_Overview_TestCertificate", comment: "")
 			static let news = NSLocalizedString("HealthCertificate_Overview_News", comment: "")
 
 			enum TestCertificateRequest {
@@ -2114,7 +2102,30 @@ enum AppStrings {
 				static let boosterRuleFAQ = NSLocalizedString("HealthCertifiedPerson_boosterRuleFAQ", comment: "")
 				static let boosterRuleFAQPlaceholder = NSLocalizedString("HealthCertifiedPerson_boosterRuleFAQ_placeholder_FAQ", comment: "")
 			}
+			enum AdmissionState {
+				static let title = NSLocalizedString("HealthCertifiedPerson_AdmissionState_title", comment: "")
+				static let faq = NSLocalizedString("HealthCertifiedPerson_AdmissionStateFAQ", comment: "")
+				static let faqPlaceHolder = NSLocalizedString("HealthCertifiedPerson_AdmissionState_FAQ_Placeholder", comment: "")
+				static let subtitle2G = NSLocalizedString("HealthCertifiedPerson_AdmissionState_subtitle2G", comment: "")
+				static let subtitle2GPlusPCR = NSLocalizedString("HealthCertifiedPerson_AdmissionState_subtitle2GPlusPCR", comment: "")
+				static let subtitle2GPlusAntigen = NSLocalizedString("HealthCertifiedPerson_AdmissionState_subtitle2GPlusAntigen", comment: "")
+				static let subtitle3G = NSLocalizedString("HealthCertifiedPerson_AdmissionState_subtitle3G", comment: "")
+				static let subtitle3GPlus = NSLocalizedString("HealthCertifiedPerson_AdmissionState_subtitle3GPlus", comment: "")
+				
+				static let description2G = NSLocalizedString("HealthCertifiedPerson_AdmissionState_description2G", comment: "")
+				static let description2GPlusPCR = NSLocalizedString("HealthCertifiedPerson_AdmissionState_description2GPlusPCR", comment: "")
+				static let description2GPlusAntigen = NSLocalizedString("HealthCertifiedPerson_AdmissionState_description2GPlusAntigen", comment: "")
+				static let description3G = NSLocalizedString("HealthCertifiedPerson_AdmissionState_description3G", comment: "")
+				static let description3GPlus = NSLocalizedString("HealthCertifiedPerson_AdmissionState_description3GPlus", comment: "")
+			
+				enum ShortTitle {
+					static let title2G = NSLocalizedString("HealthCertifiedPerson_AdmissionState_shortTitle_title2G", comment: "")
+					static let title2GPlus = NSLocalizedString("HealthCertifiedPerson_AdmissionState_shortTitle_title2GPlus", comment: "")
+					static let title3G = NSLocalizedString("HealthCertifiedPerson_AdmissionState_shortTitle_title3G", comment: "")
+					static let title3GPlus = NSLocalizedString("HealthCertifiedPerson_AdmissionState_shortTitle_title3GPlus", comment: "")
 
+				}
+			}
 			enum PreferredPerson {
 				static let dateOfBirth = NSLocalizedString("HealthCertifiedPerson_dateOfBirth", comment: "")
 				static let description = NSLocalizedString("HealthCertifiedPerson_preferredPersonDescription", comment: "")
