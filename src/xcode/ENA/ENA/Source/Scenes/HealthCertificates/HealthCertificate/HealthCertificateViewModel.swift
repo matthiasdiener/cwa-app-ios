@@ -25,6 +25,7 @@ final class HealthCertificateViewModel {
 
 		updateHealthCertificateKeyValueCellViewModels()
 		updateGradient()
+		updateFooterView()
 
 		// load certificate value sets
 		vaccinationValueSetsProvider.latestVaccinationCertificateValueSets()
@@ -64,6 +65,7 @@ final class HealthCertificateViewModel {
 			.dropFirst()
 			.sink { [weak self] _ in
 				self?.updateGradient()
+				self?.updateFooterView()
 			}
 			.store(in: &subscriptions)
 
@@ -104,7 +106,7 @@ final class HealthCertificateViewModel {
 			mode: .details,
 			healthCertificate: healthCertificate,
 			accessibilityText: AppStrings.HealthCertificate.Details.QRCodeImageDescription,
-			showInfoHit: { [weak self] in
+			onCovPassCheckInfoButtonTap: { [weak self] in
 				self?.showInfo()
 			}
 		)
@@ -119,9 +121,10 @@ final class HealthCertificateViewModel {
 		)
 	}
 
-	@OpenCombine.Published private(set) var gradientType: GradientView.GradientType = .lightBlue(withStars: true)
-	@OpenCombine.Published private(set) var triggerReload: Bool = false
-	@OpenCombine.Published private(set) var healthCertificateKeyValueCellViewModel: [HealthCertificateKeyValueCellViewModel] = []
+	@DidSetPublished private(set) var gradientType: GradientView.GradientType = .lightBlue
+	@DidSetPublished private(set) var isPrimaryFooterButtonEnabled: Bool = true
+	@DidSetPublished private(set) var triggerReload: Bool = false
+	@DidSetPublished private(set) var healthCertificateKeyValueCellViewModel: [HealthCertificateKeyValueCellViewModel] = []
 
 	var headlineCellViewModel: HealthCertificateSimpleTextCellViewModel {
 		let centerParagraphStyle = NSMutableParagraphStyle()
@@ -404,8 +407,12 @@ final class HealthCertificateViewModel {
 				(healthCertificate.validityState == .expired && healthCertificate.type == .test)) {
 			gradientType = healthCertifiedPerson.gradientType
 		} else {
-			gradientType = .solidGrey(withStars: true)
+			gradientType = .solidGrey
 		}
+	}
+
+	private func updateFooterView() {
+		isPrimaryFooterButtonEnabled = healthCertificate.validityState != .blocked
 	}
 
 }

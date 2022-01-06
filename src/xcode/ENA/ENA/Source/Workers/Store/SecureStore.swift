@@ -6,9 +6,11 @@ import Foundation
 import ExposureNotification
 import OpenCombine
 
+// swiftlint:disable file_length
+
 /// The `SecureStore` class implements the `Store` protocol that defines all required storage attributes.
 /// It uses an SQLite Database that still needs to be encrypted
-final class SecureStore: Store, AntigenTestProfileStoring {
+final class SecureStore: SecureKeyValueStoring, Store, AntigenTestProfileStoring {
 
 	// MARK: - Init
 
@@ -179,7 +181,10 @@ final class SecureStore: Store, AntigenTestProfileStoring {
 	}
 
 	var submissionCountries: [Country] {
-		get { kvStore["submissionCountries"] as [Country]? ?? [.defaultCountry()] }
+		get {
+			let countries = kvStore["submissionCountries"] as [Country]? ?? [.defaultCountry()]
+			return countries.map({ Country(withCountryCodeFallback: $0.id) })
+		}
 		set { kvStore["submissionCountries"] = newValue }
 	}
 
@@ -239,7 +244,10 @@ final class SecureStore: Store, AntigenTestProfileStoring {
 	}
 
 	var lastSelectedValidationCountry: Country {
-		get { kvStore["lastSelectedValidationCountry"] as Country? ?? Country.defaultCountry() }
+		get {
+			let country = kvStore["lastSelectedValidationCountry"] as Country? ?? Country.defaultCountry()
+			return Country(withCountryCodeFallback: country.id)
+		}
 		set { kvStore["lastSelectedValidationCountry"] = newValue }
 	}
 
@@ -258,7 +266,16 @@ final class SecureStore: Store, AntigenTestProfileStoring {
 	// MARK: - Protocol HealthCertificateValidationCaching
 	
 	var validationOnboardedCountriesCache: HealthCertificateValidationOnboardedCountriesCache? {
-		get { kvStore["validationOnboardedCountriesCache"] as HealthCertificateValidationOnboardedCountriesCache? ?? nil }
+		get {
+			let countriesCache = kvStore["validationOnboardedCountriesCache"] as HealthCertificateValidationOnboardedCountriesCache? ?? nil
+			guard let countries = countriesCache?.onboardedCountries,
+				  let eTag = countriesCache?.lastOnboardedCountriesETag
+			else {
+				return nil
+			}
+			let mappedCountries = countries.map({ Country(withCountryCodeFallback: $0.id) })
+			return HealthCertificateValidationOnboardedCountriesCache(onboardedCountries: mappedCountries, lastOnboardedCountriesETag: eTag)
+		}
 		set { kvStore["validationOnboardedCountriesCache"] = newValue }
 	}
 	
@@ -324,10 +341,11 @@ final class SecureStore: Store, AntigenTestProfileStoring {
 
 	#endif
 
-	let kvStore: SQLiteKeyValueStore
+	// MARK: - Internal
 
-	// MARK: - Private
-	private let directoryURL: URL
+	static let encryptionKeyKeychainKey = "secureStoreDatabaseKey"
+	let kvStore: SQLiteKeyValueStore
+	let directoryURL: URL
 
 }
 
@@ -404,6 +422,15 @@ extension SecureStore: AppFeaturesStoring {
 	#endif
 }
 
+extension SecureStore: TicketValidationStoring {
+	#if !RELEASE
+	var skipAllowlistValidation: Bool {
+		get { kvStore["skipAllowlistValidation"] as Bool? ?? false }
+		set { kvStore["skipAllowlistValidation"] = newValue }
+	}
+	#endif
+}
+
 extension SecureStore: AppConfigCaching {
 	var appConfigMetadata: AppConfigMetadata? {
 		get { kvStore["appConfigMetadataV2"] as AppConfigMetadata? ?? nil }
@@ -465,6 +492,16 @@ extension SecureStore: PrivacyPreservingProviding {
 }
 
 extension SecureStore: ErrorLogProviding {
+
+	var lastLoggedAppVersionNumber: Version? {
+		get { kvStore["lastLoggedAppVersionNumber"] as Version? }
+		set { kvStore["lastLoggedAppVersionNumber"] = newValue }
+	}
+	
+	var lastLoggedAppVersionTimestamp: Date? {
+		get { kvStore["lastLoggedAppVersionTimestamp"] as Date? }
+		set { kvStore["lastLoggedAppVersionTimestamp"] = newValue }
+	}
 	
 	var ppacApiTokenEls: TimestampedToken? {
 		get { kvStore["ppacApiTokenEls"] as TimestampedToken? }
@@ -509,10 +546,6 @@ extension SecureStore: CoronaTestStoring {
 		set { kvStore["antigenTest"] = newValue }
 	}
 
-	var unseenTestsCount: Int {
-		get { kvStore["unseenTestsCount"] as Int? ?? 0 }
-		set { kvStore["unseenTestsCount"] = newValue }
-	}
 }
 
 extension SecureStore: CoronaTestStoringLegacy {
@@ -577,7 +610,6 @@ extension SecureStore: CoronaTestStoringLegacy {
 		get { kvStore["isSubmissionConsentGiven"] as Bool? ?? false }
 		set { kvStore["isSubmissionConsentGiven"] = newValue }
 	}
-
 }
 
 extension SecureStore: DSCListCaching {
@@ -588,71 +620,9 @@ extension SecureStore: DSCListCaching {
 	}
 }
 
-extension SecureStore {
-
-	static let keychainDatabaseKey = "secureStoreDatabaseKey"
-
-	convenience init(subDirectory: String, environmentProvider: EnvironmentProviding = Environments()) {
-		self.init(subDirectory: subDirectory, isRetry: false, environmentProvider: environmentProvider)
+extension SecureStore: HomeBadgeStoring {
+	var badgesData: [HomeBadgeWrapper.BadgeType: Int?] {
+		get { kvStore["badgesData"] as [HomeBadgeWrapper.BadgeType: Int?]? ?? [:] }
+		set { kvStore["badgesData"] = newValue }
 	}
-
-	private convenience init(subDirectory: String, isRetry: Bool, environmentProvider: EnvironmentProviding = Environments()) {
-		do {
-			let keychain = try KeychainHelper()
-			let directoryURL = try SecureStore.databaseDirectory(at: subDirectory)
-			let fileManager = FileManager.default
-			if fileManager.fileExists(atPath: directoryURL.path) {
-				// fetch existing key from keychain or generate a new one
-				let key: String
-				if let keyData = keychain.loadFromKeychain(key: SecureStore.keychainDatabaseKey) {
-					#if DEBUG
-					if isUITesting, ProcessInfo.processInfo.arguments.contains(UITestingParameters.SecureStoreHandling.simulateMismatchingKey.rawValue) {
-						// injecting a wrong key to simulate a mismatch, e.g. because of backup restoration or other reasons
-						key = "wrong 🔑"
-						try self.init(at: directoryURL, key: key)
-						return
-					}
-					#endif
-
-					key = String(decoding: keyData, as: UTF8.self)
-				} else {
-					key = try keychain.generateDatabaseKey()
-				}
-				try self.init(at: directoryURL, key: key)
-			} else {
-				try fileManager.createDirectory(atPath: directoryURL.path, withIntermediateDirectories: true, attributes: nil)
-				let key = try keychain.generateDatabaseKey()
-				try self.init(at: directoryURL, key: key)
-			}
-		} catch is SQLiteStoreError where isRetry == false {
-			SecureStore.performHardDatabaseReset(at: subDirectory)
-			self.init(subDirectory: subDirectory, isRetry: true, environmentProvider: environmentProvider)
-		} catch {
-			fatalError("Creating the Database failed (\(error)")
-		}
-	}
-
-	private static func databaseDirectory(at subDirectory: String) throws -> URL {
-		try FileManager.default
-			.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-			.appendingPathComponent(subDirectory)
-	}
-
-	/// Last Resort option.
-	///
-	/// This function clears the existing database key and removes any existing databases.
-	private static func performHardDatabaseReset(at path: String) {
-		do {
-			Log.info("⚠️ performing hard database reset ⚠️", log: .localData)
-			// remove database key
-			try KeychainHelper().clearInKeychain(key: SecureStore.keychainDatabaseKey)
-
-			// remove database
-			let directoryURL = try databaseDirectory(at: path)
-			try FileManager.default.removeItem(at: directoryURL)
-		} catch {
-			fatalError("Reset failure: \(error.localizedDescription)")
-		}
-	}
-	// swiftlint:disable file_length
 }

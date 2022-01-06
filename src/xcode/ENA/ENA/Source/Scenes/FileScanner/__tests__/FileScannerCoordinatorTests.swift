@@ -20,7 +20,10 @@ class FileScannerCoordinatorTests: XCTestCase {
 			qrCodeFound: { _ in
 				qrCodeFoundExpectation.fulfill()
 			},
-			noQRCodeFound: { }
+			noQRCodeFound: { },
+			showActivityIndicator: { },
+			hideActivityIndicator: { },
+			onQRCodeParserError: { _ in }
 		)
 		fileScannerCoordinator.start()
 
@@ -38,7 +41,10 @@ class FileScannerCoordinatorTests: XCTestCase {
 			viewControllerSpy,
 			viewModel: viewModel,
 			qrCodeFound: { _ in },
-			noQRCodeFound: { }
+			noQRCodeFound: { },
+			showActivityIndicator: { },
+			hideActivityIndicator: { },
+			onQRCodeParserError: { _ in }
 		)
 		fileScannerCoordinator.start()
 
@@ -60,7 +66,10 @@ class FileScannerCoordinatorTests: XCTestCase {
 			viewControllerSpy,
 			viewModel: viewModel,
 			qrCodeFound: { _ in },
-			noQRCodeFound: { }
+			noQRCodeFound: { },
+			showActivityIndicator: { },
+			hideActivityIndicator: { },
+			onQRCodeParserError: { _ in }
 		)
 		fileScannerCoordinator.start()
 
@@ -124,5 +133,6 @@ private class FileScannerViewModelStub: FileScannerProcessing {
 	var processingStarted: (() -> Void)?
 	var processingFinished: ((QRCodeResult) -> Void)?
 	var processingFailed: ((FileScannerError?) -> Void)?
+	var parsingFailed: ((QRCodeParserError) -> Void)?
 	var missingPasswordForPDF: ((@escaping (String) -> Void) -> Void)?
 }

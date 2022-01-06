@@ -731,7 +731,7 @@ class ExposureSubmissionCoordinator: NSObject, RequiresAppDependencies {
 										Log.error("Could not create strong self")
 										return
 									}
-									self.healthCertificateService.removeHealthCertificate(healthCertificate)
+									self.healthCertificateService.moveHealthCertificateToBin(healthCertificate)
 									self.navigationController?.popViewController(animated: true)
 								}
 							)
@@ -1159,7 +1159,9 @@ class ExposureSubmissionCoordinator: NSObject, RequiresAppDependencies {
 			didTapContinue: { [weak self] in
 				self?.showAntigenTestProfileInput(editMode: false)
 			},
-			dismiss: { [weak self] in self?.dismiss() }
+			dismiss: { [weak self] in
+				self?.dismiss()
+			}
 		)
 
 		let footerViewModel = FooterViewModel(
@@ -1226,7 +1228,7 @@ class ExposureSubmissionCoordinator: NSObject, RequiresAppDependencies {
 				self?.showAntigenTestProfileInput(editMode: true)
 			},
 			didTapDeleteProfile: { [weak self] in
-				self?.navigationController?.popViewController(animated: true)
+				self?.navigationController?.popToRootViewController(animated: true)
 			}, dismiss: { [weak self] in self?.dismiss() }
 		)
 

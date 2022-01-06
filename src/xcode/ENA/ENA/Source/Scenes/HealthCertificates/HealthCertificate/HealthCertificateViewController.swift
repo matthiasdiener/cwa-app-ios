@@ -147,7 +147,7 @@ class HealthCertificateViewController: UIViewController, UITableViewDataSource, 
 	private let didTapMoreButton: () -> Void
 
 	private let viewModel: HealthCertificateViewModel
-	private let backgroundView = GradientBackgroundView(type: .solidGrey(withStars: true))
+	private let backgroundView = GradientBackgroundView(type: .solidGrey, withStars: true)
 	private let tableView = UITableView(frame: .zero, style: .plain)
 
 	private var subscriptions = Set<AnyCancellable>()
@@ -265,10 +265,17 @@ class HealthCertificateViewController: UIViewController, UITableViewDataSource, 
 			.assign(to: \.type, on: backgroundView)
 			.store(in: &subscriptions)
 
+		viewModel.$isPrimaryFooterButtonEnabled
+			.receive(on: DispatchQueue.main.ocombine)
+			.sink {	[weak self] in
+				self?.footerView?.setEnabled($0, button: .primary)
+			}
+			.store(in: &subscriptions)
+
 		viewModel.$healthCertificateKeyValueCellViewModel
 			.receive(on: DispatchQueue.main.ocombine)
-			.sink { _ in
-				self.tableView.reloadSections(
+			.sink { [weak self] _ in
+				self?.tableView.reloadSections(
 					[
 						HealthCertificateViewModel.TableViewSection.topCorner.rawValue,
 						HealthCertificateViewModel.TableViewSection.details.rawValue,

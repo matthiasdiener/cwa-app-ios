@@ -15,7 +15,7 @@ struct HealthCertificateQRCodeCellViewModel {
 		healthCertificate: HealthCertificate,
 		accessibilityText: String,
 		onValidationButtonTap: ((HealthCertificate, @escaping (Bool) -> Void) -> Void)? = nil,
-		showInfoHit: @escaping () -> Void
+		onCovPassCheckInfoButtonTap: @escaping () -> Void
 	) {
 		self.mode = mode
 		self.healthCertificate = healthCertificate
@@ -23,12 +23,13 @@ struct HealthCertificateQRCodeCellViewModel {
 
 		self.qrCodeViewModel = HealthCertificateQRCodeViewModel(
 			healthCertificate: healthCertificate,
+			showRealQRCodeIfValidityStateBlocked: mode == .details,
 			accessibilityLabel: accessibilityText,
-			showInfoHit: showInfoHit
+			covPassCheckInfoPosition: .top,
+			onCovPassCheckInfoButtonTap: onCovPassCheckInfoButtonTap
 		)
 
-		if healthCertificate.validityState == .invalid ||
-			(healthCertificate.type != .test && healthCertificate.validityState != .valid) {
+		if !healthCertificate.isConsideredValid {
 			switch healthCertificate.validityState {
 			case .valid:
 				self.validityStateIcon = nil
@@ -66,7 +67,16 @@ struct HealthCertificateQRCodeCellViewModel {
 					self.validityStateDescription = nil
 				}
 				self.isUnseenNewsIndicatorVisible = mode == .details && healthCertificate.isValidityStateNew
-			}
+			case .blocked:
+				   self.validityStateIcon = UIImage(named: "Icon_ExpiredInvalid")
+				   self.validityStateTitle = AppStrings.HealthCertificate.ValidityState.blocked
+				   if mode == .details {
+					   self.validityStateDescription = AppStrings.HealthCertificate.ValidityState.blockedDescription
+				   } else {
+					   self.validityStateDescription = nil
+				   }
+				   self.isUnseenNewsIndicatorVisible = mode == .details && healthCertificate.isValidityStateNew
+		   }
 		} else {
 			self.validityStateIcon = nil
 			self.validityStateTitle = nil
@@ -85,9 +95,7 @@ struct HealthCertificateQRCodeCellViewModel {
 	let qrCodeViewModel: HealthCertificateQRCodeViewModel
 
 	var title: String? {
-		if mode == .overview ||
-			healthCertificate.validityState == .invalid ||
-			(healthCertificate.type != .test && healthCertificate.validityState != .valid) {
+		if mode == .overview || !healthCertificate.isConsideredValid {
 			switch healthCertificate.entry {
 			case .vaccination:
 				return AppStrings.HealthCertificate.Person.VaccinationCertificate.headline
@@ -141,6 +149,9 @@ struct HealthCertificateQRCodeCellViewModel {
 		onValidationButtonTap != nil
 	}
 
+	var isValidationButtonEnabled: Bool {
+		healthCertificate.validityState != .blocked
+	}
 
 	func didTapValidationButton(loadingStateHandler: @escaping (Bool) -> Void) {
 		onValidationButtonTap?(healthCertificate) { isLoading in

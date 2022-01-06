@@ -3,6 +3,7 @@
 //
 
 import UIKit
+import OrderedCollections
 import OpenCombine
 
 class HealthCertifiedPersonCellModel {
@@ -11,7 +12,7 @@ class HealthCertifiedPersonCellModel {
 
 	init?(
 		healthCertifiedPerson: HealthCertifiedPerson,
-		showInfoHit: @escaping () -> Void
+		onCovPassCheckInfoButtonTap: @escaping () -> Void
 	) {
 		guard let mostRelevantCertificate = healthCertifiedPerson.healthCertificates.mostRelevant else {
 			Log.error("failed to get mostRelevant health certificate")
@@ -25,14 +26,15 @@ class HealthCertifiedPersonCellModel {
 
 		qrCodeViewModel = HealthCertificateQRCodeViewModel(
 			healthCertificate: mostRelevantCertificate,
+			showRealQRCodeIfValidityStateBlocked: false,
 			accessibilityLabel: AppStrings.HealthCertificate.Overview.covidDescription,
-			showInfoHit: showInfoHit
+			covPassCheckInfoPosition: .bottom,
+			onCovPassCheckInfoButtonTap: onCovPassCheckInfoButtonTap
 		)
 
 		if healthCertifiedPerson.unseenNewsCount > 0 {
 			self.caption = .unseenNews(count: healthCertifiedPerson.unseenNewsCount)
-		} else if mostRelevantCertificate.validityState == .invalid ||
-			(mostRelevantCertificate.type != .test && mostRelevantCertificate.validityState != .valid) {
+		} else if !mostRelevantCertificate.isConsideredValid {
 			switch mostRelevantCertificate.validityState {
 			case .valid:
 				self.caption = nil
@@ -57,17 +59,37 @@ class HealthCertifiedPersonCellModel {
 					image: UIImage(named: "Icon_ExpiredInvalid"),
 					description: AppStrings.HealthCertificate.ValidityState.invalid
 				)
+			case .blocked:
+				self.caption = .validityState(
+					image: UIImage(named: "Icon_ExpiredInvalid"),
+					description: AppStrings.HealthCertificate.ValidityState.blocked
+				)
 			}
 		} else {
 			self.caption = nil
 		}
+
+		isStatusTitleVisible = healthCertifiedPerson.admissionState != .other
+
+		switch healthCertifiedPerson.admissionState {
+		case let .twoGPlusPCR(twoG: twoGCertificate, pcrTest: testCertificate),
+			 let .twoGPlusAntigen(twoG: twoGCertificate, antigenTest: testCertificate):
+			switchableHealthCertificates = [
+				AppStrings.HealthCertificate.Overview.twoGCertificate: twoGCertificate,
+				AppStrings.HealthCertificate.Overview.testCertificate: testCertificate
+			]
+		case .threeGWithPCR, .threeGWithAntigen, .twoG, .other:
+			switchableHealthCertificates = [:]
+		}
+
+		shortStatus = healthCertifiedPerson.admissionState.shortTitle
 	}
 
 	init?(
 		decodingFailedHealthCertificate: DecodingFailedHealthCertificate,
-		showInfoHit: @escaping () -> Void
+		onCovPassCheckInfoButtonTap: @escaping () -> Void
 	) {
-		backgroundGradientType = .solidGrey(withStars: true)
+		backgroundGradientType = .solidGrey
 
 		title = AppStrings.HealthCertificate.Overview.covidTitle
 		name = ""
@@ -76,13 +98,19 @@ class HealthCertifiedPersonCellModel {
 			base45: decodingFailedHealthCertificate.base45,
 			shouldBlockCertificateCode: false,
 			accessibilityLabel: AppStrings.HealthCertificate.Overview.covidDescription,
-			showInfoHit: showInfoHit
+			covPassCheckInfoPosition: .bottom,
+			onCovPassCheckInfoButtonTap: onCovPassCheckInfoButtonTap
 		)
 
 		self.caption = .validityState(
 			image: UIImage(named: "Icon_ExpiredInvalid"),
 			description: "\(decodingFailedHealthCertificate.error)"
 		)
+
+		isStatusTitleVisible = false
+		shortStatus = nil
+
+		switchableHealthCertificates = [:]
 	}
 
 	// MARK: - Internal
@@ -100,5 +128,14 @@ class HealthCertifiedPersonCellModel {
 	let qrCodeViewModel: HealthCertificateQRCodeViewModel
 
 	let caption: Caption?
+
+	let isStatusTitleVisible: Bool
+	let shortStatus: String?
+
+	let switchableHealthCertificates: OrderedDictionary<String, HealthCertificate>
+
+	func showHealthCertificate(at index: Int) {
+		qrCodeViewModel.updateImage(with: switchableHealthCertificates.elements[index].value)
+	}
 
 }

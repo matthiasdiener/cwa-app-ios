@@ -10,7 +10,7 @@ class OnBehalfCheckinSubmissionService {
 	// MARK: - Init
 
 	init(
-		restServiceProvider: RestServiceProviding = .fake(),
+		restServiceProvider: RestServiceProviding,
 		client: Client,
 		appConfigurationProvider: AppConfigurationProviding
 	) {
@@ -67,13 +67,13 @@ class OnBehalfCheckinSubmissionService {
 					case .failure(let error):
 						Log.error("[OnBehalfCheckinSubmissionService] Getting submission TAN failed", log: .api, error: error)
 
-						completion(.failure(.submissionTANError(error)))
+						completion(.failure(.registrationTokenError(error)))
 					}
 				}
 			case .failure(let error):
 				Log.error("[OnBehalfCheckinSubmissionService] Getting registration token failed", log: .api, error: error)
 
-				completion(.failure(.registrationTokenError(error)))
+				completion(.failure(.teleTanError(error)))
 			}
 		}
 	}
@@ -107,18 +107,25 @@ class OnBehalfCheckinSubmissionService {
 			}
 		}
 	}
-
 	private func getSubmissionTAN(
 		registrationToken: String,
-		completion: @escaping (Result<String, URLSession.Response.Failure>) -> Void
+		completion: @escaping (Result<String, ServiceError<RegistrationTokenError>>) -> Void
 	) {
-		client.getTANForExposureSubmit(
-			forDevice: registrationToken,
-			isFake: false,
-			completion: completion
+		let resource = RegistrationTokenResource(
+			sendModel: SendRegistrationTokenModel(
+				token: registrationToken
+			)
 		)
+		restServiceProvider.load(resource) { result in
+			switch result {
+			case .success(let model):
+				completion(.success(model.submissionTAN))
+			case .failure(let error):
+				completion(.failure(error))
+			}
+		}
 	}
-
+	
 	private func submit(
 		checkin: Checkin,
 		submissionTAN: String,
@@ -131,7 +138,7 @@ class OnBehalfCheckinSubmissionService {
 					return
 				}
 
-				let unencryptedCheckinsEnabled = self.appConfigurationProvider.featureProvider.value(for: .unencryptedCheckinsEnabled)
+				let unencryptedCheckinsEnabled = self.appConfigurationProvider.featureProvider.boolValue(for: .unencryptedCheckinsEnabled)
 
 				var unencryptedCheckins = [SAP_Internal_Pt_CheckIn]()
 				if unencryptedCheckinsEnabled {

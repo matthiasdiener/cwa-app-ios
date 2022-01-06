@@ -53,11 +53,11 @@ protocol Client {
 
 	// MARK: Getting the Configuration
 
-	/// Gets the TAN for the device
-	func getTANForExposureSubmit(
+	/// Gets the test result for the device
+	func getTestResult(
 		forDevice registrationToken: String,
 		isFake: Bool,
-		completion completeWith: @escaping TANHandler
+		completion completeWith: @escaping TestResultHandler
 	)
 
 	// MARK: Submit keys

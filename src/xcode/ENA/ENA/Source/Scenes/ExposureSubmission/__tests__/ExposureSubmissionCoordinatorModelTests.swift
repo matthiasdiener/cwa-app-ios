@@ -33,7 +33,9 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 
 		coronaTestService.pcrTest = nil
@@ -70,7 +72,9 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 
 		coronaTestService.pcrTest = PCRTest.mock(testResult: .pending)
@@ -120,7 +124,9 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 
 		coronaTestService.pcrTest = nil
@@ -174,7 +180,9 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 
 		coronaTestService.pcrTest = PCRTest.mock(testResult: .pending)
@@ -215,12 +223,14 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				)
+				),
+				recycleBin: .fake(),
+				badgeWrapper: .fake()
 			),
 			eventProvider: MockEventStore()
 		)
 
-		XCTAssertTrue(model.shouldShowTestCertificateScreen(with: .pcr(guid: "F1EE0D-F1EE0D4D-4346-4B63-B9CF-1522D9200915")))
+		XCTAssertTrue(model.shouldShowTestCertificateScreen(with: .pcr(guid: "F1EE0D-F1EE0D4D-4346-4B63-B9CF-1522D9200915", qrCodeHash: "")))
 	}
 
 	func testShouldShowTestCertificateScreen_WithAntigenTestThatHasCertificateSupport() {
@@ -246,7 +256,9 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				)
+				),
+				recycleBin: .fake(),
+				badgeWrapper: .fake()
 			),
 			eventProvider: MockEventStore()
 		)
@@ -262,7 +274,7 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 			certificateSupportedByPointOfCare: true
 		)
 
-		XCTAssertTrue(model.shouldShowTestCertificateScreen(with: .antigen(qrCodeInformation: antigenTestQRCodeInformation)))
+		XCTAssertTrue(model.shouldShowTestCertificateScreen(with: .antigen(qrCodeInformation: antigenTestQRCodeInformation, qrCodeHash: "")))
 	}
 
 	func testShouldShowTestCertificateScreen_WithAntigenTestThatHasNoCertificateSupport() {
@@ -288,7 +300,9 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				)
+				),
+				recycleBin: .fake(),
+				badgeWrapper: .fake()
 			),
 			eventProvider: MockEventStore()
 		)
@@ -304,7 +318,7 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 			certificateSupportedByPointOfCare: false
 		)
 
-		XCTAssertFalse(model.shouldShowTestCertificateScreen(with: .antigen(qrCodeInformation: antigenTestQRCodeInformation)))
+		XCTAssertFalse(model.shouldShowTestCertificateScreen(with: .antigen(qrCodeInformation: antigenTestQRCodeInformation, qrCodeHash: "")))
 	}
 
 	func testShouldShowTestCertificateScreen_WithAntigenTestThatHasNoCertificateSupportSpecified() {
@@ -330,7 +344,9 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				)
+				),
+				recycleBin: .fake(),
+				badgeWrapper: .fake()
 			),
 			eventProvider: MockEventStore()
 		)
@@ -346,7 +362,7 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 			certificateSupportedByPointOfCare: nil
 		)
 
-		XCTAssertFalse(model.shouldShowTestCertificateScreen(with: .antigen(qrCodeInformation: antigenTestQRCodeInformation)))
+		XCTAssertFalse(model.shouldShowTestCertificateScreen(with: .antigen(qrCodeInformation: antigenTestQRCodeInformation, qrCodeHash: "")))
 	}
 
 	func testShouldShowTestCertificateScreen_FromTeleTAN() {
@@ -372,7 +388,9 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				)
+				),
+				recycleBin: .fake(),
+				badgeWrapper: .fake()
 			),
 			eventProvider: MockEventStore()
 		)
@@ -405,7 +423,9 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				)
+				),
+				recycleBin: .fake(),
+				badgeWrapper: .fake()
 			),
 			eventProvider: MockEventStore()
 		)
@@ -445,7 +465,9 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				)
+				),
+				recycleBin: .fake(),
+				badgeWrapper: .fake()
 			),
 			eventProvider: MockEventStore()
 		)
@@ -492,7 +514,9 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				)
+				),
+				recycleBin: .fake(),
+				badgeWrapper: .fake()
 			),
 			eventProvider: MockEventStore()
 		)
@@ -541,7 +565,9 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				)
+				),
+				recycleBin: .fake(),
+				badgeWrapper: .fake()
 			),
 			eventProvider: MockEventStore()
 		)
@@ -590,7 +616,9 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				)
+				),
+				recycleBin: .fake(),
+				badgeWrapper: .fake()
 			),
 			eventProvider: MockEventStore()
 		)
@@ -636,7 +664,9 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				)
+				),
+				recycleBin: .fake(),
+				badgeWrapper: .fake()
 			),
 			eventProvider: MockEventStore()
 		)
@@ -683,7 +713,9 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				)
+				),
+				recycleBin: .fake(),
+				badgeWrapper: .fake()
 			),
 			eventProvider: MockEventStore()
 		)
@@ -729,7 +761,9 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				)
+				),
+				recycleBin: .fake(),
+				badgeWrapper: .fake()
 			),
 			eventProvider: MockEventStore()
 		)
@@ -775,7 +809,9 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				)
+				),
+				recycleBin: .fake(),
+				badgeWrapper: .fake()
 			),
 			eventProvider: MockEventStore()
 		)
@@ -834,7 +870,9 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				)
+				),
+				recycleBin: .fake(),
+				badgeWrapper: .fake()
 			),
 			eventProvider: MockEventStore()
 		)
@@ -893,7 +931,9 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				)
+				),
+				recycleBin: .fake(),
+				badgeWrapper: .fake()
 			),
 			eventProvider: MockEventStore()
 		)
@@ -954,7 +994,9 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				)
+				),
+				recycleBin: .fake(),
+				badgeWrapper: .fake()
 			),
 			eventProvider: MockEventStore()
 		)
@@ -986,6 +1028,12 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 	}
 
 	func testGetTestResultSucceeds() {
+		let restServiceProvider = RestServiceProviderStub(
+			results: [
+				.success(RegistrationTokenModel(registrationToken: "fake"))
+			]
+		)
+
 		let expectedTestResult: TestResult = .positive
 
 		let client = ClientMock()
@@ -1000,6 +1048,7 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 			exposureSubmissionService: MockExposureSubmissionService(),
 			coronaTestService: CoronaTestService(
 				client: client,
+				restServiceProvider: restServiceProvider,
 				store: store,
 				eventStore: MockEventStore(),
 				diaryStore: MockDiaryStore(),
@@ -1014,7 +1063,9 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				)
+				),
+				recycleBin: .fake(),
+				badgeWrapper: .fake()
 			),
 			eventProvider: MockEventStore()
 		)
@@ -1031,7 +1082,7 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 		onErrorExpectation.isInverted = true
 
 		model.registerTestAndGetResult(
-			for: .pcr(guid: ""),
+			for: .pcr(guid: "", qrCodeHash: ""),
 			isSubmissionConsentGiven: true,
 			certificateConsent: .notGiven,
 			isLoading: {
@@ -1054,6 +1105,12 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 		let expectedError: CoronaTestServiceError = .responseFailure(.invalidResponse)
 
 		let exposureSubmissionService = MockExposureSubmissionService()
+		let restServiceProvider = RestServiceProviderStub(
+			results: [
+				.success(RegistrationTokenModel(registrationToken: "fake")),
+				.success(SubmissionTANModel(submissionTAN: "fake"))
+			]
+		)
 
 		let client = ClientMock()
 		client.onGetTestResult = { _, _, completion in
@@ -1067,6 +1124,7 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 			exposureSubmissionService: exposureSubmissionService,
 			coronaTestService: CoronaTestService(
 				client: client,
+				restServiceProvider: restServiceProvider,
 				store: store,
 				eventStore: MockEventStore(),
 				diaryStore: MockDiaryStore(),
@@ -1081,7 +1139,9 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				)
+				),
+				recycleBin: .fake(),
+				badgeWrapper: .fake()
 			),
 			eventProvider: MockEventStore()
 		)
@@ -1098,7 +1158,7 @@ class ExposureSubmissionCoordinatorModelTests: CWATestCase {
 		let onErrorExpectation = expectation(description: "onError is called")
 
 		model.registerTestAndGetResult(
-			for: .pcr(guid: ""),
+			for: .pcr(guid: "", qrCodeHash: ""),
 			isSubmissionConsentGiven: true,
 			certificateConsent: .notGiven,
 			isLoading: {

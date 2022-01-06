@@ -21,6 +21,8 @@ class CheckinQRCodeParser: QRCodeParsable {
 		qrCode: String,
 		completion: @escaping (Result<QRCodeResult, QRCodeParserError>) -> Void
 	) {
+		Log.info("Parse checkin.")
+
 		#if DEBUG
 		if isUITesting {
 			let traceLocation = TraceLocation(
@@ -36,15 +38,18 @@ class CheckinQRCodeParser: QRCodeParsable {
 				cnPublicKey: Data()
 			)
 			completion(.success(.traceLocation(traceLocation)))
+			return
 		}
 		#endif
 
 		verifyQrCode(
 			qrCodeString: qrCode,
 			onSuccess: { traceLocation in
+				Log.info("Successfuly parsed checkin.")
 				completion(.success(.traceLocation(traceLocation)))
 			},
 			onError: { error in
+				Log.info("Failed parsing checkin with error: \(error)")
 				completion(.failure(.checkinQrError(error)))
 			}
 		)
@@ -57,44 +62,42 @@ class CheckinQRCodeParser: QRCodeParsable {
 		onSuccess: @escaping((TraceLocation) -> Void),
 		onError: @escaping((CheckinQRScannerError) -> Void)
 	) {
-		appConfigurationProvider.appConfiguration().sink { [weak self] appConfig in
-			// 1-Validate URL
-			var match: NSTextCheckingResult?
-			let descriptor = appConfig.presenceTracingParameters.qrCodeDescriptors.first {
-				do {
-					let regex = try NSRegularExpression(pattern: $0.regexPattern, options: [.caseInsensitive])
-					match = regex.firstMatch(in: url, range: .init(location: 0, length: url.count))
-					return match != nil
-				} catch {
-					Log.error(error.localizedDescription, log: .checkin)
-					return false
-				}
+		let appConfig = appConfigurationProvider.currentAppConfig.value
+		// 1-Validate URL
+		var match: NSTextCheckingResult?
+		let descriptor = appConfig.presenceTracingParameters.qrCodeDescriptors.first {
+			do {
+				let regex = try NSRegularExpression(pattern: $0.regexPattern, options: [.caseInsensitive])
+				match = regex.firstMatch(in: url, range: .init(location: 0, length: url.count))
+				return match != nil
+			} catch {
+				Log.error(error.localizedDescription, log: .checkin)
+				return false
 			}
+		}
 
-			// Extract ENCODED_PAYLOAD
-			// for some reason we get an extra match at index 0 which is the entire URL so we need to add an offset of 1 to each index after that to get the correct corresponding parts
-			guard let unWrappedMatch = match, let qrDescriptor = descriptor else {
-				Log.error("the QRCode matched none of the regular expressions", log: .checkin)
-				onError(CheckinQRScannerError.codeNotFound)
-				return
-			}
-			let payLoadIndex = qrDescriptor.encodedPayloadGroupIndex
-			guard payLoadIndex < unWrappedMatch.numberOfRanges,
-				  let payLoadRange = Range(unWrappedMatch.range(at: Int(payLoadIndex) + 1), in: url) else {
-				Log.error("payLoadIndex is out of bounds, invalid payload", log: .checkin)
-				onError(CheckinQRScannerError.invalidPayload)
-				return
-			}
+		// Extract ENCODED_PAYLOAD
+		// for some reason we get an extra match at index 0 which is the entire URL so we need to add an offset of 1 to each index after that to get the correct corresponding parts
+		guard let unWrappedMatch = match, let qrDescriptor = descriptor else {
+			Log.error("the QRCode matched none of the regular expressions", log: .checkin)
+			onError(CheckinQRScannerError.codeNotFound)
+			return
+		}
+		let payLoadIndex = qrDescriptor.encodedPayloadGroupIndex
+		guard payLoadIndex < unWrappedMatch.numberOfRanges,
+			  let payLoadRange = Range(unWrappedMatch.range(at: Int(payLoadIndex) + 1), in: url) else {
+				  Log.error("payLoadIndex is out of bounds, invalid payload", log: .checkin)
+				  onError(CheckinQRScannerError.invalidPayload)
+				  return
+			  }
 
-			let payLoad = url[payLoadRange]
-			guard let traceLocation = TraceLocation(qrCodeString: String(payLoad)) else {
-				Log.error("error decoding the Payload, invalid Vendor data", log: .checkin)
-				onError(CheckinQRScannerError.invalidVendorData)
-				return
-			}
-			self?.validateTraceLocationInformation(traceLocation: traceLocation, onSuccess: onSuccess, onError: onError)
-
-		}.store(in: &subscriptions)
+		let payLoad = url[payLoadRange]
+		guard let traceLocation = TraceLocation(qrCodeString: String(payLoad)) else {
+			Log.error("error decoding the Payload, invalid Vendor data", log: .checkin)
+			onError(CheckinQRScannerError.invalidVendorData)
+			return
+		}
+		validateTraceLocationInformation(traceLocation: traceLocation, onSuccess: onSuccess, onError: onError)
 	}
 
 	func validateTraceLocationInformation(
@@ -103,7 +106,7 @@ class CheckinQRCodeParser: QRCodeParsable {
 		onError: @escaping((CheckinQRScannerError) -> Void)
 	) {
 		guard !traceLocation.description.isEmpty,
-			  traceLocation.description.count <= 100,
+			  traceLocation.description.count <= kMaxDescriptionLength,
 			  !traceLocation.description.contains("\n"),
 			  !traceLocation.description.contains("\r")
 		else {
@@ -112,7 +115,7 @@ class CheckinQRCodeParser: QRCodeParsable {
 			return
 		}
 		guard !traceLocation.address.isEmpty,
-			  traceLocation.address.count <= 100,
+			  traceLocation.address.count <= kMaxAddressLength,
 			  !traceLocation.address.contains("\n"),
 			  !traceLocation.address.contains("\r")
 		else {
@@ -141,7 +144,9 @@ class CheckinQRCodeParser: QRCodeParsable {
 	
 	// MARK: - Private
 
+	private let kMaxDescriptionLength: Int = 255
+	private let kMaxAddressLength: Int = 255
+
 	private let appConfigurationProvider: AppConfigurationProviding
-	private var subscriptions: Set<AnyCancellable> = []
 
 }

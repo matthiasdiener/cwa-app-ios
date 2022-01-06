@@ -42,10 +42,9 @@ final class HTTPClient: Client {
 		fetchDay(from: url, completion: completeWith)
 	}
 
-	func getTANForExposureSubmit(forDevice registrationToken: String, isFake: Bool = false, completion completeWith: @escaping TANHandler) {
-
+	func getTestResult(forDevice registrationToken: String, isFake: Bool = false, completion completeWith: @escaping TestResultHandler) {
 		guard
-			let tanForExposureSubmitRequest = try? URLRequest.getTanForExposureSubmitRequest(
+			let testResultRequest = try? URLRequest.getTestResultRequest(
 				configuration: configuration,
 				registrationToken: registrationToken,
 				headerValue: isFake ? 1 : 0
@@ -53,43 +52,39 @@ final class HTTPClient: Client {
 			completeWith(.failure(.invalidResponse))
 			return
 		}
-
-		session.response(for: tanForExposureSubmitRequest, isFake: isFake) { result in
+		Log.debug("Requesting TestResult", log: .api)
+		session.response(for: testResultRequest, isFake: isFake) { result in
+			Log.debug("Received TestResult", log: .api)
 			switch result {
 			case let .success(response):
 
 				if response.statusCode == 400 {
-					completeWith(.failure(.regTokenNotExist))
+					completeWith(.failure(.qrDoesNotExist))
 					return
 				}
+
 				guard response.hasAcceptableStatusCode else {
 					completeWith(.failure(.serverError(response.statusCode)))
 					return
 				}
-				guard let tanResponseData = response.body else {
+				guard let testResultResponseData = response.body else {
 					completeWith(.failure(.invalidResponse))
-					Log.error("Failed to get TAN", log: .api)
-					Log.error(String(response.statusCode), log: .api)
+					Log.error("Failed to register Device with invalid response", log: .api)
 					return
 				}
 				do {
-					let response = try JSONDecoder().decode(
-						GetTANForExposureSubmitResponse.self,
-						from: tanResponseData
+					let testResultResponse = try JSONDecoder().decode(
+						FetchTestResultResponse.self,
+						from: testResultResponseData
 					)
-					guard let tan = response.tan else {
-						Log.error("Failed to get TAN because of invalid response payload structure", log: .api)
-						completeWith(.failure(.invalidResponse))
-						return
-					}
-					completeWith(.success(tan))
-				} catch _ {
-					Log.error("Failed to get TAN because of invalid response payload structure", log: .api)
+					completeWith(.success(testResultResponse))
+				} catch {
+					Log.error("Failed to get test result with invalid response payload structure", log: .api)
 					completeWith(.failure(.invalidResponse))
 				}
 			case let .failure(error):
 				completeWith(.failure(error))
-				Log.error("Failed to get TAN due to error: \(error).", log: .api)
+				Log.error("Failed to get test result due to error: \(error).", log: .api)
 			}
 		}
 	}
@@ -935,13 +930,6 @@ final class HTTPClient: Client {
 
 // MARK: Extensions
 
-private extension HTTPClient {
-	
-	struct GetTANForExposureSubmitResponse: Codable {
-		let tan: String?
-	}
-}
-
 private extension URLRequest {
 
 	static func keySubmissionRequest(
@@ -1047,13 +1035,13 @@ private extension URLRequest {
 		return request
 	}
 	
-	static func getTanForExposureSubmitRequest(
+	static func getTestResultRequest(
 		configuration: HTTPClient.Configuration,
 		registrationToken: String,
 		headerValue: Int
 	) throws -> URLRequest {
 		
-		var request = URLRequest(url: configuration.tanRetrievalURL)
+		var request = URLRequest(url: configuration.testResultURL)
 		
 		request.setValue(
 			"\(headerValue)",
@@ -1065,7 +1053,7 @@ private extension URLRequest {
 		
 		// Add header padding.
 		request.setValue(
-			String.getRandomString(of: 14),
+			String.getRandomString(of: 7),
 			forHTTPHeaderField: "cwa-header-padding"
 		)
 		
@@ -1083,7 +1071,7 @@ private extension URLRequest {
 		
 		return request
 	}
-
+	
 	static func authorizeOTPRequest(
 		configuration: HTTPClient.Configuration,
 		otpEdus: String,

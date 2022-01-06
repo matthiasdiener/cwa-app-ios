@@ -25,6 +25,7 @@ public enum LocalNotificationIdentifier: String {
 	case certificateExpiringSoon = "HealthCertificateNotificationExpireSoon"
 	case certificateExpired = "HealthCertificateNotificationExpired"
 	case certificateInvalid = "HealthCertificateNotificationInvalid"
+	case certificateBlocked = "HealthCertificateNotificationBlocked"
 	case boosterVaccination = "BoosterVaccinationNotification"
 }
 
@@ -45,6 +46,9 @@ extension UserNotificationCenter {
 		content.badge = 1
 		content.categoryIdentifier = identifier
 		content.userInfo = info
+		if #available(iOS 15.0, *) {
+			content.interruptionLevel = .timeSensitive
+		}
 		
 		let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInterval, repeats: false)
 		let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)

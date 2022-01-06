@@ -199,9 +199,11 @@ class StatisticsInfoViewController: DynamicTableViewController {
 						text: AppStrings.Statistics.Info.faqLinkText,
 						accessibilityIdentifier: nil
 					),
-					.link(
+					.textWithLinks(
 						text: AppStrings.Statistics.Info.faqLinkTitle,
-						url: URL(string: AppStrings.Statistics.Info.faqLink)
+						links: [
+							AppStrings.Statistics.Info.faqLinkTitle: AppStrings.Statistics.Info.faqLink
+						]
 					)
 				]
 			),
@@ -273,10 +275,7 @@ class StatisticsInfoViewController: DynamicTableViewController {
 					.icon(UIImage(named: "Pfeil_steigend"), text: .string(AppStrings.Statistics.Info.trendsIncreasing), iconWidth: 19),
 					.icon(UIImage(named: "Pfeil_sinkend"), text: .string(AppStrings.Statistics.Info.trendsDecreasing), iconWidth: 19),
 					.icon(UIImage(named: "Pfeil_stabil"), text: .string(AppStrings.Statistics.Info.trendsStable), iconWidth: 19),
-					.footnote(
-						text: AppStrings.Statistics.Info.trendsFootnote,
-						accessibilityIdentifier: nil
-					),
+					.body(text: AppStrings.Statistics.Info.trendsFootnote),
 					.textWithLinks(
 						text: String(
 							format: AppStrings.Statistics.Info.blogDescription,
@@ -285,7 +284,7 @@ class StatisticsInfoViewController: DynamicTableViewController {
 							AppStrings.Statistics.Info.blog: AppStrings.Links.statisticsInfoBlog
 						],
 						linksColor: .enaColor(for: .textTint),
-						style: .footnote
+						style: .body
 					)
 				]
 			)

@@ -3,7 +3,6 @@
 //
 
 import BackgroundTasks
-import Foundation
 import UIKit
 import HealthCertificateToolkit
 import OpenCombine
@@ -14,6 +13,7 @@ class TaskExecutionHandler: ENATaskExecutionDelegate {
 
 	init(
 		riskProvider: RiskProvider,
+		restServiceProvider: RestServiceProviding,
 		exposureManager: ExposureManager,
 		plausibleDeniabilityService: PlausibleDeniabilityService,
 		contactDiaryStore: DiaryStoring,
@@ -24,6 +24,7 @@ class TaskExecutionHandler: ENATaskExecutionDelegate {
 		healthCertificateService: HealthCertificateService
 	) {
 		self.riskProvider = riskProvider
+		self.restServiceProvider = restServiceProvider
 		self.exposureManager = exposureManager
 		self.plausibleDeniabilityService = plausibleDeniabilityService
 		self.contactDiaryStore = contactDiaryStore
@@ -162,6 +163,7 @@ class TaskExecutionHandler: ENATaskExecutionDelegate {
 	// MARK: - Private
 
 	private let exposureManager: ExposureManager
+	private let restServiceProvider: RestServiceProviding
 	private let backgroundTaskConsumer = RiskConsumer()
 	private let eventStore: EventStoring
 	private let eventCheckoutService: EventCheckoutService
@@ -177,6 +179,7 @@ class TaskExecutionHandler: ENATaskExecutionDelegate {
 			diagnosisKeysRetrieval: dependencies.exposureManager,
 			appConfigurationProvider: dependencies.appConfigurationProvider,
 			client: dependencies.client,
+			restServiceProvider: restServiceProvider,
 			store: dependencies.store,
 			eventStore: dependencies.eventStore,
 			coronaTestService: dependencies.coronaTestService
@@ -251,11 +254,6 @@ class TaskExecutionHandler: ENATaskExecutionDelegate {
 
 			guard let self = self else { return }
 			if risk.riskLevelHasChanged {
-				UNUserNotificationCenter.current().presentNotification(
-					title: AppStrings.LocalNotifications.detectExposureTitle,
-					body: AppStrings.LocalNotifications.detectExposureBody,
-					identifier: ActionableNotificationIdentifier.riskDetection.identifier
-				)
 				Log.info("[ENATaskExecutionDelegate] Risk has changed.", log: .riskDetection)
 				completion(true)
 			} else {

@@ -50,6 +50,7 @@ class HealthCertifiedPerson: Codable, Equatable, Comparable {
 					base45: $0.base45,
 					validityState: $0.validityState ?? .valid,
 					didShowInvalidNotification: $0.didShowInvalidNotification ?? false,
+					didShowBlockedNotification: $0.didShowBlockedNotification ?? false,
 					isNew: $0.isNew ?? false,
 					isValidityStateNew: $0.isValidityStateNew ?? false
 				)
@@ -112,6 +113,7 @@ class HealthCertifiedPerson: Codable, Equatable, Comparable {
 			// States and subscriptions only need to be updated if certificates were added or removed
 			if healthCertificates.map({ $0.uniqueCertificateIdentifier }) != oldValue.map({ $0.uniqueCertificateIdentifier }) {
 				updateVaccinationState()
+				updateAdmissionState()
 				updateMostRelevantHealthCertificate()
 				updateHealthCertificateSubscriptions(for: healthCertificates)
 			}
@@ -141,6 +143,14 @@ class HealthCertifiedPerson: Codable, Equatable, Comparable {
 		}
 	}
 
+	@DidSetPublished var admissionState: HealthCertifiedPersonAdmissionState = .other {
+		didSet {
+			if admissionState != oldValue {
+				objectDidChange.send(self)
+			}
+		}
+	}
+
 	@DidSetPublished var mostRelevantHealthCertificate: HealthCertificate? {
 		didSet {
 			if mostRelevantHealthCertificate != oldValue {
@@ -149,7 +159,7 @@ class HealthCertifiedPerson: Codable, Equatable, Comparable {
 		}
 	}
 
-	@DidSetPublished var gradientType: GradientView.GradientType = .lightBlue(withStars: true)
+	@DidSetPublished var gradientType: GradientView.GradientType = .lightBlue
 
 	@DidSetPublished var boosterRule: Rule? {
 		didSet {
@@ -196,7 +206,6 @@ class HealthCertifiedPerson: Codable, Equatable, Comparable {
 		scheduleMostRelevantCertificateTimer()
 	}
 
-	// internal for testing
 	var recoveredVaccinationCertificate: HealthCertificate? {
 		return vaccinationCertificates.first { $0.vaccinationEntry?.isRecoveredVaccination ?? false }
 	}
@@ -215,15 +224,19 @@ class HealthCertifiedPerson: Codable, Equatable, Comparable {
 	private var mostRelevantCertificateTimer: Timer?
 
 	private var completeVaccinationProtectionDate: Date? {
-		if let completeBoosterVaccinationProtectionDate = self.completeBoosterVaccinationProtectionDate {
-			return completeBoosterVaccinationProtectionDate
-		} else if let recoveredVaccinatedCertificate = recoveredVaccinationCertificate,
+		if let recoveredVaccinatedCertificate = recoveredVaccinationCertificate,
 		   let vaccinationDateString = recoveredVaccinatedCertificate.vaccinationEntry?.dateOfVaccination {
-			// if recovery date found -> use it
+			// if recovery vaccination date found
 			return ISO8601DateFormatter.justLocalDateFormatter.date(from: vaccinationDateString)
-		} else if let lastVaccination = vaccinationCertificates.filter({ $0.vaccinationEntry?.isLastDoseInASeries ?? false }).max(),
-				  let vaccinationDate = lastVaccination.vaccinationEntry?.localVaccinationDate {
-			// else if last vaccination date -> use it
+		} else if let completeBoosterVaccinationProtectionDate = self.completeBoosterVaccinationProtectionDate {
+			// if booster vaccination date found
+			return completeBoosterVaccinationProtectionDate
+		} else if let lastVaccination = vaccinationCertificates.filter({ $0.vaccinationEntry?.isLastDoseInASeries ?? false &&
+			$0.ageInDays ?? 0 > 14 }).max(), let vaccinationDate = lastVaccination.vaccinationEntry?.localVaccinationDate {
+			// if series completion vaccination date found with > 14 days
+			return Calendar.autoupdatingCurrent.date(byAdding: .day, value: 15, to: vaccinationDate)
+		} else if let lastVaccination = vaccinationCertificates.filter({ $0.vaccinationEntry?.isLastDoseInASeries ?? false && $0.ageInDays ?? 0 <= 14 }).max(), let vaccinationDate = lastVaccination.vaccinationEntry?.localVaccinationDate {
+			// if series completion vaccination date found <= 14 days
 			return Calendar.autoupdatingCurrent.date(byAdding: .day, value: 15, to: vaccinationDate)
 		} else {
 			// no date -> completeVaccinationProtectionDate is nil
@@ -241,6 +254,7 @@ class HealthCertifiedPerson: Codable, Equatable, Comparable {
 
 	private func setup() {
 		updateVaccinationState()
+		updateAdmissionState()
 		updateMostRelevantHealthCertificate()
 		updateHealthCertificateSubscriptions(for: healthCertificates)
 
@@ -257,6 +271,7 @@ class HealthCertifiedPerson: Codable, Equatable, Comparable {
 					guard let self = self else { return }
 
 					self.updateVaccinationState()
+					self.updateAdmissionState()
 					self.updateMostRelevantHealthCertificate()
 
 					self.objectDidChange.send(self)
@@ -285,11 +300,16 @@ class HealthCertifiedPerson: Codable, Equatable, Comparable {
 		}
 	}
 
+	private func updateAdmissionState() {
+		admissionState = healthCertificates.admissionState
+	}
+
 	private func subscribeToNotifications() {
 		NotificationCenter.default.ocombine
 			.publisher(for: UIApplication.didBecomeActiveNotification)
 			.sink { [weak self] _ in
 				self?.updateVaccinationState()
+				self?.updateAdmissionState()
 			}
 			.store(in: &subscriptions)
 
@@ -297,6 +317,7 @@ class HealthCertifiedPerson: Codable, Equatable, Comparable {
 			.publisher(for: UIApplication.significantTimeChangeNotification)
 			.sink { [weak self] _ in
 				self?.updateVaccinationState()
+				self?.updateAdmissionState()
 				self?.scheduleMostRelevantCertificateTimer()
 			}
 			.store(in: &subscriptions)

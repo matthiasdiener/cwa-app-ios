@@ -26,6 +26,8 @@ final class HealthCertifiedPersonViewModel {
 		self.showInfo = showInfoHit
 
 		self.vaccinationHintCellViewModel = VaccinationHintCellModel(healthCertifiedPerson: healthCertifiedPerson)
+		self.vaccinationAdmissionStateViewModel = AdmissionStateCellModel(healthCertifiedPerson: healthCertifiedPerson)
+		
 		constructHealthCertificateCellViewModels(for: healthCertifiedPerson)
 
 		healthCertifiedPerson.objectDidChange
@@ -63,6 +65,7 @@ final class HealthCertifiedPersonViewModel {
 	enum TableViewSection: Int, CaseIterable {
 		case header
 		case qrCode
+		case admissionState
 		case vaccinationHint
 		case person
 		case certificates
@@ -114,8 +117,9 @@ final class HealthCertifiedPersonViewModel {
 	}
 
 	let vaccinationHintCellViewModel: VaccinationHintCellModel
+	let vaccinationAdmissionStateViewModel: AdmissionStateCellModel
 
-	@OpenCombine.Published private(set) var gradientType: GradientView.GradientType = .lightBlue(withStars: true)
+	@OpenCombine.Published private(set) var gradientType: GradientView.GradientType = .lightBlue
 	@OpenCombine.Published private(set) var triggerReload: Bool = false
 	@OpenCombine.Published private(set) var updateError: Error?
 
@@ -132,7 +136,7 @@ final class HealthCertifiedPersonViewModel {
 			onValidationButtonTap: { [weak self] healthCertificate, loadingStateHandler in
 				self?.didTapValidationButton(healthCertificate, loadingStateHandler)
 			},
-			showInfoHit: { [ weak self] in
+			onCovPassCheckInfoButtonTap: { [ weak self] in
 				self?.showInfo()
 			}
 		)
@@ -140,6 +144,10 @@ final class HealthCertifiedPersonViewModel {
 
 	var vaccinationHintIsVisible: Bool {
 		return !healthCertifiedPerson.vaccinationCertificates.isEmpty
+	}
+	
+	var admissionStateIsVisible: Bool {
+		return healthCertifiedPerson.admissionState != .other
 	}
 
 	var preferredPersonCellModel: PreferredPersonCellModel {
@@ -154,6 +162,8 @@ final class HealthCertifiedPersonViewModel {
 			return 1
 		case .qrCode:
 			return 1
+		case .admissionState:
+			return admissionStateIsVisible ? 1 : 0
 		case .vaccinationHint:
 			return vaccinationHintIsVisible ? 1 : 0
 		case .person:
@@ -203,7 +213,7 @@ final class HealthCertifiedPersonViewModel {
 	private var subscriptions = Set<AnyCancellable>()
 
 	private var healthCertificateCellViewModels = [HealthCertificateCellViewModel]()
-
+	
 	private func constructHealthCertificateCellViewModels(for person: HealthCertifiedPerson) {
 		let sortedHealthCertificates = person.healthCertificates.sorted(by: >)
 		healthCertificateCellViewModels = sortedHealthCertificates.map {

@@ -10,23 +10,34 @@ final class HealthCertificateCellViewModel {
 	
 	init(
 		healthCertificate: HealthCertificate,
-		healthCertifiedPerson: HealthCertifiedPerson
+		healthCertifiedPerson: HealthCertifiedPerson,
+		details: HealthCertificeCellDetails = .allDetails
 	) {
 		self.healthCertificate = healthCertificate
 		self.healthCertifiedPerson = healthCertifiedPerson
+		self.details = details
 	}
 
 	// MARK: - Internal
 	
+	enum HealthCertificeCellDetails {
+		case allDetails
+		case overview
+	}
+	
 	let healthCertificate: HealthCertificate
-
+	
 	lazy var gradientType: GradientView.GradientType = {
-		if healthCertificate.validityState == .invalid ||
-			(healthCertificate.type != .test && healthCertificate.validityState == .expired) ||
-			healthCertificate != healthCertifiedPerson.mostRelevantHealthCertificate {
-			return .solidGrey(withStars: false)
-		} else {
-			return .lightBlue(withStars: false)
+		switch details {
+		case .allDetails:
+			if healthCertificate.isUsable &&
+				healthCertificate == healthCertifiedPerson.mostRelevantHealthCertificate {
+				return healthCertifiedPerson.gradientType
+			} else {
+				return .solidGrey
+			}
+		case .overview:
+			return .lightBlue
 		}
 	}()
 
@@ -88,32 +99,37 @@ final class HealthCertificateCellViewModel {
 	}()
 
 	lazy var validityStateInfo: String? = {
-		if healthCertificate.validityState == .invalid ||
-			(healthCertificate.type != .test && healthCertificate.validityState != .valid) {
-			switch healthCertificate.validityState {
-			case .valid:
+		switch details {
+		case .allDetails:
+			if !healthCertificate.isConsideredValid {
+				switch healthCertificate.validityState {
+				case .valid:
+					return nil
+				case .expiringSoon:
+					return String(
+						format: AppStrings.HealthCertificate.ValidityState.expiringSoon,
+						DateFormatter.localizedString(from: healthCertificate.expirationDate, dateStyle: .short, timeStyle: .none),
+						DateFormatter.localizedString(from: healthCertificate.expirationDate, dateStyle: .none, timeStyle: .short)
+					)
+				case .expired:
+					return AppStrings.HealthCertificate.ValidityState.expired
+				case .invalid:
+					return AppStrings.HealthCertificate.ValidityState.invalid
+				case .blocked:
+					return AppStrings.HealthCertificate.ValidityState.blocked
+				}
+			} else if healthCertificate.isNew {
+				return AppStrings.HealthCertificate.Person.newlyAddedCertificate
+			} else {
 				return nil
-			case .expiringSoon:
-				return String(
-					format: AppStrings.HealthCertificate.ValidityState.expiringSoon,
-					DateFormatter.localizedString(from: healthCertificate.expirationDate, dateStyle: .short, timeStyle: .none),
-					DateFormatter.localizedString(from: healthCertificate.expirationDate, dateStyle: .none, timeStyle: .short)
-				)
-			case .expired:
-				return AppStrings.HealthCertificate.ValidityState.expired
-			case .invalid:
-				return AppStrings.HealthCertificate.ValidityState.invalid
 			}
-		} else if healthCertificate.isNew {
-			return AppStrings.HealthCertificate.Person.newlyAddedCertificate
-		} else {
+		case .overview:
 			return nil
 		}
 	}()
 
 	lazy var image: UIImage = {
-		if healthCertificate.validityState == .invalid ||
-			(healthCertificate.type != .test && healthCertificate.validityState == .expired) {
+		guard healthCertificate.isUsable else {
 			return UIImage(imageLiteralResourceName: "Icon_WarningTriangle_small")
 		}
 
@@ -134,15 +150,38 @@ final class HealthCertificateCellViewModel {
 	}()
 
 	lazy var isCurrentlyUsedCertificateHintVisible: Bool = {
-		healthCertificate == healthCertifiedPerson.mostRelevantHealthCertificate
+		switch details {
+		case .allDetails:
+			return healthCertificate == healthCertifiedPerson.mostRelevantHealthCertificate
+		case .overview:
+			return false
+		}
+	}()
+
+	lazy var currentlyUsedImage: UIImage? = {
+		switch gradientType {
+		case .lightBlue:
+			return UIImage(named: "Icon_CurrentlyUsedCertificate_light")
+		case .mediumBlue:
+			return UIImage(named: "Icon_CurrentlyUsedCertificate_medium")
+		case .darkBlue:
+			return UIImage(named: "Icon_CurrentlyUsedCertificate_dark")
+		case .blueRedTilted, .blueOnly, .solidGrey, .whiteToLightBlue:
+			return UIImage(named: "Icon_CurrentlyUsedCertificate_grey")
+		}
 	}()
 
 	lazy var isUnseenNewsIndicatorVisible: Bool = {
-		healthCertificate.isNew || healthCertificate.isValidityStateNew
+		switch details {
+		case .allDetails:
+			return healthCertificate.isNew || healthCertificate.isValidityStateNew
+		case .overview:
+			return false
+		}
 	}()
 
 	// MARK: - Private
 
 	private let healthCertifiedPerson: HealthCertifiedPerson
-
+	private let details: HealthCertificeCellDetails
 }

@@ -13,11 +13,21 @@ struct DeltaOnboardingNewVersionFeaturesViewModel {
 		
 		// ADD NEW FEATURES HERE
 		
-		self.featureVersion = "2.14"
+		self.featureVersion = "2.16"
 		
-		// Recycle bin feature
+		// 2G
 		self.newVersionFeatures.append(
-			NewVersionFeature(title: AppStrings.NewVersionFeatures.feature214RecycleBinTitle, description: AppStrings.NewVersionFeatures.feature214RecycleBinDescription)
+			NewVersionFeature(title: AppStrings.NewVersionFeatures.feature2162GTitle, description: AppStrings.NewVersionFeatures.feature2162GDescription)
+		)
+		
+		// Negative Test Notice
+		self.newVersionFeatures.append(
+			NewVersionFeature(title: AppStrings.NewVersionFeatures.feature216NegativeTestNoticeTitle, description: AppStrings.NewVersionFeatures.feature216NegativeTestNoticeDescription)
+		)
+		
+		// High Risk Notification
+		self.newVersionFeatures.append(
+			NewVersionFeature(title: AppStrings.NewVersionFeatures.feature216HighRiskNotificationTitle, description: AppStrings.NewVersionFeatures.feature216HighRiskNotificationDescription)
 		)
 	}
 

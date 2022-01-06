@@ -3,6 +3,7 @@
 //
 
 @testable import ENA
+import OpenCombine
 import ExposureNotification
 import HealthCertificateToolkit
 import XCTest
@@ -32,7 +33,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 
 		// WHEN
@@ -68,7 +71,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 
 		XCTAssertFalse(service.hasAtLeastOneShownPositiveOrSubmittedTest)
@@ -122,19 +127,15 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
-		)
-
-		service.antigenTest = AntigenTest.mock(
-			pointOfCareConsentDate: Date(timeIntervalSinceNow: -(60 * 60 * 48)),
-			sampleCollectionDate: nil,
-			testResult: .negative
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 
 		let publisherExpectation = expectation(description: "")
-		publisherExpectation.expectedFulfillmentCount = 2
+		publisherExpectation.expectedFulfillmentCount = 3
 
-		let expectedValues = [false, true]
+		let expectedValues = [false, false, true]
 
 		var receivedValues = [Bool]()
 		let subscription = service.$antigenTestIsOutdated
@@ -142,6 +143,12 @@ class CoronaTestServiceTests: CWATestCase {
 				receivedValues.append($0)
 				publisherExpectation.fulfill()
 			}
+
+		service.antigenTest = AntigenTest.mock(
+			pointOfCareConsentDate: Date(timeIntervalSinceNow: -(60 * 60 * 48)),
+			sampleCollectionDate: nil,
+			testResult: .negative
+		)
 
 		waitForExpectations(timeout: .short)
 
@@ -174,8 +181,22 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
+
+		let publisherExpectation = expectation(description: "")
+		publisherExpectation.expectedFulfillmentCount = 3
+
+		let expectedValues = [false, false, true]
+
+		var receivedValues = [Bool]()
+		let subscription = service.$antigenTestIsOutdated
+			.sink {
+				receivedValues.append($0)
+				publisherExpectation.fulfill()
+			}
 
 		// Outdated only according to sample collection date, not according to point of care consent date
 		// As we are using the sample collection date if set, the test is outdated
@@ -184,18 +205,6 @@ class CoronaTestServiceTests: CWATestCase {
 			sampleCollectionDate: Date(timeIntervalSinceNow: -(60 * 60 * 48)),
 			testResult: .negative
 		)
-
-		let publisherExpectation = expectation(description: "")
-		publisherExpectation.expectedFulfillmentCount = 2
-
-		let expectedValues = [false, true]
-
-		var receivedValues = [Bool]()
-		let subscription = service.$antigenTestIsOutdated
-			.sink {
-				receivedValues.append($0)
-				publisherExpectation.fulfill()
-			}
 
 		waitForExpectations(timeout: .short)
 
@@ -228,18 +237,15 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
-		)
-
-		service.antigenTest = AntigenTest.mock(
-			pointOfCareConsentDate: Date(timeIntervalSinceNow: -(60 * 60 * 48) + 5),
-			testResult: .negative
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 
 		let publisherExpectation = expectation(description: "")
-		publisherExpectation.expectedFulfillmentCount = 2
+		publisherExpectation.expectedFulfillmentCount = 3
 
-		let expectedValues = [false, true]
+		let expectedValues = [false, false, true]
 
 		var receivedValues = [Bool]()
 		let subscription = service.$antigenTestIsOutdated
@@ -247,6 +253,11 @@ class CoronaTestServiceTests: CWATestCase {
 				receivedValues.append($0)
 				publisherExpectation.fulfill()
 			}
+
+		service.antigenTest = AntigenTest.mock(
+			pointOfCareConsentDate: Date(timeIntervalSinceNow: -(60 * 60 * 48) + 5),
+			testResult: .negative
+		)
 
 		// Setting 10 seconds explicitly as it takes 5 seconds for the outdated state to happen
 		waitForExpectations(timeout: 10)
@@ -280,18 +291,15 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
-		)
-
-		service.antigenTest = AntigenTest.mock(
-			pointOfCareConsentDate: Date(timeIntervalSinceNow: -(60 * 60 * 48)),
-			testResult: .negative
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 
 		let publisherExpectation = expectation(description: "")
-		publisherExpectation.expectedFulfillmentCount = 3
+		publisherExpectation.expectedFulfillmentCount = 4
 
-		let expectedValues = [false, true, false]
+		let expectedValues = [false, false, true, false]
 
 		var receivedValues = [Bool]()
 		let subscription = service.$antigenTestIsOutdated
@@ -304,6 +312,11 @@ class CoronaTestServiceTests: CWATestCase {
 					service.removeTest(.antigen)
 				}
 			}
+
+		service.antigenTest = AntigenTest.mock(
+			pointOfCareConsentDate: Date(timeIntervalSinceNow: -(60 * 60 * 48)),
+			testResult: .negative
+		)
 
 		waitForExpectations(timeout: .short)
 
@@ -336,19 +349,15 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
-		)
-
-		service.antigenTest = AntigenTest.mock(
-			registrationToken: "1",
-			pointOfCareConsentDate: Date(timeIntervalSinceNow: -(60 * 60 * 48)),
-			testResult: .negative
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 
 		let publisherExpectation = expectation(description: "")
-		publisherExpectation.expectedFulfillmentCount = 3
+		publisherExpectation.expectedFulfillmentCount = 4
 
-		let expectedValues = [false, true, false]
+		let expectedValues = [false, false, true, false]
 
 		var receivedValues = [Bool]()
 		let subscription = service.$antigenTestIsOutdated
@@ -365,6 +374,12 @@ class CoronaTestServiceTests: CWATestCase {
 					)
 				}
 			}
+
+		service.antigenTest = AntigenTest.mock(
+			registrationToken: "1",
+			pointOfCareConsentDate: Date(timeIntervalSinceNow: -(60 * 60 * 48)),
+			testResult: .negative
+		)
 
 		waitForExpectations(timeout: .short)
 
@@ -397,19 +412,15 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
-		)
-
-		service.antigenTest = AntigenTest.mock(
-			registrationToken: "1",
-			pointOfCareConsentDate: Date(timeIntervalSinceNow: -(60 * 60 * 48)),
-			testResult: .negative
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 
 		let publisherExpectation = expectation(description: "")
-		publisherExpectation.expectedFulfillmentCount = 4
+		publisherExpectation.expectedFulfillmentCount = 5
 
-		let expectedValues = [false, true, false, true]
+		let expectedValues = [false, false, true, false, true]
 
 		var receivedValues = [Bool]()
 		let subscription = service.$antigenTestIsOutdated
@@ -426,6 +437,12 @@ class CoronaTestServiceTests: CWATestCase {
 					)
 				}
 			}
+
+		service.antigenTest = AntigenTest.mock(
+			registrationToken: "1",
+			pointOfCareConsentDate: Date(timeIntervalSinceNow: -(60 * 60 * 48)),
+			testResult: .negative
+		)
 
 		waitForExpectations(timeout: .short)
 
@@ -460,16 +477,15 @@ class CoronaTestServiceTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				)
-			)
-
-			service.antigenTest = AntigenTest.mock(
-				pointOfCareConsentDate: Date(timeIntervalSinceNow: -(60 * 60 * 48)),
-				testResult: testResult
+				),
+				recycleBin: .fake(),
+				badgeWrapper: .fake()
 			)
 
 			let publisherExpectation = expectation(description: "")
-			let expectedValues = [false]
+			publisherExpectation.expectedFulfillmentCount = 2
+
+			let expectedValues = [false, false]
 
 			var receivedValues = [Bool]()
 			let subscription = service.$antigenTestIsOutdated
@@ -477,6 +493,11 @@ class CoronaTestServiceTests: CWATestCase {
 					receivedValues.append($0)
 					publisherExpectation.fulfill()
 				}
+
+			service.antigenTest = AntigenTest.mock(
+				pointOfCareConsentDate: Date(timeIntervalSinceNow: -(60 * 60 * 48)),
+				testResult: testResult
+			)
 
 			waitForExpectations(timeout: .short)
 
@@ -507,7 +528,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 
 		XCTAssertNil(service.coronaTest(ofType: .pcr))
@@ -565,7 +588,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		service.pcrTest = nil
 
@@ -573,6 +598,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 		service.registerPCRTestAndGetResult(
 			guid: "guid",
+			qrCodeHash: "qrCodeHash",
 			isSubmissionConsentGiven: false,
 			certificateConsent: .notGiven
 		) { result in
@@ -593,6 +619,7 @@ class CoronaTestServiceTests: CWATestCase {
 		}
 
 		XCTAssertEqual(pcrTest.registrationToken, "registrationToken")
+		XCTAssertEqual(pcrTest.qrCodeHash, "qrCodeHash")
 		XCTAssertEqual(
 			try XCTUnwrap(pcrTest.registrationDate).timeIntervalSince1970,
 			Date().timeIntervalSince1970,
@@ -645,7 +672,7 @@ class CoronaTestServiceTests: CWATestCase {
 		}
 
 		let appConfiguration = CachedAppConfigurationMock()
-
+		let badgeWrapper = HomeBadgeWrapper.fake()
 		let service = CoronaTestService(
 			client: client,
 			restServiceProvider: restServiceProvider,
@@ -663,16 +690,19 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: badgeWrapper
 		)
 
-		let expectedCounts = [0, 1, 0]
+		let expectedCounts = [nil, "1", nil]
 		let countExpectation = expectation(description: "Count updated")
 		countExpectation.expectedFulfillmentCount = 3
-		var receivedCounts = [Int]()
-		let countSubscription = service.unseenTestsCount
-			.sink {
-				receivedCounts.append($0)
+		var receivedCounts = [String?]()
+
+		let countSubscription = badgeWrapper.$stringValue
+			.sink { stringValue in
+				receivedCounts.append(stringValue)
 				countExpectation.fulfill()
 			}
 
@@ -682,6 +712,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 		service.registerPCRTestAndGetResult(
 			guid: "E1277F-E1277F24-4AD2-40BC-AFF8-CBCCCD893E4B",
+			qrCodeHash: "qrCodeHash",
 			isSubmissionConsentGiven: true,
 			markAsUnseen: true,
 			certificateConsent: .given(dateOfBirth: "2000-01-01")
@@ -695,7 +726,7 @@ class CoronaTestServiceTests: CWATestCase {
 			}
 		}
 
-		service.resetUnseenTestsCount()
+		badgeWrapper.reset(.unseenTests)
 
 		waitForExpectations(timeout: .short)
 
@@ -708,6 +739,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 		XCTAssertEqual(receivedCounts, expectedCounts)
 		XCTAssertEqual(pcrTest.registrationToken, "registrationToken2")
+		XCTAssertEqual(pcrTest.qrCodeHash, "qrCodeHash")
 		XCTAssertEqual(
 			try XCTUnwrap(pcrTest.registrationDate).timeIntervalSince1970,
 			Date().timeIntervalSince1970,
@@ -764,7 +796,7 @@ class CoronaTestServiceTests: CWATestCase {
 		}
 
 		let appConfiguration = CachedAppConfigurationMock()
-
+		let badgeWrapper = HomeBadgeWrapper.fake()
 		let service = CoronaTestService(
 			client: client,
 			restServiceProvider: restServiceProvider,
@@ -782,14 +814,17 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: badgeWrapper
 		)
 		
-		let expectedCounts = [0]
+		let expectedCounts: [String?] = [nil]
 		let countExpectation = expectation(description: "Count updated")
 		countExpectation.expectedFulfillmentCount = 1
-		var receivedCounts = [Int]()
-		let countSubscription = service.unseenTestsCount
+		var receivedCounts = [String?]()
+
+		let countSubscription = badgeWrapper.$stringValue
 			.sink {
 				receivedCounts.append($0)
 				countExpectation.fulfill()
@@ -801,6 +836,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 		service.registerPCRTestAndGetResult(
 			guid: "F1EE0D-F1EE0D4D-4346-4B63-B9CF-1522D9200915",
+			qrCodeHash: "",
 			isSubmissionConsentGiven: true,
 			certificateConsent: .given(dateOfBirth: "1995-06-07")
 		) { result in
@@ -875,7 +911,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		service.pcrTest = nil
 
@@ -883,6 +921,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 		service.registerPCRTestAndGetResult(
 			guid: "F1EE0D-F1EE0D4D-4346-4B63-B9CF-1522D9200915",
+			qrCodeHash: "",
 			isSubmissionConsentGiven: true,
 			certificateConsent: .given(dateOfBirth: nil)
 		) { result in
@@ -914,7 +953,9 @@ class CoronaTestServiceTests: CWATestCase {
 		store.isPrivacyPreservingAnalyticsConsentGiven = true
 
 		let restServiceProvider = RestServiceProviderStub(results: [
-			.failure(ServiceError<TeleTanError>.receivedResourceError(.qrAlreadyUsed))
+			.failure(ServiceError<TeleTanError>.receivedResourceError(.qrAlreadyUsed)),
+			// the extra load response if for the fakeVerificationServerRequest for PlausibleDeniability
+			.success(SubmissionTANModel(submissionTAN: "fake"))
 		])
 
 		let client = ClientMock()
@@ -938,7 +979,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		service.pcrTest = nil
 
@@ -946,6 +989,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 		service.registerPCRTestAndGetResult(
 			guid: "guid",
+			qrCodeHash: "",
 			isSubmissionConsentGiven: false,
 			certificateConsent: .notGiven
 		) { result in
@@ -974,7 +1018,8 @@ class CoronaTestServiceTests: CWATestCase {
 		let restServiceProvider = RestServiceProviderStub(results: [
 			.success(
 				RegistrationTokenModel(registrationToken: "registrationToken")
-			)
+			),
+			.success(SubmissionTANModel(submissionTAN: "fake"))
 		])
 
 		let client = ClientMock()
@@ -1001,7 +1046,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		service.pcrTest = nil
 
@@ -1009,6 +1056,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 		service.registerPCRTestAndGetResult(
 			guid: "guid",
+			qrCodeHash: "qrCodeHash",
 			isSubmissionConsentGiven: false,
 			certificateConsent: .notGiven
 		) { result in
@@ -1029,6 +1077,7 @@ class CoronaTestServiceTests: CWATestCase {
 		}
 
 		XCTAssertEqual(pcrTest.registrationToken, "registrationToken")
+		XCTAssertEqual(pcrTest.qrCodeHash, "qrCodeHash")
 		XCTAssertEqual(
 			try XCTUnwrap(pcrTest.registrationDate).timeIntervalSince1970,
 			Date().timeIntervalSince1970,
@@ -1060,7 +1109,8 @@ class CoronaTestServiceTests: CWATestCase {
 		let restServiceProvider = RestServiceProviderStub(results: [
 			.success(
 				RegistrationTokenModel(registrationToken: "registrationToken")
-			)
+			),
+			.success(SubmissionTANModel(submissionTAN: "fake"))
 		])
 
 		let client = ClientMock()
@@ -1084,7 +1134,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		Analytics.setupMock(
 			store: store,
@@ -1147,7 +1199,8 @@ class CoronaTestServiceTests: CWATestCase {
 		let restServiceProvider = RestServiceProviderStub(results: [
 			.success(
 				RegistrationTokenModel(registrationToken: "registrationToken2")
-			)
+			),
+			.success(SubmissionTANModel(submissionTAN: "fake"))
 		])
 
 		let client = ClientMock()
@@ -1172,7 +1225,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		
 		service.pcrTest = nil
@@ -1227,7 +1282,8 @@ class CoronaTestServiceTests: CWATestCase {
 		store.isPrivacyPreservingAnalyticsConsentGiven = true
 
 		let restServiceProvider = RestServiceProviderStub(results: [
-			.failure(ServiceError<TeleTanError>.receivedResourceError(.teleTanAlreadyUsed))
+			.failure(ServiceError<TeleTanError>.receivedResourceError(.teleTanAlreadyUsed)),
+			.success(SubmissionTANModel(submissionTAN: "fake"))
 		])
 
 		let client = ClientMock()
@@ -1250,7 +1306,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		service.pcrTest = nil
 
@@ -1324,7 +1382,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		service.antigenTest = nil
 
@@ -1332,6 +1392,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 		service.registerAntigenTestAndGetResult(
 			with: "hash",
+			qrCodeHash: "qrCodeHash",
 			pointOfCareConsentDate: Date(timeIntervalSince1970: 2222),
 			firstName: "Erika",
 			lastName: "Mustermann",
@@ -1358,6 +1419,7 @@ class CoronaTestServiceTests: CWATestCase {
 		}
 
 		XCTAssertEqual(antigenTest.registrationToken, "registrationToken")
+		XCTAssertEqual(antigenTest.qrCodeHash, "qrCodeHash")
 		XCTAssertEqual(antigenTest.pointOfCareConsentDate, Date(timeIntervalSince1970: 2222))
 		XCTAssertEqual(antigenTest.testedPerson.firstName, "Erika")
 		XCTAssertEqual(antigenTest.testedPerson.lastName, "Mustermann")
@@ -1379,7 +1441,8 @@ class CoronaTestServiceTests: CWATestCase {
 		let restServiceProvider = RestServiceProviderStub(results: [
 			.success(
 				RegistrationTokenModel(registrationToken: "registrationToken")
-			)
+			),
+			.success(SubmissionTANModel(submissionTAN: "fake"))
 		])
 
 		let client = ClientMock()
@@ -1389,7 +1452,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 		let store = MockTestStore()
 		let appConfiguration = CachedAppConfigurationMock()
-
+		let badgeWrapper = HomeBadgeWrapper.fake()
 		let service = CoronaTestService(
 			client: client,
 			restServiceProvider: restServiceProvider,
@@ -1407,14 +1470,16 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: badgeWrapper
 		)
 		
-		let expectedCounts = [0, 1, 0]
+		let expectedCounts = [nil, "1", nil]
 		let countExpectation = expectation(description: "Count updated")
 		countExpectation.expectedFulfillmentCount = 3
-		var receivedCounts = [Int]()
-		let countSubscription = service.unseenTestsCount
+		var receivedCounts = [String?]()
+		let countSubscription = badgeWrapper.$stringValue
 			.sink {
 				receivedCounts.append($0)
 				countExpectation.fulfill()
@@ -1428,6 +1493,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 		service.registerAntigenTestAndGetResult(
 			with: "hash",
+			qrCodeHash: "qrCodeHash",
 			pointOfCareConsentDate: Date(timeIntervalSince1970: 2222),
 			firstName: nil,
 			lastName: nil,
@@ -1446,8 +1512,8 @@ class CoronaTestServiceTests: CWATestCase {
 			}
 		}
 
-		service.resetUnseenTestsCount()
-		
+		badgeWrapper.reset(.unseenTests)
+
 		waitForExpectations(timeout: .short)
 
 		guard let antigenTest = service.antigenTest else {
@@ -1459,6 +1525,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 		XCTAssertEqual(receivedCounts, expectedCounts)
 		XCTAssertEqual(antigenTest.registrationToken, "registrationToken")
+		XCTAssertEqual(antigenTest.qrCodeHash, "qrCodeHash")
 		XCTAssertEqual(antigenTest.pointOfCareConsentDate, Date(timeIntervalSince1970: 2222))
 		XCTAssertNil(antigenTest.testedPerson.firstName)
 		XCTAssertNil(antigenTest.testedPerson.lastName)
@@ -1506,7 +1573,7 @@ class CoronaTestServiceTests: CWATestCase {
 		}
 
 		let appConfiguration = CachedAppConfigurationMock()
-
+		let badgeWrapper = HomeBadgeWrapper.fake()
 		let service = CoronaTestService(
 			client: client,
 			restServiceProvider: restServiceProvider,
@@ -1524,14 +1591,16 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		
-		let expectedCounts = [0]
+		let expectedCounts: [String?] = [nil]
 		let countExpectation = expectation(description: "Count updated")
 		countExpectation.expectedFulfillmentCount = 1
-		var receivedCounts = [Int]()
-		let countSubscription = service.unseenTestsCount
+		var receivedCounts = [String?]()
+		let countSubscription = badgeWrapper.$stringValue
 			.sink {
 				receivedCounts.append($0)
 				countExpectation.fulfill()
@@ -1543,6 +1612,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 		service.registerAntigenTestAndGetResult(
 			with: "hash",
+			qrCodeHash: "",
 			pointOfCareConsentDate: Date(timeIntervalSince1970: 2222),
 			firstName: "Erika",
 			lastName: "Mustermann",
@@ -1579,7 +1649,8 @@ class CoronaTestServiceTests: CWATestCase {
 		let client = ClientMock()
 
 		let restServiceProvider = RestServiceProviderStub(results: [
-			.failure(ServiceError<TeleTanError>.receivedResourceError(.qrAlreadyUsed))
+			.failure(ServiceError<TeleTanError>.receivedResourceError(.qrAlreadyUsed)),
+			.success(SubmissionTANModel(submissionTAN: "fake"))
 		])
 
 		let store = MockTestStore()
@@ -1602,7 +1673,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		service.antigenTest = nil
 
@@ -1610,6 +1683,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 		service.registerAntigenTestAndGetResult(
 			with: "hash",
+			qrCodeHash: "",
 			pointOfCareConsentDate: Date(timeIntervalSince1970: 2222),
 			firstName: nil,
 			lastName: nil,
@@ -1635,11 +1709,11 @@ class CoronaTestServiceTests: CWATestCase {
 	func testRegisterAntigenTestAndGetResult_RegistrationSucceedsGettingTestResultFails() {
 		let client = ClientMock()
 
-        let restServiceProvider = RestServiceProviderStub(results: [
-            .success(
-				RegistrationTokenModel(registrationToken: "registrationToken")
-            )
-        ])
+		let restServiceProvider = RestServiceProviderStub(results: [
+			.success(RegistrationTokenModel(registrationToken: "registrationToken")),
+			.success(SubmissionTANModel(submissionTAN: "fake"))
+		]
+		)
 
 		client.onGetTestResult = { _, _, completion in
 			completion(.failure(.serverError(500)))
@@ -1665,7 +1739,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		service.antigenTest = nil
 
@@ -1673,6 +1749,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 		service.registerAntigenTestAndGetResult(
 			with: "hash",
+			qrCodeHash: "qrCodeHash",
 			pointOfCareConsentDate: Date(timeIntervalSince1970: 2222),
 			firstName: nil,
 			lastName: nil,
@@ -1698,6 +1775,7 @@ class CoronaTestServiceTests: CWATestCase {
 		}
 
 		XCTAssertEqual(antigenTest.registrationToken, "registrationToken")
+		XCTAssertEqual(antigenTest.qrCodeHash, "qrCodeHash")
 		XCTAssertEqual(antigenTest.pointOfCareConsentDate, Date(timeIntervalSince1970: 2222))
 		XCTAssertNil(antigenTest.testedPerson.firstName)
 		XCTAssertNil(antigenTest.testedPerson.lastName)
@@ -1715,9 +1793,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 	func testUpdatePCRTestResult_success() {
 		let restServiceProvider = RestServiceProviderStub(results: [
-			.success(
-				RegistrationTokenModel(registrationToken: "registrationToken")
-			)
+			.success(SubmissionTANModel(submissionTAN: "fake"))
 		])
 
 		let client = ClientMock()
@@ -1745,7 +1821,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		service.pcrTest = PCRTest.mock(registrationToken: "regToken")
 
@@ -1778,12 +1856,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 	func testUpdateAntigenTestResult_success() {
 		let restServiceProvider = RestServiceProviderStub(results: [
-			.success(
-				TestResultModel(testResult: 2, sc: nil, labId: nil)
-			),
-			.success(
-				RegistrationTokenModel(registrationToken: "registrationToken")
-			)
+			.success(SubmissionTANModel(submissionTAN: "fake"))
 		])
 		
 		let client = ClientMock()
@@ -1811,7 +1884,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		service.antigenTest = AntigenTest.mock(registrationToken: "regToken")
 		
@@ -1863,7 +1938,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		service.pcrTest = nil
 
@@ -1903,7 +1980,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		service.antigenTest = nil
 
@@ -1943,7 +2022,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		service.pcrTest = PCRTest.mock(registrationToken: nil)
 
@@ -1991,7 +2072,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		service.antigenTest = AntigenTest.mock(registrationToken: nil)
 
@@ -2027,9 +2110,19 @@ class CoronaTestServiceTests: CWATestCase {
 
 		let store = MockTestStore()
 		let appConfiguration = CachedAppConfigurationMock()
+		let restServiceProvider = RestServiceProviderStub(results: [
+			.success(SubmissionTANModel(submissionTAN: "fake")),
+			.success(SubmissionTANModel(submissionTAN: "fake")),
+			.success(SubmissionTANModel(submissionTAN: "fake")),
+			.success(SubmissionTANModel(submissionTAN: "fake")),
+			.success(SubmissionTANModel(submissionTAN: "fake")),
+			.success(SubmissionTANModel(submissionTAN: "fake"))
+
+		])
 
 		let testService = CoronaTestService(
 			client: client,
+			restServiceProvider: restServiceProvider,
 			store: store,
 			eventStore: MockEventStore(),
 			diaryStore: MockDiaryStore(),
@@ -2045,7 +2138,9 @@ class CoronaTestServiceTests: CWATestCase {
 				),
 				recycleBin: .fake()
 			),
-			notificationCenter: mockNotificationCenter
+			notificationCenter: mockNotificationCenter,
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		testService.antigenTest = AntigenTest.mock(registrationToken: "regToken")
 		testService.pcrTest = PCRTest.mock(registrationToken: "regToken")
@@ -2097,7 +2192,9 @@ class CoronaTestServiceTests: CWATestCase {
 				),
 				recycleBin: .fake()
 			),
-			notificationCenter: mockNotificationCenter
+			notificationCenter: mockNotificationCenter,
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		testService.antigenTest = AntigenTest.mock(registrationToken: "regToken")
 		testService.pcrTest = PCRTest.mock(registrationToken: "regToken")
@@ -2136,7 +2233,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		testService.antigenTest = AntigenTest.mock(registrationToken: "regToken")
 		testService.pcrTest = PCRTest.mock(registrationToken: "regToken")
@@ -2178,7 +2277,9 @@ class CoronaTestServiceTests: CWATestCase {
 				),
 				recycleBin: .fake()
 			),
-			notificationCenter: mockNotificationCenter
+			notificationCenter: mockNotificationCenter,
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		testService.antigenTest = AntigenTest.mock(registrationToken: "regToken")
 		testService.pcrTest = PCRTest.mock(registrationToken: "regToken")
@@ -2204,7 +2305,6 @@ class CoronaTestServiceTests: CWATestCase {
 		let diaryStore = MockDiaryStore()
 		let store = MockTestStore()
 		let appConfiguration = CachedAppConfigurationMock()
-
 		let testService = CoronaTestService(
 			client: client,
 			store: store,
@@ -2222,7 +2322,9 @@ class CoronaTestServiceTests: CWATestCase {
 				),
 				recycleBin: .fake()
 			),
-			notificationCenter: mockNotificationCenter
+			notificationCenter: mockNotificationCenter,
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		let antigenTest = AntigenTest.mock(
 			registrationToken: "regToken",
@@ -2261,7 +2363,6 @@ class CoronaTestServiceTests: CWATestCase {
 		let diaryStore = MockDiaryStore()
 		let store = MockTestStore()
 		let appConfiguration = CachedAppConfigurationMock()
-
 		let testService = CoronaTestService(
 			client: client,
 			store: store,
@@ -2279,7 +2380,9 @@ class CoronaTestServiceTests: CWATestCase {
 				),
 				recycleBin: .fake()
 			),
-			notificationCenter: mockNotificationCenter
+			notificationCenter: mockNotificationCenter,
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 
 		testService.antigenTest = AntigenTest.mock(registrationToken: "regToken")
@@ -2306,7 +2409,6 @@ class CoronaTestServiceTests: CWATestCase {
 		let diaryStore = MockDiaryStore()
 		let store = MockTestStore()
 		let appConfiguration = CachedAppConfigurationMock()
-
 		let testService = CoronaTestService(
 			client: client,
 			store: store,
@@ -2324,7 +2426,9 @@ class CoronaTestServiceTests: CWATestCase {
 				),
 				recycleBin: .fake()
 			),
-			notificationCenter: mockNotificationCenter
+			notificationCenter: mockNotificationCenter,
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 
 		testService.antigenTest = AntigenTest.mock(registrationToken: "regToken")
@@ -2369,7 +2473,9 @@ class CoronaTestServiceTests: CWATestCase {
 				),
 				recycleBin: .fake()
 			),
-			notificationCenter: mockNotificationCenter
+			notificationCenter: mockNotificationCenter,
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 
 		testService.antigenTest = AntigenTest.mock(registrationToken: "regToken")
@@ -2414,7 +2520,9 @@ class CoronaTestServiceTests: CWATestCase {
 				),
 				recycleBin: .fake()
 			),
-			notificationCenter: mockNotificationCenter
+			notificationCenter: mockNotificationCenter,
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 
 		testService.antigenTest = AntigenTest.mock(registrationToken: "regToken")
@@ -2440,7 +2548,6 @@ class CoronaTestServiceTests: CWATestCase {
 
 		let store = MockTestStore()
 		let appConfiguration = CachedAppConfigurationMock()
-
 		let testService = CoronaTestService(
 			client: client,
 			store: store,
@@ -2458,7 +2565,9 @@ class CoronaTestServiceTests: CWATestCase {
 				),
 				recycleBin: .fake()
 			),
-			notificationCenter: mockNotificationCenter
+			notificationCenter: mockNotificationCenter,
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		testService.antigenTest = AntigenTest.mock(registrationToken: "regToken")
 		testService.pcrTest = PCRTest.mock(registrationToken: "regToken")
@@ -2478,6 +2587,7 @@ class CoronaTestServiceTests: CWATestCase {
 		let store = MockTestStore()
 		let appConfiguration = CachedAppConfigurationMock()
 
+
 		let testService = CoronaTestService(
 			client: client,
 			store: store,
@@ -2495,7 +2605,9 @@ class CoronaTestServiceTests: CWATestCase {
 				),
 				recycleBin: .fake()
 			),
-			notificationCenter: mockNotificationCenter
+			notificationCenter: mockNotificationCenter,
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		testService.antigenTest = AntigenTest.mock(
 			registrationToken: "regToken",
@@ -2525,6 +2637,7 @@ class CoronaTestServiceTests: CWATestCase {
 		let store = MockTestStore()
 		let appConfiguration = CachedAppConfigurationMock()
 
+
 		let testService = CoronaTestService(
 			client: client,
 			store: store,
@@ -2542,7 +2655,9 @@ class CoronaTestServiceTests: CWATestCase {
 				),
 				recycleBin: .fake()
 			),
-			notificationCenter: mockNotificationCenter
+			notificationCenter: mockNotificationCenter,
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		testService.antigenTest = AntigenTest.mock(
 			registrationToken: "regToken",
@@ -2571,6 +2686,7 @@ class CoronaTestServiceTests: CWATestCase {
 		let store = MockTestStore()
 		let appConfiguration = CachedAppConfigurationMock()
 
+
 		let testService = CoronaTestService(
 			client: client,
 			store: store,
@@ -2588,7 +2704,9 @@ class CoronaTestServiceTests: CWATestCase {
 				),
 				recycleBin: .fake()
 			),
-			notificationCenter: mockNotificationCenter
+			notificationCenter: mockNotificationCenter,
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		testService.antigenTest = AntigenTest.mock(
 			registrationToken: "regToken",
@@ -2620,6 +2738,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 		let registrationDate = try XCTUnwrap(Calendar.current.date(byAdding: .day, value: -21, to: Date()))
 
+
 		let testService = CoronaTestService(
 			client: client,
 			store: store,
@@ -2637,7 +2756,9 @@ class CoronaTestServiceTests: CWATestCase {
 				),
 				recycleBin: .fake()
 			),
-			notificationCenter: mockNotificationCenter
+			notificationCenter: mockNotificationCenter,
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		testService.antigenTest = AntigenTest.mock(
 			registrationToken: "regToken",
@@ -2669,7 +2790,6 @@ class CoronaTestServiceTests: CWATestCase {
 		let appConfiguration = CachedAppConfigurationMock()
 
 		let pointOfCareConsentDate = try XCTUnwrap(Calendar.current.date(byAdding: .day, value: -21, to: Date()))
-
 		let testService = CoronaTestService(
 			client: client,
 			store: store,
@@ -2687,7 +2807,9 @@ class CoronaTestServiceTests: CWATestCase {
 				),
 				recycleBin: .fake()
 			),
-			notificationCenter: mockNotificationCenter
+			notificationCenter: mockNotificationCenter,
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		testService.antigenTest = AntigenTest.mock(
 			registrationToken: "regToken",
@@ -2716,7 +2838,6 @@ class CoronaTestServiceTests: CWATestCase {
 
 		let dateComponents = DateComponents(day: -21, second: 10)
 		let registrationDate = try XCTUnwrap(Calendar.current.date(byAdding: dateComponents, to: Date()))
-
 		let testService = CoronaTestService(
 			client: client,
 			store: store,
@@ -2734,7 +2855,9 @@ class CoronaTestServiceTests: CWATestCase {
 				),
 				recycleBin: .fake()
 			),
-			notificationCenter: mockNotificationCenter
+			notificationCenter: mockNotificationCenter,
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		testService.antigenTest = AntigenTest.mock(
 			registrationToken: "regToken",
@@ -2786,7 +2909,9 @@ class CoronaTestServiceTests: CWATestCase {
 				),
 				recycleBin: .fake()
 			),
-			notificationCenter: mockNotificationCenter
+			notificationCenter: mockNotificationCenter,
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		testService.antigenTest = AntigenTest.mock(
 			registrationToken: "regToken",
@@ -2811,7 +2936,9 @@ class CoronaTestServiceTests: CWATestCase {
 		client.onGetTestResult = { _, _, completion in
 			completion(.failure(.qrDoesNotExist))
 		}
-
+		let restServiceProvider = RestServiceProviderStub(results: [
+			.success(SubmissionTANModel(submissionTAN: "fake"))
+		])
 		let dateComponents = DateComponents(day: -21)
 		let registrationDate = try XCTUnwrap(Calendar.current.date(byAdding: dateComponents, to: Date()))
 
@@ -2820,6 +2947,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 		let testService = CoronaTestService(
 			client: client,
+			restServiceProvider: restServiceProvider,
 			store: store,
 			eventStore: MockEventStore(),
 			diaryStore: MockDiaryStore(),
@@ -2835,7 +2963,9 @@ class CoronaTestServiceTests: CWATestCase {
 				),
 				recycleBin: .fake()
 			),
-			notificationCenter: MockUserNotificationCenter()
+			notificationCenter: MockUserNotificationCenter(),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		testService.pcrTest = PCRTest.mock(
 			registrationToken: "regToken",
@@ -2859,7 +2989,9 @@ class CoronaTestServiceTests: CWATestCase {
 		client.onGetTestResult = { _, _, completion in
 			completion(.failure(.qrDoesNotExist))
 		}
-
+		let restServiceProvider = RestServiceProviderStub(results: [
+			.success(SubmissionTANModel(submissionTAN: "fake"))
+		])
 		let registrationDate = try XCTUnwrap(Calendar.current.date(byAdding: DateComponents(day: -21, second: 10), to: Date()))
 
 		let store = MockTestStore()
@@ -2867,6 +2999,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 		let testService = CoronaTestService(
 			client: client,
+			restServiceProvider: restServiceProvider,
 			store: store,
 			eventStore: MockEventStore(),
 			diaryStore: MockDiaryStore(),
@@ -2882,7 +3015,9 @@ class CoronaTestServiceTests: CWATestCase {
 				),
 				recycleBin: .fake()
 			),
-			notificationCenter: MockUserNotificationCenter()
+			notificationCenter: MockUserNotificationCenter(),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		testService.pcrTest = PCRTest.mock(
 			registrationToken: "regToken",
@@ -2906,7 +3041,9 @@ class CoronaTestServiceTests: CWATestCase {
 		client.onGetTestResult = { _, _, completion in
 			completion(.failure(.qrDoesNotExist))
 		}
-
+		let restServiceProvider = RestServiceProviderStub(results: [
+			.success(SubmissionTANModel(submissionTAN: "fake"))
+		])
 		let dateComponents = DateComponents(day: -21)
 		let registrationDate = try XCTUnwrap(Calendar.current.date(byAdding: dateComponents, to: Date()))
 		// Set point of care date to younger than 21 days to ensure that registration date wins
@@ -2917,6 +3054,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 		let testService = CoronaTestService(
 			client: client,
+			restServiceProvider: restServiceProvider,
 			store: store,
 			eventStore: MockEventStore(),
 			diaryStore: MockDiaryStore(),
@@ -2932,7 +3070,9 @@ class CoronaTestServiceTests: CWATestCase {
 				),
 				recycleBin: .fake()
 			),
-			notificationCenter: MockUserNotificationCenter()
+			notificationCenter: MockUserNotificationCenter(),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		testService.antigenTest = AntigenTest.mock(
 			registrationToken: "regToken",
@@ -2957,7 +3097,9 @@ class CoronaTestServiceTests: CWATestCase {
 		client.onGetTestResult = { _, _, completion in
 			completion(.failure(.qrDoesNotExist))
 		}
-
+		let restServiceProvider = RestServiceProviderStub(results: [
+			.success(SubmissionTANModel(submissionTAN: "fake"))
+		])
 		let registrationDate = try XCTUnwrap(Calendar.current.date(byAdding: DateComponents(day: -21, second: 10), to: Date()))
 		// Set point of care date to older than 21 days to ensure that registration date wins
 		let pointOfCareConsentDate = try XCTUnwrap(Calendar.current.date(byAdding: DateComponents(day: -21), to: Date()))
@@ -2967,6 +3109,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 		let testService = CoronaTestService(
 			client: client,
+			restServiceProvider: restServiceProvider,
 			store: store,
 			eventStore: MockEventStore(),
 			diaryStore: MockDiaryStore(),
@@ -2982,7 +3125,9 @@ class CoronaTestServiceTests: CWATestCase {
 				),
 				recycleBin: .fake()
 			),
-			notificationCenter: MockUserNotificationCenter()
+			notificationCenter: MockUserNotificationCenter(),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		testService.antigenTest = AntigenTest.mock(
 			registrationToken: "regToken",
@@ -3007,7 +3152,9 @@ class CoronaTestServiceTests: CWATestCase {
 		client.onGetTestResult = { _, _, completion in
 			completion(.failure(.qrDoesNotExist))
 		}
-
+		let restServiceProvider = RestServiceProviderStub(results: [
+			.success(SubmissionTANModel(submissionTAN: "fake"))
+		])
 		let dateComponents = DateComponents(day: -21)
 		let pointOfCareConsentDate = try XCTUnwrap(Calendar.current.date(byAdding: dateComponents, to: Date()))
 
@@ -3016,6 +3163,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 		let testService = CoronaTestService(
 			client: client,
+			restServiceProvider: restServiceProvider,
 			store: store,
 			eventStore: MockEventStore(),
 			diaryStore: MockDiaryStore(),
@@ -3031,7 +3179,9 @@ class CoronaTestServiceTests: CWATestCase {
 				),
 				recycleBin: .fake()
 			),
-			notificationCenter: MockUserNotificationCenter()
+			notificationCenter: MockUserNotificationCenter(),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		testService.antigenTest = AntigenTest.mock(
 			registrationToken: "regToken",
@@ -3056,6 +3206,9 @@ class CoronaTestServiceTests: CWATestCase {
 		client.onGetTestResult = { _, _, completion in
 			completion(.failure(.qrDoesNotExist))
 		}
+		let restServiceProvider = RestServiceProviderStub(results: [
+			.success(SubmissionTANModel(submissionTAN: "fake"))
+		])
 
 		let dateComponents = DateComponents(day: -21, second: 10)
 		let pointOfCareConsentDate = try XCTUnwrap(Calendar.current.date(byAdding: dateComponents, to: Date()))
@@ -3065,6 +3218,7 @@ class CoronaTestServiceTests: CWATestCase {
 
 		let testService = CoronaTestService(
 			client: client,
+			restServiceProvider: restServiceProvider,
 			store: store,
 			eventStore: MockEventStore(),
 			diaryStore: MockDiaryStore(),
@@ -3080,7 +3234,9 @@ class CoronaTestServiceTests: CWATestCase {
 				),
 				recycleBin: .fake()
 			),
-			notificationCenter: MockUserNotificationCenter()
+			notificationCenter: MockUserNotificationCenter(),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		testService.antigenTest = AntigenTest.mock(
 			registrationToken: "regToken",
@@ -3101,6 +3257,68 @@ class CoronaTestServiceTests: CWATestCase {
 	}
 
 	// MARK: - Test Removal
+
+	func testMovingCoronaTestToBin() {
+		let client = ClientMock()
+		let store = MockTestStore()
+		let appConfiguration = CachedAppConfigurationMock()
+		let recycleBin = RecycleBin(store: store)
+
+		let service = CoronaTestService(
+			client: client,
+			store: store,
+			eventStore: MockEventStore(),
+			diaryStore: MockDiaryStore(),
+			appConfiguration: appConfiguration,
+			healthCertificateService: HealthCertificateService(
+				store: store,
+				dccSignatureVerifier: DCCSignatureVerifyingStub(),
+				dscListProvider: MockDSCListProvider(),
+				client: client,
+				appConfiguration: appConfiguration,
+				boosterNotificationsService: BoosterNotificationsService(
+					rulesDownloadService: RulesDownloadService(store: store, client: client)
+				),
+				recycleBin: recycleBin
+			),
+			recycleBin: recycleBin,
+			badgeWrapper: .fake()
+		)
+
+		service.pcrTest = PCRTest.mock(registrationToken: "pcrRegistrationToken")
+		service.antigenTest = AntigenTest.mock(registrationToken: "antigenRegistrationToken")
+
+		XCTAssertNotNil(service.pcrTest)
+		XCTAssertNotNil(service.antigenTest)
+		XCTAssertTrue(store.recycleBinItems.isEmpty)
+		XCTAssertTrue(store.recycleBinItemsSubject.value.isEmpty)
+
+		service.moveTestToBin(.pcr)
+
+		XCTAssertNil(service.pcrTest)
+		XCTAssertNotNil(service.antigenTest)
+		XCTAssertEqual(store.recycleBinItems.count, 1)
+		XCTAssertEqual(store.recycleBinItemsSubject.value.count, 1)
+
+		service.pcrTest = PCRTest.mock(registrationToken: "pcrRegistrationToken2")
+
+		XCTAssertNotNil(service.pcrTest)
+		XCTAssertNotNil(service.antigenTest)
+
+		service.moveTestToBin(.antigen)
+
+		XCTAssertNotNil(service.pcrTest)
+		XCTAssertNil(service.antigenTest)
+		XCTAssertEqual(store.recycleBinItems.count, 2)
+		XCTAssertEqual(store.recycleBinItemsSubject.value.count, 2)
+
+		service.moveTestToBin(.pcr)
+
+		XCTAssertNil(service.pcrTest)
+		XCTAssertNil(service.antigenTest)
+		XCTAssertEqual(store.recycleBinItems.count, 3)
+		XCTAssertEqual(store.recycleBinItemsSubject.value.count, 3)
+	}
 
 	func testDeletingCoronaTest() {
 		let client = ClientMock()
@@ -3123,7 +3341,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 
 		service.pcrTest = PCRTest.mock(registrationToken: "pcrRegistrationToken")
@@ -3175,24 +3395,25 @@ class CoronaTestServiceTests: CWATestCase {
 						return
 					}
 					expectation.fulfill()
-
+					
 					XCTAssertFalse(resource.locator.isFake)
 					XCTAssertEqual(count, 0)
-
+					
 					count += 1
 				}
-			)
+			),
+			LoadResource(
+				result: .success(
+					SubmissionTANModel(submissionTAN: "fake")
+				),
+				willLoadResource: { _ in
+					expectation.fulfill()
+					XCTAssertEqual(count, 1)
+					count += 1
+				})
 		])
 
 		let client = ClientMock()
-
-		client.onGetTANForExposureSubmit = { _, isFake, completion in
-			expectation.fulfill()
-			XCTAssertTrue(isFake)
-			XCTAssertEqual(count, 1)
-			count += 1
-			completion(.failure(.fakeResponse))
-		}
 
 		client.onSubmitCountries = { _, isFake, completion in
 			expectation.fulfill()
@@ -3224,7 +3445,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		service.pcrTest = PCRTest.mock(registrationToken: "regToken")
 		service.antigenTest = AntigenTest.mock(registrationToken: "regToken")
@@ -3291,14 +3514,6 @@ class CoronaTestServiceTests: CWATestCase {
 			completion(.success(.fake(testResult: testResult.rawValue)))
 		}
 
-		client.onGetTANForExposureSubmit = { _, isFake, completion in
-			expectation.fulfill()
-			XCTAssertTrue(isFake)
-			XCTAssertEqual(count, 1)
-			count += 1
-			completion(.failure(.fakeResponse))
-		}
-
 		client.onSubmitCountries = { _, isFake, completion in
 			expectation.fulfill()
 			XCTAssertTrue(isFake)
@@ -3309,9 +3524,26 @@ class CoronaTestServiceTests: CWATestCase {
 
 		let store = MockTestStore()
 		let appConfiguration = CachedAppConfigurationMock()
-
+		let restServiceProvider = RestServiceProviderStub(loadResources: [
+			LoadResource(
+				result: .success(
+					SubmissionTANModel(submissionTAN: "fake")
+				),
+				willLoadResource: { resource in
+					guard let resource = resource as? RegistrationTokenResource  else {
+						XCTFail("RegistrationTokenResource expected.")
+						return
+					}
+					expectation.fulfill()
+					
+					XCTAssertTrue(resource.locator.isFake)
+					XCTAssertEqual(count, 1)
+					count += 1
+				})
+		])
 		let service = CoronaTestService(
 			client: client,
+			restServiceProvider: restServiceProvider,
 			store: store,
 			eventStore: MockEventStore(),
 			diaryStore: MockDiaryStore(),
@@ -3326,7 +3558,9 @@ class CoronaTestServiceTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			)
+			),
+			recycleBin: .fake(),
+			badgeWrapper: .fake()
 		)
 		service.pcrTest = PCRTest.mock(registrationToken: "regToken")
 		service.antigenTest = AntigenTest.mock(registrationToken: "regToken")

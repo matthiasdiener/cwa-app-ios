@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import ENASecurity
 
 /**
 RestServiceProvider is basically a dispatcher that directs work to the correct service by type.
@@ -12,12 +13,36 @@ class RestServiceProvider: RestServiceProviding {
 
 	init(
 		environment: EnvironmentProviding = Environments(),
+		session: URLSession? = nil,
+		cache: KeyValueCaching,
+		jwkSet: [JSONWebKey] = []
+	) {
+		self.environment = environment
+		self.optionalSession = session
+
+		self.standardRestService = StandardRestService(environment: environment, session: session)
+		self.cachedRestService = CachedRestService(environment: environment, session: session, cache: cache)
+		self.wifiOnlyRestService = WifiOnlyRestService(environment: environment, session: session)
+		self.dynamicPinningRestService = DynamicPinningRestService(environment: environment, session: session, jwkSet: jwkSet)
+		self.disabledPinningRestService = DisabledPinningRestService(environment: environment, session: session)
+	}
+
+	#if DEBUG
+
+	init(
+		environment: EnvironmentProviding = Environments(),
 		session: URLSession? = nil
 	) {
-		self.restService = StandardRestService(environment: environment, session: session)
-		self.cachedService = CachedRestService(environment: environment, session: session)
-		self.wifiOnlyService = WifiOnlyRestService(environment: environment, session: session)
+		self.environment = environment
+		self.optionalSession = session
+		self.standardRestService = StandardRestService(environment: environment, session: session)
+		self.cachedRestService = CachedRestService(environment: environment, session: session, cache: KeyValueCacheFake())
+		self.wifiOnlyRestService = WifiOnlyRestService(environment: environment, session: session)
+		self.dynamicPinningRestService = DynamicPinningRestService(environment: environment, session: session)
+		self.disabledPinningRestService = DisabledPinningRestService(environment: environment, session: session)
 	}
+
+	#endif
 
 	func load<R>(
 		_ resource: R,
@@ -26,76 +51,57 @@ class RestServiceProvider: RestServiceProviding {
 		// dispatch loading to the correct rest service
 		switch resource.type {
 		case .default:
-			restService.load(resource, completion)
+			standardRestService.load(resource, completion)
 		case .caching:
-			cachedService.load(resource, completion)
+			cachedRestService.load(resource, completion)
 		case .wifiOnly:
-			wifiOnlyService.load(resource, completion)
+			wifiOnlyRestService.load(resource, completion)
 		case .retrying:
 			Log.error("Not yet implemented")
+		case .dynamicPinning:
+			/// use lock to make sure we are not updating dynamicPinningRestService at the moment
+			updateLock.lock()
+			dynamicPinningRestService.load(resource, completion)
+			updateLock.unlock()
+		case .disabledPinning:
+			disabledPinningRestService.load(resource, completion)
+			
 		}
+	}
+
+	// update evaluation trust - only possible for dynamic pinning at the moment
+	func update(_ evaluateTrust: EvaluateTrust) {
+		guard let delegate = dynamicPinningRestService.urlSessionDelegate as? CoronaWarnURLSessionDelegate else {
+			return
+		}
+
+		updateLock.lock()
+		delegate.evaluateTrust = evaluateTrust
+		updateLock.unlock()
 	}
 
 	// MARK: - Private
 
-	private let restService: StandardRestService
-	private let cachedService: CachedRestService
-	private let wifiOnlyService: WifiOnlyRestService
+	private let environment: EnvironmentProviding
+	private let optionalSession: URLSession?
+	private let standardRestService: StandardRestService
+	private let cachedRestService: CachedRestService
+	private let wifiOnlyRestService: WifiOnlyRestService
+	private let dynamicPinningRestService: DynamicPinningRestService
+	private let disabledPinningRestService: DisabledPinningRestService
+	private let updateLock: NSLock = NSLock()
 
 }
 
 #if !RELEASE
+extension RestServiceProvider {
 
-struct LoadResource {
-	let result: Result<Any, Error>
-	let willLoadResource: ((Any) -> Void)?
-}
-
-class RestServiceProviderStub: RestServiceProviding {
-	init(
-		loadResources: [LoadResource]
-	) {
-		self.loadResources = loadResources
-	}
-
-	convenience init(results: [Result<Any, Error>]) {
-		let _loadResources = results.map {
-			LoadResource(result: $0, willLoadResource: nil)
+	var evaluateTrust: EvaluateTrust? {
+		guard let delegate = dynamicPinningRestService.urlSessionDelegate as? CoronaWarnURLSessionDelegate else {
+			return nil
 		}
-		self.init(loadResources: _loadResources)
+		return delegate.evaluateTrust
 	}
 
-	private var loadResources: [LoadResource]
-
-	func load<R>(
-		_ resource: R,
-		_ completion: @escaping (Result<R.Receive.ReceiveModel, ServiceError<R.CustomError>>) -> Void
-	) where R: Resource {
-		guard let loadResource = loadResources.first else {
-			fatalError("load was called to often.")
-		}
-		loadResource.willLoadResource?(resource)
-
-		switch loadResource.result {
-		case .success(let model):
-			guard let _model = model as? R.Receive.ReceiveModel else {
-				fatalError("model does not have the correct type.")
-			}
-			completion(.success(_model))
-		case .failure(let error):
-			guard let _error = error as? ServiceError<R.CustomError> else {
-				fatalError("error does not have the correct type.")
-			}
-			completion(.failure(_error))
-		}
-		loadResources.removeFirst()
-	}
 }
-
-extension RestServiceProviding where Self == RestServiceProviderStub {
-	static func fake() -> RestServiceProviding {
-		return RestServiceProviderStub(loadResources: [])
-	}
-}
-
 #endif

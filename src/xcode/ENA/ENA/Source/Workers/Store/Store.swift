@@ -99,6 +99,12 @@ protocol AppFeaturesStoring: AnyObject {
 	#endif
 }
 
+protocol TicketValidationStoring: AnyObject {
+	#if !RELEASE
+	var skipAllowlistValidation: Bool { get set }
+	#endif
+}
+
 protocol AppConfigCaching: AnyObject {
 	var appConfigMetadata: AppConfigMetadata? { get set }
 }
@@ -132,6 +138,11 @@ protocol ErrorLogProviding: AnyObject {
 	var otpTokenEls: OTPToken? { get set }
 	/// Date of last otp authorization
 	var otpElsAuthorizationDate: Date? { get set }
+	/// Last logged app version number
+	var lastLoggedAppVersionNumber: Version? { get set }
+	/// Timestamp of last logged app version number
+	var lastLoggedAppVersionTimestamp: Date? { get set }
+	
 	#if !RELEASE
 	/// For DeveloperMenu - Indicates if the ELS shall be activated or not at startup
 	var elsLoggingActiveAtStartup: Bool { get set }
@@ -175,8 +186,6 @@ protocol CoronaTestStoring {
 	var pcrTest: PCRTest? { get set }
 
 	var antigenTest: AntigenTest? { get set }
-	
-	var unseenTestsCount: Int { get set }
 }
 
 protocol AntigenTestProfileStoring: AnyObject {
@@ -269,6 +278,10 @@ protocol RecycleBinStoring: AnyObject {
 	var recycleBinItems: Set<RecycleBinItem> { get set }
 }
 
+protocol HomeBadgeStoring: AnyObject {
+	var badgesData: [HomeBadgeWrapper.BadgeType: Int?] { get set }
+}
+
 // swiftlint:disable all
 /// Wrapper protocol
 protocol Store:
@@ -291,6 +304,8 @@ protocol Store:
 	DSCListCaching,
 	DeviceTimeCheckStoring,
 	AppFeaturesStoring,
-	RecycleBinStoring
+	RecycleBinStoring,
+	TicketValidationStoring,
+	HomeBadgeStoring
 {}
 // swiftlint:enable all
