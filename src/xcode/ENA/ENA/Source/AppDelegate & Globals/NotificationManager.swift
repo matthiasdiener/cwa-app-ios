@@ -34,12 +34,8 @@ final class NotificationManager: NSObject, UNUserNotificationCenterDelegate {
 		if notification.request.identifier.contains(LocalNotificationIdentifier.checkout.rawValue) {
 			eventCheckoutService.checkoutOverdueCheckins()
 		}
-		
-		if #available(iOS 14.0, *) {
-			completionHandler([.banner, .alert, .badge, .sound])
-		} else {
-			completionHandler([.alert, .badge, .sound])
-		}
+
+		completionHandler([.alert, .badge, .sound])
 	}
 
 	func userNotificationCenter(_: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {

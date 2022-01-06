@@ -13,14 +13,12 @@ class HomeTableViewModel {
 		state: HomeState,
 		store: Store,
 		coronaTestService: CoronaTestService,
-		onTestResultCellTap: @escaping (CoronaTestType?) -> Void,
-		badgeWrapper: HomeBadgeWrapper
+		onTestResultCellTap: @escaping (CoronaTestType?) -> Void
 	) {
 		self.state = state
 		self.store = store
 		self.coronaTestService = coronaTestService
 		self.onTestResultCellTap = onTestResultCellTap
-		self.badgeWrapper = badgeWrapper
 
 		coronaTestService.$pcrTest
 			.sink { [weak self] _ in
@@ -89,6 +87,7 @@ class HomeTableViewModel {
 	}
 
 	func heightForRow(at indexPath: IndexPath) -> CGFloat {
+		
 		let isStatisticsCell = HomeTableViewModel.Section(rawValue: indexPath.section) == .statistics
 		let isGlobalStatisticsNotLoaded = state.statistics.supportedCardIDSequence.isEmpty
 		let isLocalStatisticsNotCached = state.store.selectedLocalStatisticsRegions.isEmpty
@@ -111,19 +110,12 @@ class HomeTableViewModel {
 	}
 
 	func didTapTestResultButton(coronaTestType: CoronaTestType) {
-		if coronaTestType == .antigen && coronaTestService.antigenTestIsOutdated {
+		if coronaTestService.coronaTest(ofType: coronaTestType)?.testResult == .expired ||
+			(coronaTestType == .antigen && coronaTestService.antigenTestIsOutdated) {
 			coronaTestService.removeTest(coronaTestType)
 		} else {
 			onTestResultCellTap(coronaTestType)
 		}
-	}
-
-	func shouldShowDeletionConfirmationAlert(for coronaTestType: CoronaTestType) -> Bool {
-		coronaTestService.coronaTest(ofType: coronaTestType)?.testResult == .expired
-	}
-
-	func moveTestToBin(type coronaTestType: CoronaTestType) {
-		coronaTestService.moveTestToBin(coronaTestType)
 	}
 
 	func updateTestResult() {
@@ -136,7 +128,7 @@ class HomeTableViewModel {
 				case .noCoronaTestOfRequestedType, .noRegistrationToken, .testExpired:
 					// Errors because of no registered corona tests or expired tests are ignored
 					break
-				case .responseFailure, .serviceError, .registrationTokenError, .unknownTestResult, .malformedDateOfBirthKey:
+				default:
 					// Only show errors for corona tests that are still expecting their final test result
 					if self.coronaTestService.pcrTest != nil && self.coronaTestService.pcrTest?.finalTestResultReceivedDate == nil {
 						self.testResultLoadingError = error
@@ -153,7 +145,7 @@ class HomeTableViewModel {
 				case .noCoronaTestOfRequestedType, .noRegistrationToken, .testExpired:
 					// Errors because of no registered corona tests or expired tests are ignored
 					break
-				case .responseFailure, .serviceError, .registrationTokenError, .unknownTestResult, .malformedDateOfBirthKey:
+				default:
 					// Only show errors for corona tests that are still expecting their final test result
 					if self.coronaTestService.antigenTest != nil && self.coronaTestService.antigenTest?.finalTestResultReceivedDate == nil {
 						self.testResultLoadingError = error
@@ -164,14 +156,12 @@ class HomeTableViewModel {
 	}
 
 	func resetBadgeCount() {
-		badgeWrapper.resetAll()
+		coronaTestService.resetUnseenTestsCount()
 	}
 
 	// MARK: - Private
 
 	private let onTestResultCellTap: (CoronaTestType?) -> Void
-	private let badgeWrapper: HomeBadgeWrapper
-
 	private var subscriptions = Set<AnyCancellable>()
 
 	private var computedRiskAndTestResultsRows: [RiskAndTestResultsRow] {

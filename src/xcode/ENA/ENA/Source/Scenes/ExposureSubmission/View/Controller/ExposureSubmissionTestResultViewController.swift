@@ -188,7 +188,7 @@ class ExposureSubmissionTestResultViewController: DynamicTableViewController, Fo
 		)
 
 		let deleteAction = UIAlertAction(
-			title: AppStrings.ExposureSubmissionResult.removeAlert_ConfirmButtonTitle,
+			title: AppStrings.Common.alertActionRemove,
 			style: .destructive,
 			handler: { [weak self] _ in
 				self?.viewModel.deleteTest()

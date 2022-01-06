@@ -92,11 +92,6 @@ class HealthCertifiedPersonViewController: UIViewController, UITableViewDataSour
 			cell.configure(with: viewModel.qrCodeCellViewModel)
 			return cell
 
-		case .admissionState:
-			let cell = tableView.dequeueReusableCell(cellType: AdmissionStateTableViewCell.self, for: indexPath)
-			cell.configure(with: viewModel.vaccinationAdmissionStateViewModel)
-			return cell
-
 		case .vaccinationHint:
 			let cell = tableView.dequeueReusableCell(cellType: VaccinationHintTableViewCell.self, for: indexPath)
 			cell.configure(with: viewModel.vaccinationHintCellViewModel)
@@ -166,7 +161,6 @@ class HealthCertifiedPersonViewController: UIViewController, UITableViewDataSour
 		guard editingStyle == .delete, let healthCertificate = viewModel.healthCertificate(for: indexPath) else { return }
 
 		let vaccinationHintWasVisible = viewModel.vaccinationHintIsVisible
-		let admissionStateWasVisible = viewModel.admissionStateIsVisible
 
 		self.didSwipeToDelete(healthCertificate) { [weak self] in
 			guard let self = self else { return }
@@ -182,13 +176,7 @@ class HealthCertifiedPersonViewController: UIViewController, UITableViewDataSour
 				} else if !vaccinationHintWasVisible && self.viewModel.vaccinationHintIsVisible {
 					insertIndexPaths.append(IndexPath(row: 0, section: HealthCertifiedPersonViewModel.TableViewSection.vaccinationHint.rawValue))
 				}
-				
-				if !self.viewModel.admissionStateIsVisible && admissionStateWasVisible {
-					deleteIndexPaths.append(IndexPath(row: 0, section: HealthCertifiedPersonViewModel.TableViewSection.admissionState.rawValue))
-				} else if self.viewModel.admissionStateIsVisible && !admissionStateWasVisible {
-					insertIndexPaths.append(IndexPath(row: 0, section: HealthCertifiedPersonViewModel.TableViewSection.admissionState.rawValue))
-				}
-				
+
 				tableView.deleteRows(at: deleteIndexPaths, with: .automatic)
 				tableView.insertRows(at: insertIndexPaths, with: .automatic)
 			}, completion: { _ in
@@ -209,7 +197,7 @@ class HealthCertifiedPersonViewController: UIViewController, UITableViewDataSour
 	private let didSwipeToDelete: (HealthCertificate, @escaping () -> Void) -> Void
 
 	private let viewModel: HealthCertifiedPersonViewModel
-	private let backgroundView = GradientBackgroundView(type: .solidGrey, withStars: true)
+	private let backgroundView = GradientBackgroundView(type: .solidGrey(withStars: true))
 	private let tableView = UITableView(frame: .zero, style: .plain)
 
 	private var subscriptions = Set<AnyCancellable>()
@@ -282,11 +270,6 @@ class HealthCertifiedPersonViewController: UIViewController, UITableViewDataSour
 			HealthCertificateSimpleTextCell.self,
 			forCellReuseIdentifier: HealthCertificateSimpleTextCell.reuseIdentifier
 		)
-		tableView.register(
-			AdmissionStateTableViewCell.self,
-			forCellReuseIdentifier: AdmissionStateTableViewCell.reuseIdentifier
-		)
-
 		tableView.register(
 			HealthCertificateQRCodeCell.self,
 			forCellReuseIdentifier: HealthCertificateQRCodeCell.reuseIdentifier

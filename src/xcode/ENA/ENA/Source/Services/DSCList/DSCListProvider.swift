@@ -50,8 +50,6 @@ final class DSCListProvider: DSCListProviding {
 	private let interval: TimeInterval
 
 	private static func loadDSCListMetaDataIfAvailable(store: DSCListCaching, interval: TimeInterval) -> DSCListMetaData {
-		Log.info("Load DSCList.")
-
 		guard let metaDataDSCList = store.dscList else {
 			// store is empty -> store default and return it
 			guard
@@ -64,16 +62,12 @@ final class DSCListProvider: DSCListProviding {
 			Log.info("Fallback default DSCList got loaded", log: .api)
 			return DSCListMetaData(eTag: nil, timestamp: Date(timeIntervalSinceNow: -interval), dscList: dscList)
 		}
-		
-		Log.info("DSCList loaded from store.")
 		return metaDataDSCList
 	}
 
 	@objc
 	private func updateListIfNeeded() {
-		Log.info("Update DSCList if needed.")
 		Log.debug("timeinterval since last check: \(metaData.timestamp.timeIntervalSinceNow)")
-		
 		guard metaData.timestamp.timeIntervalSinceNow < -interval else {
 			Log.debug("DSCList update interval not reached - stop")
 			return

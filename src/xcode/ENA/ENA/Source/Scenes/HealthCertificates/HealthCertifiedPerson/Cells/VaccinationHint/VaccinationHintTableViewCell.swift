@@ -5,7 +5,7 @@
 import UIKit
 import OpenCombine
 
-class VaccinationHintTableViewCell: UITableViewCell, UITextViewDelegate, ReuseIdentifierProviding {
+class VaccinationHintTableViewCell: UITableViewCell, ReuseIdentifierProviding {
 
 	// MARK: - Init
 
@@ -26,12 +26,6 @@ class VaccinationHintTableViewCell: UITableViewCell, UITextViewDelegate, ReuseId
 		super.traitCollectionDidChange(previousTraitCollection)
 
 		updateBorderWidth()
-	}
-
-	// MARK: - Protocol UITextViewDelegate
-
-	func textView(_ textView: UITextView, shouldInteractWith url: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-		LinkHelper.open(url: url, interaction: interaction) == .allow
 	}
 
 	// MARK: - Internal
@@ -136,8 +130,6 @@ class VaccinationHintTableViewCell: UITableViewCell, UITextViewDelegate, ReuseId
 		selectionStyle = .none
 
 		updateBorderWidth()
-
-		faqLinkTextView.delegate = self
 
 		backgroundContainerView.translatesAutoresizingMaskIntoConstraints = false
 		contentView.addSubview(backgroundContainerView)

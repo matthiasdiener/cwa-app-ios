@@ -14,45 +14,40 @@ struct TeleTanResource: Resource {
 	) {
 		self.locator = .registrationToken(isFake: isFake)
 		self.type = .default
-		self.sendResource = PaddingJSONSendResource<KeyModel>(sendModel)
+		self.sendResource = JSONSendResource<KeyModel>(sendModel)
 		self.receiveResource = JSONReceiveResource<RegistrationTokenModel>()
 		self.keyModel = sendModel
 	}
 
 	// MARK: - Protocol Resource
 
-	typealias Send = PaddingJSONSendResource<KeyModel>
+	typealias Send = JSONSendResource<KeyModel>
 	typealias Receive = JSONReceiveResource<RegistrationTokenModel>
 	typealias CustomError = TeleTanError
 
 	var locator: Locator
 	var type: ServiceType
-	var sendResource: PaddingJSONSendResource<KeyModel>
+	var sendResource: JSONSendResource<KeyModel>
 	var receiveResource: JSONReceiveResource<RegistrationTokenModel>
 
-	func customError(for error: ServiceError<TeleTanError>) -> TeleTanError? {
-		switch error {
-		case .unexpectedServerError(let statusCode):
-			switch (keyModel.keyType, statusCode) {
-			case (.teleTan, 400):
-				return .teleTanAlreadyUsed
-			case (_, 400):
-				return .qrAlreadyUsed
-			default:
-				return nil
-			}
+	func customStatusCodeError(statusCode: Int) -> TeleTanError? {
+		switch (keyModel.keyType, statusCode) {
+		case (.teleTan, 400):
+			return .teleTanAlreadyUsed
+		case (_, 400):
+			return .qrAlreadyUsed
 		default:
 			return nil
 		}
 	}
-	
+
 	// MARK: - Private
 
 	private let keyModel: KeyModel
 
 }
 
-enum TeleTanError: LocalizedError {
+enum TeleTanError: Error {
 	case teleTanAlreadyUsed
 	case qrAlreadyUsed
 

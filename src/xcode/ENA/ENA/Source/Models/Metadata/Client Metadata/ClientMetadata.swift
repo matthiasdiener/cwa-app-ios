@@ -8,7 +8,7 @@ struct ClientMetadata: Codable {
 
 	// MARK: - Init
 
-	init(etag: String? = nil) {
+	init(etag: String?) {
 		self.eTag = etag
 		
 		let iosVersion = ProcessInfo().operatingSystemVersion

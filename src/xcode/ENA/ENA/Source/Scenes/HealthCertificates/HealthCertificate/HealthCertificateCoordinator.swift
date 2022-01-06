@@ -178,7 +178,7 @@ final class HealthCertificateCoordinator {
 								title: AppStrings.HealthCertificate.Alert.deleteButton,
 								style: .destructive,
 								handler: { _ in
-									self.healthCertificateService.moveHealthCertificateToBin(self.healthCertificate)
+									self.healthCertificateService.removeHealthCertificate(self.healthCertificate)
 
 									switch self.parentingViewController {
 									case .push(let navigationController):
@@ -283,7 +283,6 @@ final class HealthCertificateCoordinator {
 				)
 			}
 		)
-		printAction.isEnabled = healthCertificate.validityState != .blocked
 		actionSheet.addAction(printAction)
 
 		let deleteButtonTitle: String

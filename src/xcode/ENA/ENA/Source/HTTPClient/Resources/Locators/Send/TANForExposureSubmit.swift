@@ -11,11 +11,12 @@ extension Locator {
 	// type:	default
 	// comment:
 	static func tanForExposureSubmit(
+		registrationToken: String,
 		isFake: Bool
 	) -> Locator {
 		let fake = String(isFake ? 1 : 0)
 		return Locator(
-			endpoint: .verification,
+			endpoint: .distribution,
 			paths: ["version", "v1", "tan"],
 			method: .post,
 			defaultHeaders: [

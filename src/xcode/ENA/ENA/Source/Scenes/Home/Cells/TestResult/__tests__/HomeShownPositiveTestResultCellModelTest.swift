@@ -28,9 +28,7 @@ class HomeShownPositiveTestResultCellModelTest: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			),
-			recycleBin: .fake(),
-			badgeWrapper: .fake()
+			)
 		)
 
 		coronaTestService.pcrTest = PCRTest.mock(
@@ -128,9 +126,7 @@ class HomeShownPositiveTestResultCellModelTest: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			),
-			recycleBin: .fake(),
-			badgeWrapper: .fake()
+			)
 		)
 
 		coronaTestService.antigenTest = AntigenTest.mock(

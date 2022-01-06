@@ -13,7 +13,7 @@ class EuTracingTableViewCell: UITableViewCell {
 	override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
 		super.init(style: style, reuseIdentifier: reuseIdentifier)
 		// self
-		selectionStyle = .default
+		selectionStyle = .none
 		backgroundColor = .enaColor(for: .background)
 		accessoryType = .disclosureIndicator
 		// iconView

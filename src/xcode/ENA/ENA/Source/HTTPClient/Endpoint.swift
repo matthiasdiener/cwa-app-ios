@@ -7,14 +7,13 @@ import Foundation
 Wraps the different endpoints for the different resources
 */
 
-enum Endpoint: Equatable, Hashable {
+enum Endpoint {
 	case distribution
 	case submission
 	case verification
 	case dataDonation
 	case errorLogSubmission
 	case dcc
-	case dynamic(URL)
 
 	// MARK: - Internal
 
@@ -32,8 +31,7 @@ enum Endpoint: Equatable, Hashable {
 			return environmentData.dccURL
 		case .dataDonation:
 			return environmentData.dataDonationURL
-		case .dynamic(let url):
-			return url
 		}
 	}
+
 }

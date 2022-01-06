@@ -16,7 +16,6 @@ class RiskLegendDotBodyCell: UITableViewCell {
 	
 	override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
 		super.init(style: style, reuseIdentifier: reuseIdentifier)
-		selectionStyle = .none
 		// dotView
 		dotView.backgroundColor = .enaColor(for: .riskHigh)
 		dotView.layer.cornerRadius = 8

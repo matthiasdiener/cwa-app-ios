@@ -8,7 +8,7 @@ import CommonCrypto.CommonHMAC
 
 enum CheckinDecryptionError: Error {
 	case messageAuthenticationCodeMissmatch
-	case decryptionFailed(CBCEncryptionError)
+	case decryptionFailed(AESEncryptionError)
 	case checkInRecordDecodingFailed
 }
 
@@ -21,7 +21,7 @@ struct CheckinEncryptionResult {
 enum CheckinEncryptionError: Error {
 	case randomBytesCreationFailed
 	case checkInRecordEncodingFailed
-	case encryptionFailed(CBCEncryptionError)
+	case encryptionFailed(AESEncryptionError)
 	case hmacCreationFailed
 }
 
@@ -69,11 +69,11 @@ struct CheckinEncryption: CheckinEncrypting {
 		let encryptionKey = self.encryptionKey(for: locationId)
 
 		// Create `CheckInRecord`: the `encrypted CheckInRecord` shall be decrypted
-		let cbcEncryption = CBCEncryption(
+		let aesEncryption = AESEncryption(
 			encryptionKey: encryptionKey,
 			initializationVector: initializationVector
 		)
-		let decryptionResult = cbcEncryption.decrypt(data: encryptedCheckinRecord)
+		let decryptionResult = aesEncryption.decrypt(data: encryptedCheckinRecord)
 
 		guard case let .success(checkinRecordData) = decryptionResult else {
 			if case let .failure(error) = decryptionResult {
@@ -114,19 +114,19 @@ struct CheckinEncryption: CheckinEncrypting {
 		// Determine `encryption key`: the `encryption key` shall be determined
 		let encryptionKey = self.encryptionKey(for: locationId)
 
-		// Determine random `iv`: the initialization vector `iv` shall be determined as a secure random sequence of 16 bytes.
-		guard let randomInitializationVector = Data.randomBytes(length: 16) else {
+		// Determine random `iv`: the initialization vector `iv` shall be determined as a secure random sequence of 32 bytes.
+		guard let randomInitializationVector = randomBytes(length: 16) else {
 			return .failure(.randomBytesCreationFailed)
 		}
 		let finalInitializationVector = initializationVector ?? randomInitializationVector
 
 
 		// Create `encrypted CheckInRecord`: the `CheckInRecord` shall be encrypted
-		let cbcEncryption = CBCEncryption(
+		let aesEncryption = AESEncryption(
 			encryptionKey: encryptionKey,
 			initializationVector: finalInitializationVector
 		)
-		let encryptionResult = cbcEncryption.encrypt(data: checkinRecordData)
+		let encryptionResult = aesEncryption.encrypt(data: checkinRecordData)
 
 		guard case let .success(encryptedCheckinData) = encryptionResult else {
 			if case let .failure(error) = encryptionResult {
@@ -212,5 +212,23 @@ struct CheckinEncryption: CheckinEncrypting {
 		let key = messageAuthenticationCodeKey(for: locationId)
 		let data = initializationVector + encryptedCheckinRecord
 		return hmac(data: data, key: key)
+	}
+
+	private func randomBytes(length: Int) -> Data? {
+		var randomData = Data(count: length)
+
+		let result: Int32? = randomData.withUnsafeMutableBytes {
+			guard let baseAddress = $0.baseAddress else {
+				Log.error("Could not access base address.", log: .checkin)
+				return nil
+			}
+			return SecRandomCopyBytes(kSecRandomDefault, length, baseAddress)
+		}
+		if let result = result, result == errSecSuccess {
+			return randomData
+		} else {
+			Log.error("Failed to generate random bytes.", log: .checkin)
+			return nil
+		}
 	}
 }

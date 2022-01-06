@@ -14,7 +14,6 @@ final class DMViewController: UITableViewController, RequiresAppDependencies {
 	
 	init(
 		client: Client,
-		restServiceProvider: RestServiceProviding,
 		wifiClient: WifiOnlyHTTPClient,
 		exposureSubmissionService: ExposureSubmissionService,
 		otpService: OTPServiceProviding,
@@ -25,7 +24,6 @@ final class DMViewController: UITableViewController, RequiresAppDependencies {
 		healthCertificateService: HealthCertificateService
 	) {
 		self.client = client
-		self.restServiceProvider = restServiceProvider
 		self.wifiClient = wifiClient
 		self.exposureSubmissionService = exposureSubmissionService
 		self.otpService = otpService
@@ -87,10 +85,6 @@ final class DMViewController: UITableViewController, RequiresAppDependencies {
 			vc = DMNHCViewController(
 				store: store
 			)
-
-		case .ticketValidation:
-			vc = DMTicketValidationViewController(store: store)
-
 		case .keys:
 			vc = DMKeysViewController(
 				client: client,
@@ -185,7 +179,6 @@ final class DMViewController: UITableViewController, RequiresAppDependencies {
 	// MARK: - Private
 	
 	private let client: Client
-	private let restServiceProvider: RestServiceProviding
 	private let consumer = RiskConsumer()
 	private let exposureSubmissionService: ExposureSubmissionService
 	private let otpService: OTPServiceProviding
@@ -203,7 +196,7 @@ final class DMViewController: UITableViewController, RequiresAppDependencies {
 
 	@objc
 	private func sendFakeRequest() {
-		FakeRequestService(client: client, restServiceProvider: restServiceProvider).fakeRequest {
+		FakeRequestService(client: client).fakeRequest {
 			let alert = self.setupErrorAlert(title: "Info", message: "Fake request was sent.")
 			self.present(alert, animated: true) {}
 		}

@@ -38,8 +38,7 @@ class RootCoordinator: NSObject, RequiresAppDependencies, UITabBarControllerDele
 		vaccinationValueSetsProvider: VaccinationValueSetsProviding,
 		elsService: ErrorLogSubmissionProviding,
 		recycleBin: RecycleBin,
-		restServiceProvider: RestServiceProviding,
-		badgeWrapper: HomeBadgeWrapper
+		restServiceProvider: RestServiceProviding
 	) {
 		self.delegate = delegate
 		self.coronaTestService = coronaTestService
@@ -55,7 +54,6 @@ class RootCoordinator: NSObject, RequiresAppDependencies, UITabBarControllerDele
 		self.elsService = elsService
 		self.recycleBin = recycleBin
 		self.restServiceProvider = restServiceProvider
-		self.badgeWrapper = badgeWrapper
 	}
 
 	deinit {
@@ -96,7 +94,7 @@ class RootCoordinator: NSObject, RequiresAppDependencies, UITabBarControllerDele
 
 		return true
 	}
-
+	
 	// MARK: - Internal
 
 	let viewController: UIViewController = {
@@ -104,8 +102,7 @@ class RootCoordinator: NSObject, RequiresAppDependencies, UITabBarControllerDele
 		viewController.view.backgroundColor = .enaColor(for: .background)
 		return viewController
 	}()
-
-	// swiftlint:disable function_body_length
+	
 	func showHome(enStateHandler: ENStateHandler, route: Route?) {
 		// only create and init the whole view stack if not done before
 		// there for we check if the homeCoordinator exists
@@ -136,7 +133,6 @@ class RootCoordinator: NSObject, RequiresAppDependencies, UITabBarControllerDele
 		let qrScannerCoordinator = QRScannerCoordinator(
 			store: store,
 			client: client,
-			restServiceProvider: restServiceProvider,
 			eventStore: eventStore,
 			appConfiguration: appConfigurationProvider,
 			eventCheckoutService: eventCheckoutService,
@@ -145,8 +141,7 @@ class RootCoordinator: NSObject, RequiresAppDependencies, UITabBarControllerDele
 			healthCertificateValidationOnboardedCountriesProvider: healthCertificateValidationOnboardedCountriesProvider,
 			vaccinationValueSetsProvider: vaccinationValueSetsProvider,
 			exposureSubmissionService: exposureSubmissionService,
-			coronaTestService: coronaTestService,
-			recycleBin: recycleBin
+			coronaTestService: coronaTestService
 		)
 		self.qrScannerCoordinator = qrScannerCoordinator
 		
@@ -162,8 +157,7 @@ class RootCoordinator: NSObject, RequiresAppDependencies, UITabBarControllerDele
 			exposureSubmissionService: exposureSubmissionService,
 			qrScannerCoordinator: qrScannerCoordinator,
 			recycleBin: recycleBin,
-			restServiceProvider: restServiceProvider,
-			badgeWrapper: badgeWrapper
+			restServiceProvider: restServiceProvider
 		)
 		self.homeCoordinator = homeCoordinator
 		homeCoordinator.showHome(
@@ -289,6 +283,7 @@ class RootCoordinator: NSObject, RequiresAppDependencies, UITabBarControllerDele
 				
 		healthCertificatesTabCoordinator?.showCertifiedPersonFromNotification(for: healthCertifiedPerson)
 	}
+
 	
 	func showOnboarding() {
 		let onboardingVC = OnboardingInfoViewController(
@@ -349,7 +344,6 @@ class RootCoordinator: NSObject, RequiresAppDependencies, UITabBarControllerDele
 	private let vaccinationValueSetsProvider: VaccinationValueSetsProviding
 	private let recycleBin: RecycleBin
 	private let restServiceProvider: RestServiceProviding
-	private let badgeWrapper: HomeBadgeWrapper
 
 	private let tabBarController = UITabBarController()
 
@@ -372,7 +366,6 @@ class RootCoordinator: NSObject, RequiresAppDependencies, UITabBarControllerDele
 				diagnosisKeysRetrieval: exposureManager,
 				appConfigurationProvider: CachedAppConfigurationMock(with: CachedAppConfigurationMock.screenshotConfiguration, store: store),
 				client: ClientMock(),
-				restServiceProvider: restServiceProvider,
 				store: store,
 				eventStore: eventStore,
 				coronaTestService: coronaTestService
@@ -384,7 +377,6 @@ class RootCoordinator: NSObject, RequiresAppDependencies, UITabBarControllerDele
 			diagnosisKeysRetrieval: exposureManager,
 			appConfigurationProvider: appConfigurationProvider,
 			client: client,
-			restServiceProvider: restServiceProvider,
 			store: store,
 			eventStore: eventStore,
 			coronaTestService: coronaTestService

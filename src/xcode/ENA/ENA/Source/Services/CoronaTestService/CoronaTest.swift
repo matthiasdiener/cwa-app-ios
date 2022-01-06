@@ -9,7 +9,7 @@ enum CoronaTestType: Int, CaseIterable, Codable, Equatable {
 	case antigen
 }
 
-enum CoronaTest: Equatable, Codable, Hashable, RecycleBinIdentifiable {
+enum CoronaTest: Equatable, Codable, RecycleBinIdentifiable {
 
 	case pcr(PCRTest)
 	case antigen(AntigenTest)
@@ -29,15 +29,6 @@ enum CoronaTest: Equatable, Codable, Hashable, RecycleBinIdentifiable {
 			return pcrTest.registrationToken
 		case .antigen(let antigenTest):
 			return antigenTest.registrationToken
-		}
-	}
-
-	var qrCodeHash: String? {
-		switch self {
-		case .pcr(let pcrTest):
-			return pcrTest.qrCodeHash
-		case .antigen(let antigenTest):
-			return antigenTest.qrCodeHash
 		}
 	}
 
@@ -179,7 +170,6 @@ enum CoronaTest: Equatable, Codable, Hashable, RecycleBinIdentifiable {
 	// MARK: - Protocol RecycleBinIdentifiable
 
 	var recycleBinIdentifier: String {
-		return String(hashValue)
+		return uniqueCertificateIdentifier ?? ""
 	}
-
 }

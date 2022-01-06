@@ -4,16 +4,11 @@
 
 struct HealthCertificateRestorationHandler: CertificateRestorationHandling {
 
-	// MARK: - Init
-
 	init(service: HealthCertificateService) {
-		restore = { healthCertificate in
+		self.restore = { healthCertificate in
 			service.addHealthCertificate(healthCertificate)
 		}
 	}
 
-	// MARK: - Protocol CertificateRestorationHandling
-
-	let restore: ((HealthCertificate) -> Void)
-
+	var restore: ((HealthCertificate) -> Void)
 }

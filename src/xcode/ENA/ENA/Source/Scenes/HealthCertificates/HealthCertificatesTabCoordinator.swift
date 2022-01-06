@@ -111,7 +111,7 @@ final class HealthCertificatesTabCoordinator {
 			onCertifiedPersonTap: { [weak self] healthCertifiedPerson in
 				self?.showHealthCertifiedPerson(healthCertifiedPerson)
 			},
-			onCovPassCheckInfoButtonTap: { [weak self] in
+			showInfoHit: { [weak self] in
 				self?.presentCovPassInfoScreen()
 			}
 		)
@@ -241,7 +241,7 @@ final class HealthCertificatesTabCoordinator {
 								Log.error("Could not create strong self")
 								return
 							}
-							self.healthCertificateService.moveHealthCertificateToBin(healthCertificate)
+							self.healthCertificateService.removeHealthCertificate(healthCertificate)
 							// Do not confirm deletion if we removed the last certificate of the person (this removes the person, too) because it would trigger a new reload of the table where no person can be shown. Instead, we dismiss the view controller.
 							if self.healthCertificateService.healthCertifiedPersons.contains(healthCertifiedPerson) {
 								confirmDeletion()

@@ -14,18 +14,12 @@ class FileScannerCoordinator: NSObject, UIImagePickerControllerDelegate, UINavig
 		_ parentViewController: UIViewController,
 		viewModel: FileScannerProcessing,
 		qrCodeFound: @escaping (QRCodeResult) -> Void,
-		noQRCodeFound: @escaping () -> Void,
-		showActivityIndicator: @escaping () -> Void,
-		hideActivityIndicator: @escaping () -> Void,
-		onQRCodeParserError: @escaping (QRCodeParserError) -> Void
+		noQRCodeFound: @escaping () -> Void
 	) {
 		self.parentViewController = parentViewController
 		self.viewModel = viewModel
 		self.qrCodeFound = qrCodeFound
 		self.noQRCodeFound = noQRCodeFound
-		self.showActivityIndicator = showActivityIndicator
-		self.hideActivityIndicator = hideActivityIndicator
-		self.onQRCodeParserError = onQRCodeParserError
 	}
 
 	// MARK: - UIImagePickerControllerDelegate
@@ -100,23 +94,19 @@ class FileScannerCoordinator: NSObject, UIImagePickerControllerDelegate, UINavig
 
 		viewModel.processingStarted = { [weak self] in
 			DispatchQueue.main.async {
-				self?.showActivityIndicator()
+				self?.showIndicator()
 			}
 		}
 
 		viewModel.processingFinished = { [weak self] qrCodeResult in
 			DispatchQueue.main.async {
 				self?.qrCodeFound(qrCodeResult)
-				self?.hideActivityIndicator()
+				self?.hideIndicator()
 			}
 		}
 
-		viewModel.processingFailed = { [weak self] error in
-			if case .qrCodeParserError(let parserError) = error {
-				self?.onQRCodeParserError(parserError)
-			} else {
-				self?.presentSimpleAlert(error)
-			}
+		viewModel.processingFailed = { [weak self] alertType in
+			self?.presentSimpleAlert(alertType)
 		}
 
 		viewModel.missingPasswordForPDF = { [weak self] callback in
@@ -130,13 +120,12 @@ class FileScannerCoordinator: NSObject, UIImagePickerControllerDelegate, UINavig
 
 	// MARK: - Private
 
+	private let activityIndicatorView = FileScannerIndicatorView()
+	private let duration = 0.45
 	private let parentViewController: UIViewController
 	private let qrCodeFound: (QRCodeResult) -> Void
 	private let noQRCodeFound: () -> Void
-	private let showActivityIndicator: () -> Void
-	private let hideActivityIndicator: () -> Void
-	private let onQRCodeParserError: (QRCodeParserError) -> Void
-	
+
 	private var viewModel: FileScannerProcessing
 
 	private func finishedPickingImage() {
@@ -281,9 +270,42 @@ class FileScannerCoordinator: NSObject, UIImagePickerControllerDelegate, UINavig
 		parentViewController.present(alert, animated: true)
 	}
 
+	private func showIndicator() {
+		guard let parentView = parentViewController.view else {
+			Log.error("Failed to get parentViewController - stop", log: .fileScanner)
+			return
+		}
+		activityIndicatorView.alpha = 0.0
+		activityIndicatorView.translatesAutoresizingMaskIntoConstraints = false
+		parentView.addSubview(activityIndicatorView)
+		NSLayoutConstraint.activate(
+			[
+				activityIndicatorView.topAnchor.constraint(equalTo: parentView.layoutMarginsGuide.topAnchor),
+				activityIndicatorView.bottomAnchor.constraint(equalTo: parentView.layoutMarginsGuide.bottomAnchor),
+				activityIndicatorView.leadingAnchor.constraint(equalTo: parentView.leadingAnchor),
+				activityIndicatorView.trailingAnchor.constraint(equalTo: parentView.trailingAnchor)
+			]
+		)
+
+		let animator = UIViewPropertyAnimator(duration: duration, curve: .easeIn) { [weak self] in
+			self?.activityIndicatorView.alpha = 1.0
+		}
+		animator.startAnimation()
+	}
+
+	private func hideIndicator() {
+		let animator = UIViewPropertyAnimator(duration: duration, curve: .easeIn) { [weak self] in
+			self?.activityIndicatorView.alpha = 0.0
+		}
+		animator.addCompletion { [weak self] _ in
+			self?.activityIndicatorView.removeFromSuperview()
+		}
+		animator.startAnimation()
+	}
+
 	private func presentSimpleAlert(_ error: FileScannerError?) {
 		DispatchQueue.main.async { [weak self] in
-			self?.hideActivityIndicator()
+			self?.hideIndicator()
 			guard let self = self,
 				  let error = error else {
 				Log.error("Failed to get strong self", log: .fileScanner)

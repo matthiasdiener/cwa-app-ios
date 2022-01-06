@@ -32,7 +32,7 @@ class HTTPClientPlausibleDeniabilityTests: CWATestCase {
 
 	func test_getRegistrationToken_requestPadding() {
 		// GIVE
-		let sendResource = PaddingJSONSendResource<KeyModel>(
+		let sendResource = JSONSendResource<KeyModel>(
 			KeyModel(
 				key: "123456789",
 				keyType: .teleTan
@@ -52,20 +52,25 @@ class HTTPClientPlausibleDeniabilityTests: CWATestCase {
 	}
 
 	func test_getTANForExposureSubmit_requestPadding() {
-		
-		let sendResource = PaddingJSONSendResource<SendRegistrationTokenModel>(
-			SendRegistrationTokenModel(token: "dummyRegToken")
-		)
-		if case let .success(bodyData) = sendResource.encode() {
-			do {
-				let data = try XCTUnwrap(bodyData)
-				XCTAssertEqual(data.count, 250)
-			} catch {
-				XCTFail("Should unwrap data object \(error.localizedDescription)")
-			}
-		} else {
-			XCTFail("Wrong padding body size")
+
+		// Setup.
+
+		let expectation = self.expectation(description: "all callbacks called")
+		expectation.expectedFulfillmentCount = 4
+		let session = MockUrlSession(data: nil, nextResponse: nil, error: nil) { request in
+			expectation.fulfill()
+			XCTAssertEqual(request.httpBody?.count, 250)
 		}
+
+		let stack = MockNetworkStack(mockSession: session)
+		let client = HTTPClient.makeWith(mock: stack)
+
+		// Test.
+
+		client.getTANForExposureSubmit(forDevice: "dummyRegToken") { _ in expectation.fulfill() }
+		client.getTANForExposureSubmit(forDevice: "dummyRegToken", isFake: true) { _ in expectation.fulfill() }
+
+		waitForExpectations(timeout: .short)
 	}
 
 	// This test makes sure that all headers + urls have the same length.
@@ -75,7 +80,7 @@ class HTTPClientPlausibleDeniabilityTests: CWATestCase {
 
 		// Setup.
 		let expectation = self.expectation(description: "all callbacks called")
-		expectation.expectedFulfillmentCount = 6
+		expectation.expectedFulfillmentCount = 8
 
 		var previousSize: Int?
 
@@ -100,37 +105,9 @@ class HTTPClientPlausibleDeniabilityTests: CWATestCase {
 		let client = HTTPClient.makeWith(mock: stack)
 
 		// Test.
-		let restServiceProvider = RestServiceProviderStub(
-			results: [
-				.success(SubmissionTANModel(submissionTAN: "fake")),
-				.success(SubmissionTANModel(submissionTAN: "fake"))
-			]
-		)
-		let resource = RegistrationTokenResource(
-			sendModel: SendRegistrationTokenModel(
-				token: "dummyRegToken"
-			)
-		)
-		restServiceProvider.load(resource) { _ in
-			expectation.fulfill()
-		}
-		let fakeRequestResource = RegistrationTokenResource(
-			isFake: true,
-			sendModel: SendRegistrationTokenModel(
-				token: "dummyRegToken"
-			)
-		)
 
-		restServiceProvider.load(fakeRequestResource) { _ in
-			expectation.fulfill()
-		}
-		
-		client.getTestResult(forDevice: "dummyDevice") { _ in
-			expectation.fulfill()
-		}
-		client.getTestResult(forDevice: "dummyDevice", isFake: true) { _
-			in expectation.fulfill()
-		}
+		client.getTANForExposureSubmit(forDevice: "dummyRegToken") { _ in expectation.fulfill() }
+		client.getTANForExposureSubmit(forDevice: "dummyRegToken", isFake: true) { _ in expectation.fulfill() }
 
 		waitForExpectations(timeout: .short)
 	}

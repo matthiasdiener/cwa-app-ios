@@ -11,12 +11,10 @@ class RecycleBinViewModel {
 
 	init(
 		store: RecycleBinStoring,
-		recycleBin: RecycleBin,
-		onOverwrite: @escaping (RecycleBinItem) -> Void
+		recycleBin: RecycleBin
 	) {
 		self.store = store
 		self.recycleBin = recycleBin
-		self.onOverwrite = onOverwrite
 
 		store.recycleBinItemsSubject
 			.sink { [weak self] in
@@ -64,14 +62,7 @@ class RecycleBinViewModel {
 			fatalError("didTapEntryCell can only be called from the entries section")
 		}
 
-		let item = recycleBinItems[indexPath.row]
-
-		switch recycleBin.canRestore(item) {
-		case .success:
-			recycleBin.restore(item)
-		case .failure(.testError(.testTypeAlreadyRegistered)):
-			onOverwrite(item)
-		}
+		recycleBin.restore(recycleBinItems[indexPath.row])
 	}
 
 	func removeEntry(at indexPath: IndexPath) {
@@ -86,7 +77,6 @@ class RecycleBinViewModel {
 
 	private let store: RecycleBinStoring
 	private let recycleBin: RecycleBin
-	private let onOverwrite: (RecycleBinItem) -> Void
 
 	private var subscriptions: [AnyCancellable] = []
 

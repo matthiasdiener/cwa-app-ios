@@ -59,7 +59,7 @@ class EventCheckoutServiceTests: CWATestCase {
 		})
 		let checkinLocation = try XCTUnwrap(_checkinLocation)
 
-		XCTAssertEqual(checkinLocation.name, "Some Description, Some Address")
+		XCTAssertEqual(checkinLocation.name, "Some Description, Some Address, \(dateIntervalFormatter.string(from: today, to: tomorrow))")
 	}
 
 	func test_When_Checkout_Then_ContactDiaryLocationVisitsCreated() {

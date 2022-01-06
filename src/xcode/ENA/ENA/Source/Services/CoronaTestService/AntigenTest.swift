@@ -4,7 +4,7 @@
 
 import Foundation
 
-struct AntigenTest: Equatable, Hashable {
+struct AntigenTest: Equatable {
 
 	// MARK: - Internal
 
@@ -14,7 +14,6 @@ struct AntigenTest: Equatable, Hashable {
 	var sampleCollectionDate: Date?
 	var registrationDate: Date?
 	var registrationToken: String?
-	var qrCodeHash: String?
 
 	var testedPerson: TestedPerson
 
@@ -50,7 +49,6 @@ extension AntigenTest: Codable {
 		case sampleCollectionDate
 		case registrationDate
 		case registrationToken
-		case qrCodeHash
 		case testedPerson
 		case testResult
 		case finalTestResultReceivedDate
@@ -72,7 +70,6 @@ extension AntigenTest: Codable {
 		sampleCollectionDate = try container.decodeIfPresent(Date.self, forKey: .sampleCollectionDate)
 		registrationDate = try container.decodeIfPresent(Date.self, forKey: .registrationDate)
 		registrationToken = try container.decodeIfPresent(String.self, forKey: .registrationToken)
-		qrCodeHash = try container.decodeIfPresent(String.self, forKey: .qrCodeHash)
 
 		testedPerson = try container.decode(TestedPerson.self, forKey: .testedPerson)
 

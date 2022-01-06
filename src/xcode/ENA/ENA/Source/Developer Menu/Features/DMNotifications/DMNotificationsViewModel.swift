@@ -35,7 +35,10 @@ final class DMLocalNotificationsViewModel {
 	}
 
 	func cellViewModel(for indexPath: IndexPath) -> Any {
-		let identifier = healthCertificateService.healthCertifiedPersons[indexPath.section].healthCertificates[indexPath.row].uniqueCertificateIdentifier
+
+		guard let identifier = healthCertificateService.healthCertifiedPersons[indexPath.section].healthCertificates[indexPath.row].uniqueCertificateIdentifier else {
+			fatalError("Failed to find matching identifier")
+		}
 
 		return DMButtonCellViewModel(
 			text: "Trigger notifications for person: \(indexPath.section) with certificate \(indexPath.row)",

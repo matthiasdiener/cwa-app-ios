@@ -17,16 +17,13 @@ class CoronaTestsQRCodeParser: QRCodeParsable {
 		qrCode: String,
 		completion: @escaping (Result<QRCodeResult, QRCodeParserError>) -> Void
 	) {
-		Log.info("Parse corona test.")
-
 		#if DEBUG
 		if isUITesting {
-			completion(.success(.coronaTest(CoronaTestRegistrationInformation.pcr(guid: "guid", qrCodeHash: "qrCodeHash"))))
+			completion(.success(.coronaTest(CoronaTestRegistrationInformation.pcr(guid: "guid"))))
 		}
 		#endif
 		
 		guard let coronaTestQRCodeInformation = coronaTestQRCodeInformation(from: qrCode) else {
-			Log.info("Failed parsing corona test with error codeNotFound")
 			completion(.failure(.scanningError(.codeNotFound)))
 			return
 		}
@@ -80,7 +77,7 @@ class CoronaTestsQRCodeParser: QRCodeParsable {
 			  ) else {
 			return nil
 		}
-		return matchings.isEmpty ? nil : .pcr(guid: candidate, qrCodeHash: ENAHasher.sha256(guidURL))
+		return matchings.isEmpty ? nil : .pcr(guid: candidate)
 	}
 	
 }

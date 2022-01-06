@@ -32,7 +32,7 @@ class HealthCertificateCellViewModelTests: XCTestCase {
 			healthCertifiedPerson: healthCertifiedPerson
 		)
 
-		XCTAssertEqual(viewModel.gradientType, .lightBlue)
+		XCTAssertEqual(viewModel.gradientType, .lightBlue(withStars: false))
 		XCTAssertEqual(viewModel.headline, "Impfzertifikat")
 		XCTAssertEqual(viewModel.subheadline, "Impfung 1 von 2")
 		XCTAssertEqual(viewModel.detail, "Geimpft am 01.06.21")
@@ -65,31 +65,28 @@ class HealthCertificateCellViewModelTests: XCTestCase {
 			healthCertifiedPerson: healthCertifiedPerson
 		)
 
-		XCTAssertEqual(viewModel.gradientType, .lightBlue)
+		XCTAssertEqual(viewModel.gradientType, .lightBlue(withStars: false))
 		XCTAssertEqual(viewModel.headline, "Impfzertifikat")
 		XCTAssertEqual(viewModel.subheadline, "Impfung 1 von 2")
 		XCTAssertEqual(viewModel.detail, "Geimpft am 01.06.21")
 		XCTAssertEqual(viewModel.validityStateInfo, "Neu")
 		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "VaccinationCertificate_PartiallyVaccinated_Icon"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_light"))
 		XCTAssertTrue(viewModel.isCurrentlyUsedCertificateHintVisible)
 	}
 
 	func testViewModelWithSeriesCompletingVaccinationCertificateWithoutCompleteProtection() throws {
 		let healthCertificate = try vaccinationCertificate(daysOffset: -14, doseNumber: 2, totalSeriesOfDoses: 2)
 		let healthCertifiedPerson = HealthCertifiedPerson(healthCertificates: [healthCertificate])
-		healthCertifiedPerson.gradientType = .mediumBlue
 
 		let viewModel = HealthCertificateCellViewModel(
 			healthCertificate: healthCertificate,
 			healthCertifiedPerson: healthCertifiedPerson
 		)
 
-		XCTAssertEqual(viewModel.gradientType, .mediumBlue)
+		XCTAssertEqual(viewModel.gradientType, .lightBlue(withStars: false))
 		XCTAssertEqual(viewModel.headline, "Impfzertifikat")
 		XCTAssertEqual(viewModel.subheadline, "Impfung 2 von 2")
 		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "VaccinationCertificate_FullyVaccinated_Icon"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_medium"))
 		XCTAssertTrue(viewModel.isCurrentlyUsedCertificateHintVisible)
 	}
 
@@ -99,18 +96,16 @@ class HealthCertificateCellViewModelTests: XCTestCase {
 		let healthCertificate3 = try vaccinationCertificate(daysOffset: -15, doseNumber: 3, totalSeriesOfDoses: 3)
 
 		let healthCertifiedPerson = HealthCertifiedPerson(healthCertificates: [healthCertificate1, healthCertificate2, healthCertificate3])
-		healthCertifiedPerson.gradientType = .darkBlue
 
 		let viewModel = HealthCertificateCellViewModel(
 			healthCertificate: healthCertificate3,
 			healthCertifiedPerson: healthCertifiedPerson
 		)
 
-		XCTAssertEqual(viewModel.gradientType, .darkBlue)
+		XCTAssertEqual(viewModel.gradientType, .lightBlue(withStars: false))
 		XCTAssertEqual(viewModel.headline, "Impfzertifikat")
 		XCTAssertEqual(viewModel.subheadline, "Impfung 3 von 3")
 		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "VaccinationCertificate_CompletelyProtected_Icon"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_dark"))
 		XCTAssertTrue(viewModel.isCurrentlyUsedCertificateHintVisible)
 	}
 
@@ -123,11 +118,10 @@ class HealthCertificateCellViewModelTests: XCTestCase {
 			healthCertifiedPerson: healthCertifiedPerson
 		)
 
-		XCTAssertEqual(viewModel.gradientType, .lightBlue)
+		XCTAssertEqual(viewModel.gradientType, .lightBlue(withStars: false))
 		XCTAssertEqual(viewModel.headline, "Impfzertifikat")
 		XCTAssertEqual(viewModel.subheadline, "Impfung 2 von 2")
 		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "VaccinationCertificate_CompletelyProtected_Icon"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_light"))
 		XCTAssertTrue(viewModel.isCurrentlyUsedCertificateHintVisible)
 	}
 
@@ -144,11 +138,10 @@ class HealthCertificateCellViewModelTests: XCTestCase {
 			healthCertifiedPerson: healthCertifiedPerson
 		)
 
-		XCTAssertEqual(viewModel.gradientType, .solidGrey)
+		XCTAssertEqual(viewModel.gradientType, .solidGrey(withStars: false))
 		XCTAssertEqual(viewModel.headline, "Impfzertifikat")
 		XCTAssertEqual(viewModel.subheadline, "Impfung 1 von 2")
 		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "VaccinationCertificate_PartiallyVaccinated_Icon"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_grey"))
 		XCTAssertFalse(viewModel.isCurrentlyUsedCertificateHintVisible)
 	}
 
@@ -178,7 +171,7 @@ class HealthCertificateCellViewModelTests: XCTestCase {
 			healthCertifiedPerson: healthCertifiedPerson
 		)
 
-		XCTAssertEqual(viewModel.gradientType, .lightBlue)
+		XCTAssertEqual(viewModel.gradientType, .lightBlue(withStars: false))
 		XCTAssertEqual(viewModel.headline, "Impfzertifikat")
 		XCTAssertEqual(viewModel.subheadline, "Impfung 1 von 2")
 		XCTAssertEqual(viewModel.detail, "Geimpft am 01.06.21")
@@ -191,7 +184,6 @@ class HealthCertificateCellViewModelTests: XCTestCase {
 			)
 		)
 		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "VaccinationCertificate_PartiallyVaccinated_Icon"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_light"))
 		XCTAssertTrue(viewModel.isCurrentlyUsedCertificateHintVisible)
 	}
 
@@ -219,13 +211,12 @@ class HealthCertificateCellViewModelTests: XCTestCase {
 			healthCertifiedPerson: healthCertifiedPerson
 		)
 
-		XCTAssertEqual(viewModel.gradientType, .solidGrey)
+		XCTAssertEqual(viewModel.gradientType, .solidGrey(withStars: false))
 		XCTAssertEqual(viewModel.headline, "Impfzertifikat")
 		XCTAssertEqual(viewModel.subheadline, "Impfung 1 von 2")
 		XCTAssertEqual(viewModel.detail, "Geimpft am 01.06.21")
 		XCTAssertEqual(viewModel.validityStateInfo, "Zertifikat abgelaufen")
 		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "Icon_WarningTriangle_small"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_grey"))
 		XCTAssertTrue(viewModel.isCurrentlyUsedCertificateHintVisible)
 	}
 
@@ -253,47 +244,12 @@ class HealthCertificateCellViewModelTests: XCTestCase {
 			healthCertifiedPerson: healthCertifiedPerson
 		)
 
-		XCTAssertEqual(viewModel.gradientType, .solidGrey)
+		XCTAssertEqual(viewModel.gradientType, .solidGrey(withStars: false))
 		XCTAssertEqual(viewModel.headline, "Impfzertifikat")
 		XCTAssertEqual(viewModel.subheadline, "Impfung 1 von 2")
 		XCTAssertEqual(viewModel.detail, "Geimpft am 01.06.21")
 		XCTAssertEqual(viewModel.validityStateInfo, "Zertifikat (Signatur) ungültig")
 		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "Icon_WarningTriangle_small"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_grey"))
-		XCTAssertTrue(viewModel.isCurrentlyUsedCertificateHintVisible)
-	}
-
-	func testViewModelWithBlockedIncompleteVaccinationCertificate() throws {
-		let healthCertificate = try HealthCertificate(
-			base45: try base45Fake(
-				from: DigitalCovidCertificate.fake(
-					vaccinationEntries: [
-						VaccinationEntry.fake(
-							doseNumber: 1,
-							totalSeriesOfDoses: 2,
-							dateOfVaccination: "2021-06-01"
-						)
-					]
-				)
-			),
-			validityState: .blocked,
-			isNew: true
-		)
-
-		let healthCertifiedPerson = HealthCertifiedPerson(healthCertificates: [healthCertificate])
-
-		let viewModel = HealthCertificateCellViewModel(
-			healthCertificate: healthCertificate,
-			healthCertifiedPerson: healthCertifiedPerson
-		)
-
-		XCTAssertEqual(viewModel.gradientType, .solidGrey)
-		XCTAssertEqual(viewModel.headline, "Impfzertifikat")
-		XCTAssertEqual(viewModel.subheadline, "Impfung 1 von 2")
-		XCTAssertEqual(viewModel.detail, "Geimpft am 01.06.21")
-		XCTAssertEqual(viewModel.validityStateInfo, "Zertifikat ungültig")
-		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "Icon_WarningTriangle_small"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_grey"))
 		XCTAssertTrue(viewModel.isCurrentlyUsedCertificateHintVisible)
 	}
 
@@ -319,13 +275,12 @@ class HealthCertificateCellViewModelTests: XCTestCase {
 			healthCertifiedPerson: healthCertifiedPerson
 		)
 
-		XCTAssertEqual(viewModel.gradientType, .lightBlue)
+		XCTAssertEqual(viewModel.gradientType, .lightBlue(withStars: false))
 		XCTAssertEqual(viewModel.headline, "Testzertifikat")
 		XCTAssertEqual(viewModel.subheadline, "PCR-Test")
 		XCTAssertEqual(viewModel.detail, "Probenahme am 29.05.21")
 		XCTAssertNil(viewModel.validityStateInfo)
 		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "TestCertificate_Icon"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_light"))
 		XCTAssertTrue(viewModel.isCurrentlyUsedCertificateHintVisible)
 	}
 
@@ -352,13 +307,12 @@ class HealthCertificateCellViewModelTests: XCTestCase {
 			healthCertifiedPerson: healthCertifiedPerson
 		)
 
-		XCTAssertEqual(viewModel.gradientType, .lightBlue)
+		XCTAssertEqual(viewModel.gradientType, .lightBlue(withStars: false))
 		XCTAssertEqual(viewModel.headline, "Testzertifikat")
 		XCTAssertEqual(viewModel.subheadline, "PCR-Test")
 		XCTAssertEqual(viewModel.detail, "Probenahme am 29.05.21")
 		XCTAssertEqual(viewModel.validityStateInfo, "Neu")
 		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "TestCertificate_Icon"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_light"))
 		XCTAssertTrue(viewModel.isCurrentlyUsedCertificateHintVisible)
 	}
 
@@ -386,13 +340,12 @@ class HealthCertificateCellViewModelTests: XCTestCase {
 			healthCertifiedPerson: healthCertifiedPerson
 		)
 
-		XCTAssertEqual(viewModel.gradientType, .lightBlue)
+		XCTAssertEqual(viewModel.gradientType, .lightBlue(withStars: false))
 		XCTAssertEqual(viewModel.headline, "Testzertifikat")
 		XCTAssertEqual(viewModel.subheadline, "Schnelltest")
 		XCTAssertEqual(viewModel.detail, "Probenahme am 13.05.21")
 		XCTAssertNil(viewModel.validityStateInfo)
 		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "TestCertificate_Icon"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_light"))
 		XCTAssertTrue(viewModel.isCurrentlyUsedCertificateHintVisible)
 	}
 
@@ -420,13 +373,12 @@ class HealthCertificateCellViewModelTests: XCTestCase {
 			healthCertifiedPerson: healthCertifiedPerson
 		)
 
-		XCTAssertEqual(viewModel.gradientType, .lightBlue)
+		XCTAssertEqual(viewModel.gradientType, .lightBlue(withStars: false))
 		XCTAssertEqual(viewModel.headline, "Testzertifikat")
 		XCTAssertEqual(viewModel.subheadline, "Schnelltest")
 		XCTAssertEqual(viewModel.detail, "Probenahme am 13.05.21")
 		XCTAssertEqual(viewModel.validityStateInfo, "Neu")
 		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "TestCertificate_Icon"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_light"))
 		XCTAssertTrue(viewModel.isCurrentlyUsedCertificateHintVisible)
 	}
 
@@ -453,13 +405,12 @@ class HealthCertificateCellViewModelTests: XCTestCase {
 			healthCertifiedPerson: healthCertifiedPerson
 		)
 
-		XCTAssertEqual(viewModel.gradientType, .lightBlue)
+		XCTAssertEqual(viewModel.gradientType, .lightBlue(withStars: false))
 		XCTAssertEqual(viewModel.headline, "Testzertifikat")
 		XCTAssertNil(viewModel.subheadline)
 		XCTAssertEqual(viewModel.detail, "Probenahme am 13.05.21")
 		XCTAssertNil(viewModel.validityStateInfo)
 		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "TestCertificate_Icon"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_light"))
 		XCTAssertTrue(viewModel.isCurrentlyUsedCertificateHintVisible)
 	}
 
@@ -486,13 +437,12 @@ class HealthCertificateCellViewModelTests: XCTestCase {
 			healthCertifiedPerson: healthCertifiedPerson
 		)
 
-		XCTAssertEqual(viewModel.gradientType, .lightBlue)
+		XCTAssertEqual(viewModel.gradientType, .lightBlue(withStars: false))
 		XCTAssertEqual(viewModel.headline, "Testzertifikat")
 		XCTAssertNil(viewModel.subheadline)
 		XCTAssertEqual(viewModel.detail, "Probenahme am 13.05.21")
 		XCTAssertEqual(viewModel.validityStateInfo, "Neu")
 		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "TestCertificate_Icon"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_light"))
 		XCTAssertTrue(viewModel.isCurrentlyUsedCertificateHintVisible)
 	}
 
@@ -519,46 +469,12 @@ class HealthCertificateCellViewModelTests: XCTestCase {
 			healthCertifiedPerson: healthCertifiedPerson
 		)
 
-		XCTAssertEqual(viewModel.gradientType, .solidGrey)
+		XCTAssertEqual(viewModel.gradientType, .solidGrey(withStars: false))
 		XCTAssertEqual(viewModel.headline, "Testzertifikat")
 		XCTAssertEqual(viewModel.subheadline, "PCR-Test")
 		XCTAssertEqual(viewModel.detail, "Probenahme am 29.05.21")
 		XCTAssertEqual(viewModel.validityStateInfo, "Zertifikat (Signatur) ungültig")
 		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "Icon_WarningTriangle_small"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_grey"))
-		XCTAssertTrue(viewModel.isCurrentlyUsedCertificateHintVisible)
-	}
-
-	func testViewModelWithBlockedAntigenTestCertificate() throws {
-		let healthCertificate = try HealthCertificate(
-			base45: try base45Fake(
-				from: DigitalCovidCertificate.fake(
-					testEntries: [
-						TestEntry.fake(
-							typeOfTest: "LP217198-3",
-							dateTimeOfSampleCollection: "2021-05-29T14:36:00.000Z"
-						)
-					]
-				)
-			),
-			validityState: .blocked,
-			isNew: true
-		)
-
-		let healthCertifiedPerson = HealthCertifiedPerson(healthCertificates: [healthCertificate])
-
-		let viewModel = HealthCertificateCellViewModel(
-			healthCertificate: healthCertificate,
-			healthCertifiedPerson: healthCertifiedPerson
-		)
-
-		XCTAssertEqual(viewModel.gradientType, .solidGrey)
-		XCTAssertEqual(viewModel.headline, "Testzertifikat")
-		XCTAssertEqual(viewModel.subheadline, "Schnelltest")
-		XCTAssertEqual(viewModel.detail, "Probenahme am 29.05.21")
-		XCTAssertEqual(viewModel.validityStateInfo, "Zertifikat ungültig")
-		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "Icon_WarningTriangle_small"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_grey"))
 		XCTAssertTrue(viewModel.isCurrentlyUsedCertificateHintVisible)
 	}
 
@@ -583,13 +499,12 @@ class HealthCertificateCellViewModelTests: XCTestCase {
 			healthCertifiedPerson: healthCertifiedPerson
 		)
 
-		XCTAssertEqual(viewModel.gradientType, .lightBlue)
+		XCTAssertEqual(viewModel.gradientType, .lightBlue(withStars: false))
 		XCTAssertEqual(viewModel.headline, "Genesenenzertifikat")
 		XCTAssertNil(viewModel.subheadline)
 		XCTAssertEqual(viewModel.detail, "gültig bis 18.03.22")
 		XCTAssertNil(viewModel.validityStateInfo)
 		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "RecoveryCertificate_Icon"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_light"))
 		XCTAssertTrue(viewModel.isCurrentlyUsedCertificateHintVisible)
 	}
 
@@ -615,13 +530,12 @@ class HealthCertificateCellViewModelTests: XCTestCase {
 			healthCertifiedPerson: healthCertifiedPerson
 		)
 
-		XCTAssertEqual(viewModel.gradientType, .lightBlue)
+		XCTAssertEqual(viewModel.gradientType, .lightBlue(withStars: false))
 		XCTAssertEqual(viewModel.headline, "Genesenenzertifikat")
 		XCTAssertNil(viewModel.subheadline)
 		XCTAssertEqual(viewModel.detail, "gültig bis 18.03.22")
 		XCTAssertEqual(viewModel.validityStateInfo, "Neu")
 		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "RecoveryCertificate_Icon"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_light"))
 		XCTAssertTrue(viewModel.isCurrentlyUsedCertificateHintVisible)
 	}
 
@@ -649,7 +563,7 @@ class HealthCertificateCellViewModelTests: XCTestCase {
 			healthCertifiedPerson: healthCertifiedPerson
 		)
 
-		XCTAssertEqual(viewModel.gradientType, .lightBlue)
+		XCTAssertEqual(viewModel.gradientType, .lightBlue(withStars: false))
 		XCTAssertEqual(viewModel.headline, "Genesenenzertifikat")
 		XCTAssertNil(viewModel.subheadline)
 		XCTAssertEqual(viewModel.detail, "gültig bis 18.03.22")
@@ -662,7 +576,6 @@ class HealthCertificateCellViewModelTests: XCTestCase {
 			)
 		)
 		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "RecoveryCertificate_Icon"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_light"))
 		XCTAssertTrue(viewModel.isCurrentlyUsedCertificateHintVisible)
 	}
 
@@ -688,13 +601,12 @@ class HealthCertificateCellViewModelTests: XCTestCase {
 			healthCertifiedPerson: healthCertifiedPerson
 		)
 
-		XCTAssertEqual(viewModel.gradientType, .solidGrey)
+		XCTAssertEqual(viewModel.gradientType, .solidGrey(withStars: false))
 		XCTAssertEqual(viewModel.headline, "Genesenenzertifikat")
 		XCTAssertNil(viewModel.subheadline)
 		XCTAssertEqual(viewModel.detail, "gültig bis 18.03.22")
 		XCTAssertEqual(viewModel.validityStateInfo, "Zertifikat abgelaufen")
 		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "Icon_WarningTriangle_small"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_grey"))
 		XCTAssertTrue(viewModel.isCurrentlyUsedCertificateHintVisible)
 	}
 
@@ -720,45 +632,12 @@ class HealthCertificateCellViewModelTests: XCTestCase {
 			healthCertifiedPerson: healthCertifiedPerson
 		)
 
-		XCTAssertEqual(viewModel.gradientType, .solidGrey)
+		XCTAssertEqual(viewModel.gradientType, .solidGrey(withStars: false))
 		XCTAssertEqual(viewModel.headline, "Genesenenzertifikat")
 		XCTAssertNil(viewModel.subheadline)
 		XCTAssertEqual(viewModel.detail, "gültig bis 18.03.22")
 		XCTAssertEqual(viewModel.validityStateInfo, "Zertifikat (Signatur) ungültig")
 		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "Icon_WarningTriangle_small"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_grey"))
-		XCTAssertTrue(viewModel.isCurrentlyUsedCertificateHintVisible)
-	}
-
-	func testViewModelWithBlockedRecoveryCertificate() throws {
-		let healthCertificate = try HealthCertificate(
-			base45: try base45Fake(
-				from: DigitalCovidCertificate.fake(
-					recoveryEntries: [
-						RecoveryEntry.fake(
-							certificateValidUntil: "2022-03-18T07:12:45.132Z"
-						)
-					]
-				)
-			),
-			validityState: .blocked,
-			isNew: true
-		)
-
-		let healthCertifiedPerson = HealthCertifiedPerson(healthCertificates: [healthCertificate])
-
-		let viewModel = HealthCertificateCellViewModel(
-			healthCertificate: healthCertificate,
-			healthCertifiedPerson: healthCertifiedPerson
-		)
-
-		XCTAssertEqual(viewModel.gradientType, .solidGrey)
-		XCTAssertEqual(viewModel.headline, "Genesenenzertifikat")
-		XCTAssertNil(viewModel.subheadline)
-		XCTAssertEqual(viewModel.detail, "gültig bis 18.03.22")
-		XCTAssertEqual(viewModel.validityStateInfo, "Zertifikat ungültig")
-		XCTAssertEqual(viewModel.image, UIImage(imageLiteralResourceName: "Icon_WarningTriangle_small"))
-		XCTAssertEqual(viewModel.currentlyUsedImage, UIImage(named: "Icon_CurrentlyUsedCertificate_grey"))
 		XCTAssertTrue(viewModel.isCurrentlyUsedCertificateHintVisible)
 	}
 

@@ -20,7 +20,6 @@ class ENAExposureSubmissionService: ExposureSubmissionService {
 		diagnosisKeysRetrieval: DiagnosisKeysRetrieval,
 		appConfigurationProvider: AppConfigurationProviding,
 		client: Client,
-		restServiceProvider: RestServiceProviding,
 		store: Store,
 		eventStore: EventStoringProviding,
 		deadmanNotificationManager: DeadmanNotificationManageable? = nil,
@@ -29,13 +28,12 @@ class ENAExposureSubmissionService: ExposureSubmissionService {
 		self.diagnosisKeysRetrieval = diagnosisKeysRetrieval
 		self.appConfigurationProvider = appConfigurationProvider
 		self.client = client
-		self.restServiceProvider = restServiceProvider
 		self.store = store
 		self.eventStore = eventStore
 		self.deadmanNotificationManager = deadmanNotificationManager ?? DeadmanNotificationManager(coronaTestService: coronaTestService)
 		self.coronaTestService = coronaTestService
 
-		fakeRequestService = FakeRequestService(client: client, restServiceProvider: restServiceProvider)
+		fakeRequestService = FakeRequestService(client: client)
 	}
 
 	convenience init(dependencies: ExposureSubmissionServiceDependencies) {
@@ -43,7 +41,6 @@ class ENAExposureSubmissionService: ExposureSubmissionService {
 			diagnosisKeysRetrieval: dependencies.exposureManager,
 			appConfigurationProvider: dependencies.appConfigurationProvider,
 			client: dependencies.client,
-			restServiceProvider: dependencies.restServiceProvider,
 			store: dependencies.store,
 			eventStore: dependencies.eventStore,
 			coronaTestService: dependencies.coronaTestService
@@ -155,7 +152,7 @@ class ENAExposureSubmissionService: ExposureSubmissionService {
 					with: self.symptomsOnset
 				)
 
-				let unencryptedCheckinsEnabled = self.appConfigurationProvider.featureProvider.boolValue(for: .unencryptedCheckinsEnabled)
+				let unencryptedCheckinsEnabled = self.appConfigurationProvider.featureProvider.value(for: .unencryptedCheckinsEnabled)
 
 				var unencryptedCheckins = [SAP_Internal_Pt_CheckIn]()
 				if unencryptedCheckinsEnabled {
@@ -203,7 +200,6 @@ class ENAExposureSubmissionService: ExposureSubmissionService {
 	private let diagnosisKeysRetrieval: DiagnosisKeysRetrieval
 	private let appConfigurationProvider: AppConfigurationProviding
 	private let client: Client
-	private let restServiceProvider: RestServiceProviding
 	private let store: Store
 	private let eventStore: EventStoringProviding
 	private let deadmanNotificationManager: DeadmanNotificationManageable

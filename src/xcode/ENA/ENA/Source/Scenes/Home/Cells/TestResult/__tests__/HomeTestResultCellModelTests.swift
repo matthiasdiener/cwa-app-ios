@@ -106,9 +106,7 @@ class HomeTestResultCellModelTests: CWATestCase {
 					rulesDownloadService: RulesDownloadService(store: store, client: client)
 				),
 				recycleBin: .fake()
-			),
-			recycleBin: .fake(),
-			badgeWrapper: .fake()
+			)
 		)
 		coronaTestService.pcrTest = PCRTest.mock()
 
@@ -119,9 +117,9 @@ class HomeTestResultCellModelTests: CWATestCase {
 				expectationOnUpdate.fulfill()
 			}
 		)
-
+		
 		XCTAssertEqual(cellModel.title, AppStrings.Home.TestResult.pcrTitle)
-
+		
 		cellModel.$subtitle
 			.dropFirst()
 			.sink { receivedValue in
@@ -129,7 +127,7 @@ class HomeTestResultCellModelTests: CWATestCase {
 				expectationSubtitles.fulfill()
 			}
 			.store(in: &subscriptions)
-
+		
 		cellModel.$description
 			.dropFirst()
 			.sink { receivedValue in
@@ -137,7 +135,7 @@ class HomeTestResultCellModelTests: CWATestCase {
 				expectationDescription.fulfill()
 			}
 			.store(in: &subscriptions)
-
+		
 		cellModel.$buttonTitle
 			.dropFirst()
 			.sink { receivedValue in
@@ -145,7 +143,7 @@ class HomeTestResultCellModelTests: CWATestCase {
 				expectationButtonTitle.fulfill()
 			}
 			.store(in: &subscriptions)
-
+		
 		cellModel.$image
 			.dropFirst()
 			.sink { receivedValue in
@@ -153,7 +151,7 @@ class HomeTestResultCellModelTests: CWATestCase {
 				expectationButtonImage.fulfill()
 			}
 			.store(in: &subscriptions)
-
+		
 		cellModel.$isActivityIndicatorHidden
 			.dropFirst()
 			.sink { receivedValue in
@@ -161,7 +159,7 @@ class HomeTestResultCellModelTests: CWATestCase {
 				expectationIndicatorVisibility.fulfill()
 			}
 			.store(in: &subscriptions)
-
+		
 		cellModel.$isUserInteractionEnabled
 			.dropFirst()
 			.sink { receivedValue in
@@ -183,9 +181,9 @@ class HomeTestResultCellModelTests: CWATestCase {
 		coronaTestService.pcrTest?.testResult = .positive
 		coronaTestService.pcrTest?.testResult = .expired
 		coronaTestService.pcrTestResultIsLoading = true
-
+				
 		waitForExpectations(timeout: .short, handler: nil)
-
+		
 		subscriptions.forEach({ $0.cancel() })
 
 		XCTAssertEqual(receivedSubtitles, subtitleArray)

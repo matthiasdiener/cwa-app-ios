@@ -171,13 +171,12 @@ public struct ValidationRulesAccess: ValidationRulesAccessing, BoosterRulesAcces
             log("Validation-Result: Rule-Identifier: \(String(describing: $0.rule?.identifier)), Result: \($0.result)")
         }
 
-        for inputRule in rules {
-            if let firstPassedRule = (validationResult.first {
-                $0.rule?.identifier == inputRule.identifier && $0.result == .passed
-            }) {
-                return .success(firstPassedRule)
-            }
+        guard let firstPassedRule = (validationResult.first {
+            $0.result == .passed
+        }) else {
+            return .failure(.NO_PASSED_RESULT)
         }
-        return .failure(.NO_PASSED_RESULT)
+
+        return .success(firstPassedRule)
     }
 }

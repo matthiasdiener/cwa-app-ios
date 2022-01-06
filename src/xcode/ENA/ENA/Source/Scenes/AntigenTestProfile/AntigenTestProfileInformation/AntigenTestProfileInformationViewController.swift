@@ -33,6 +33,7 @@ class AntigenTestProfileInformationViewController: DynamicTableViewController, F
 		navigationItem.title = viewModel.title
 		navigationItem.rightBarButtonItem = dismissHandlingCloseBarButton
 		setupView()
+		viewModel.markScreenSeen()
 	}
 
 	// MARK: - Protocol FooterViewHandling
@@ -41,8 +42,6 @@ class AntigenTestProfileInformationViewController: DynamicTableViewController, F
 		guard case .primary = type else {
 			return
 		}
-		
-		viewModel.markScreenSeen()
 		didTapContinue()
 	}
 

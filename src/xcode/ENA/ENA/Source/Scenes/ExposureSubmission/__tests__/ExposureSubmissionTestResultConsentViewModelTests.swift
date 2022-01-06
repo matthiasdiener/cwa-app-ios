@@ -33,9 +33,7 @@ class ExposureSubmissionTestResultConsentViewModelTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				),
-				recycleBin: .fake(),
-				badgeWrapper: .fake()
+				)
 			),
 			testResultAvailability: .availableAndPositive,
 			dismissCompletion: nil
@@ -87,9 +85,7 @@ class ExposureSubmissionTestResultConsentViewModelTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				),
-				recycleBin: .fake(),
-				badgeWrapper: .fake()
+				)
 			),
 			testResultAvailability: .availableAndPositive,
 			dismissCompletion: nil
@@ -129,9 +125,7 @@ class ExposureSubmissionTestResultConsentViewModelTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				),
-				recycleBin: .fake(),
-				badgeWrapper: .fake()
+				)
 			),
 			testResultAvailability: .availableAndPositive,
 			dismissCompletion: nil

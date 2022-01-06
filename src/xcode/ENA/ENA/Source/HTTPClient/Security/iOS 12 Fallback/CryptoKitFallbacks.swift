@@ -26,8 +26,7 @@ extension Data {
 	/// - Returns: String representation of the hash value
 	func sha256String() -> String {
 		// https://stackoverflow.com/a/48580310/194585
-		// Do NOT remove the default parameter enforceFallback. Otherwise, another slower func is called from CryptoSwift.
-		sha256(enforceFallback: false).compactMap { String(format: "%02hhx", $0) }.joined()
+		sha256().compactMap { String(format: "%02hhx", $0) }.joined()
 	}
 
 

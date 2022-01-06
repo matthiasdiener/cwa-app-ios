@@ -11,13 +11,10 @@ class CloseBarButtonItem: UIBarButtonItem {
 
 	init(
 		mode: Mode = .normal,
-		onTap: @escaping () -> Void,
-		accessibilityIdentifierSuffix: String = ""
+		onTap: @escaping () -> Void
 	) {
 		self.onTap = onTap
 		super.init()
-		accessibilityLabel = AppStrings.AccessibilityLabel.close
-		accessibilityIdentifier = AccessibilityIdentifiers.AccessibilityLabel.close + accessibilityIdentifierSuffix
 		setup(mode)
 	}
 
@@ -55,6 +52,9 @@ class CloseBarButtonItem: UIBarButtonItem {
 		}
 		closeButton.addTarget(self, action: #selector(didTap), for: .primaryActionTriggered)
 		customView = closeButton
+
+		accessibilityLabel = AppStrings.AccessibilityLabel.close
+		accessibilityIdentifier = AccessibilityIdentifiers.AccessibilityLabel.close
 	}
 
 }

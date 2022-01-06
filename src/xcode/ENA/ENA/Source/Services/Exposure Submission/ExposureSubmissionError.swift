@@ -78,6 +78,8 @@ extension ExposureSubmissionError: LocalizedError {
 			return AppStrings.ExposureSubmissionError.qrNotExist
 		case .teleTanAlreadyUsed:
 			return AppStrings.ExposureSubmissionError.teleTanAlreadyUsed
+		case .regTokenNotExist:
+			return AppStrings.ExposureSubmissionError.regTokenNotExist
 		case .noKeysCollected:
 			return AppStrings.ExposureSubmissionError.noKeysCollected
 		case .internal:

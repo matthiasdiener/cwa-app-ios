@@ -57,7 +57,7 @@ class ENAUITests_04a_ExposureSubmission: CWATestCase {
 		XCTAssertTrue(app.navigationBars[AccessibilityIdentifiers.General.exposureSubmissionNavigationControllerTitle].waitForExistence(timeout: .medium))
 
 		// Simulator only Alert will open where you can choose what the QRScanner should scan, we want to cancel here.
-		let cancelButton = try XCTUnwrap(app.buttons[AccessibilityIdentifiers.UniversalQRScanner.other])
+		let cancelButton = try XCTUnwrap(app.buttons[AccessibilityIdentifiers.UniversalQRScanner.cancel])
 		cancelButton.waitAndTap()
 		
 		// QR Code Scanner Screen
@@ -87,7 +87,6 @@ class ENAUITests_04a_ExposureSubmission: CWATestCase {
 	}
 	
 	func test_SymptomsOptionNo() {
-		app.setLaunchArgument(LaunchArguments.exposureSubmission.isFetchingSubmissionTan, to: true)
 		launchAndNavigateToSymptomsScreen()
 
 		let optionYes = app.buttons["AppStrings.ExposureSubmissionSymptoms.answerOptionYes"]
@@ -126,7 +125,6 @@ class ENAUITests_04a_ExposureSubmission: CWATestCase {
 	}
 
 	func test_SymptomsOptionPreferNotToSay() {
-		app.setLaunchArgument(LaunchArguments.exposureSubmission.isFetchingSubmissionTan, to: true)
 		launchAndNavigateToSymptomsScreen()
 
 		let optionYes = app.buttons["AppStrings.ExposureSubmissionSymptoms.answerOptionYes"]
@@ -165,7 +163,6 @@ class ENAUITests_04a_ExposureSubmission: CWATestCase {
 	}
 
 	func test_SymptomsOnsetDateOption() {
-		app.setLaunchArgument(LaunchArguments.exposureSubmission.isFetchingSubmissionTan, to: true)
 		launchAndNavigateToSymptomsOnsetScreen()
 
 		let optionExactDate = app.buttons["AppStrings.DatePickerOption.day"].firstMatch
@@ -323,7 +320,6 @@ class ENAUITests_04a_ExposureSubmission: CWATestCase {
 	
 	// Navigate to the Thank You screen after getting the positive test result.
 	func test_ThankYouScreen_withWarnOthers() {
-		app.setLaunchArgument(LaunchArguments.exposureSubmission.isFetchingSubmissionTan, to: true)
 		app.setLaunchArgument(LaunchArguments.common.ENStatus, to: ENStatus.active.stringValue)
 		app.setLaunchArgument(LaunchArguments.test.pcr.testResult, to: TestResult.positive.stringValue)
 		app.setLaunchArgument(LaunchArguments.test.pcr.positiveTestResultWasShown, to: true)
@@ -356,7 +352,6 @@ class ENAUITests_04a_ExposureSubmission: CWATestCase {
 
 	// Navigate to the Thank You screen with alert on Test Result Screen.
 	func test_ThankYouScreen_WarnOthersFromAlert() {
-		app.setLaunchArgument(LaunchArguments.exposureSubmission.isFetchingSubmissionTan, to: true)
 		app.setLaunchArgument(LaunchArguments.common.ENStatus, to: ENStatus.active.stringValue)
 		app.setLaunchArgument(LaunchArguments.test.pcr.testResult, to: TestResult.positive.stringValue)
 		launch()
@@ -462,8 +457,6 @@ class ENAUITests_04a_ExposureSubmission: CWATestCase {
 	}
 	
 	func test_exposureSubmissionSuccess_screen() {
-		app.setLaunchArgument(LaunchArguments.exposureSubmission.isFetchingSubmissionTan, to: true)
-
 		launchAndNavigateToSymptomsScreen()
 
 		// Symptoms Screen: Select no symptoms option

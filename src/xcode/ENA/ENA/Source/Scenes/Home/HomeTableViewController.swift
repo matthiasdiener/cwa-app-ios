@@ -464,13 +464,7 @@ class HomeTableViewController: UITableViewController, NavigationBarOpacityDelega
 		cell.configure(
 			with: cellModel,
 			onPrimaryAction: { [weak self] in
-				guard let self = self else { return }
-
-				if self.viewModel.shouldShowDeletionConfirmationAlert(for: coronaTestType) {
-					self.showDeletionConfirmationAlert(for: coronaTestType)
-				} else {
-					self.viewModel.didTapTestResultButton(coronaTestType: coronaTestType)
-				}
+				self?.viewModel.didTapTestResultButton(coronaTestType: coronaTestType)
 			}
 		)
 
@@ -517,16 +511,16 @@ class HomeTableViewController: UITableViewController, NavigationBarOpacityDelega
 			},
 			onSecondaryAction: { [weak self] in
 				let alert = UIAlertController(
-					title: AppStrings.ExposureSubmissionResult.removeAlert_Title,
-					message: AppStrings.ExposureSubmissionResult.removeAlert_Text,
+					title: AppStrings.Home.TestResult.ShownPositive.deleteAlertTitle,
+					message: AppStrings.Home.TestResult.ShownPositive.deleteAlertDescription,
 					preferredStyle: .alert
 				)
 				
 				let deleteAction = UIAlertAction(
-					title: AppStrings.ExposureSubmissionResult.removeAlert_ConfirmButtonTitle,
+					title: AppStrings.Home.TestResult.ShownPositive.deleteAlertDeleteButtonTitle,
 					style: .destructive,
 					handler: { [weak self] _ in
-						self?.viewModel.coronaTestService.moveTestToBin(coronaTestType)
+						self?.viewModel.coronaTestService.removeTest(coronaTestType)
 					}
 				)
 				deleteAction.accessibilityIdentifier = AccessibilityIdentifiers.Home.ShownPositiveTestResultCell.deleteAlertDeleteButton
@@ -851,35 +845,6 @@ class HomeTableViewController: UITableViewController, NavigationBarOpacityDelega
 		present(tooltipViewController, animated: true) { [weak self] in
 			self?.viewModel.store.shouldShowQRScannerTooltip = false
 		}
-	}
-
-	private func showDeletionConfirmationAlert(for coronaTestType: CoronaTestType) {
-		let alert = UIAlertController(
-			title: AppStrings.ExposureSubmissionResult.removeAlert_Title,
-			message: AppStrings.ExposureSubmissionResult.removeAlert_Text,
-			preferredStyle: .alert
-		)
-
-		let cancelAction = UIAlertAction(
-			title: AppStrings.Common.alertActionCancel,
-			style: .cancel,
-			handler: { _ in
-				alert.dismiss(animated: true)
-			}
-		)
-
-		let deleteAction = UIAlertAction(
-			title: AppStrings.ExposureSubmissionResult.removeAlert_ConfirmButtonTitle,
-			style: .destructive,
-			handler: { [weak self] _ in
-				self?.viewModel.moveTestToBin(type: coronaTestType)
-			}
-		)
-
-		alert.addAction(deleteAction)
-		alert.addAction(cancelAction)
-
-		present(alert, animated: true, completion: nil)
 	}
 
 	@objc

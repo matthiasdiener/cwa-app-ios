@@ -6,13 +6,13 @@ import Foundation
 import OpenCombine
 
 enum OnBehalfCheckinSubmissionError: LocalizedError, Equatable {
-	case teleTanError(ServiceError<TeleTanError>)
-	case registrationTokenError(ServiceError<RegistrationTokenError>)
+	case registrationTokenError(ServiceError<TeleTanError>)
+	case submissionTANError(URLSession.Response.Failure)
 	case submissionError(SubmissionError)
 
 	var errorDescription: String? {
 		switch self {
-		case .teleTanError(let failure):
+		case .registrationTokenError(let failure):
 			switch failure {
 			case .receivedResourceError(let teleTanError):
 				switch teleTanError {
@@ -34,20 +34,14 @@ enum OnBehalfCheckinSubmissionError: LocalizedError, Equatable {
 			default:
 				return "\(AppStrings.OnBehalfCheckinSubmission.Error.tryAgain) (\(failure))"
 			}
-		case .registrationTokenError(let failure):
+		case .submissionTANError(let failure):
 			switch failure {
-			case .transportationError(let transportationError):
-				if let error = transportationError as NSError?,
-				   error.domain == NSURLErrorDomain,
-				   error.code == NSURLErrorNotConnectedToInternet {
-					return "\(AppStrings.OnBehalfCheckinSubmission.Error.noNetwork) (TAN_OB_NO_NETWORK)"
-				} else {
-					return "\(AppStrings.OnBehalfCheckinSubmission.Error.noNetwork) (UNKOWN)"
-				}
-			case .unexpectedServerError(let statusCode) where (400...409).contains(statusCode):
+			case .serverError(let statusCode) where (400...409).contains(statusCode):
 				return "\(AppStrings.OnBehalfCheckinSubmission.Error.failed) (TAN_OB_CLIENT_ERROR)"
-			case .unexpectedServerError(let statusCode) where (500...509).contains(statusCode):
+			case .serverError(let statusCode) where (500...509).contains(statusCode):
 				return "\(AppStrings.OnBehalfCheckinSubmission.Error.tryAgain) (TAN_OB_SERVER_ERROR)"
+			case .noNetworkConnection:
+				return "\(AppStrings.OnBehalfCheckinSubmission.Error.noNetwork) (TAN_OB_NO_NETWORK)"
 			default:
 				return "\(AppStrings.OnBehalfCheckinSubmission.Error.tryAgain) (\(failure))"
 			}

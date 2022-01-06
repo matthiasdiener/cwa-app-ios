@@ -9,21 +9,10 @@ import UIKit
 
 extension RestServiceProviding where Self == RestServiceProviderStub {
 
-	static var exposureSubmissionServiceProvider: RestServiceProviderStub {
-		RestServiceProviderStub(results: [
-			.success(
-				SubmissionTANModel(submissionTAN: "registrationToken")
-			)
-		])
-	}
-
 	static var coronaTestServiceProvider: RestServiceProviderStub {
 		RestServiceProviderStub(results: [
 			.success(
 				RegistrationTokenModel(registrationToken: "registrationToken")
-			),
-			.success(
-				SubmissionTANModel(submissionTAN: "registrationToken")
 			)
 		])
 	}
@@ -32,9 +21,6 @@ extension RestServiceProviding where Self == RestServiceProviderStub {
 		RestServiceProviderStub(results: [
 			.success(
 				RegistrationTokenModel(registrationToken: "registrationToken")
-			),
-			.success(
-				SubmissionTANModel(submissionTAN: "registrationToken")
 			)
 		])
 	}

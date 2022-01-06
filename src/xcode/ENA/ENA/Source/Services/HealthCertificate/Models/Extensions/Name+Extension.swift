@@ -7,8 +7,6 @@ import HealthCertificateToolkit
 
 extension Name {
 
-	// MARK: - Internal
-
 	var fullName: String {
 		return [resolvedGivenName, resolvedFamilyName].formatted()
 	}
@@ -26,9 +24,9 @@ extension Name {
 	var standardizedName: String {
 		return [standardizedGivenName, standardizedFamilyName].formatted()
 	}
-	
+
 	var groupingStandardizedName: String {
-		return trimmedStandardizedName
+		return standardizedName
 			.replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
 			.replacingOccurrences(of: "<+", with: "<", options: .regularExpression)
 			.trimmingCharacters(in: .whitespaces)
@@ -40,15 +38,6 @@ extension Name {
 		return [standardizedFamilyName, standardizedGivenName].formatted(separator: "")
 	}
 
-	// MARK: - Private
-
-	private var trimmedStandardizedName: String {
-		return [
-			standardizedGivenName?.trimmingCharacters(in: CharacterSet(charactersIn: "<")),
-			standardizedFamilyName.trimmingCharacters(in: CharacterSet(charactersIn: "<"))
-		].formatted()
-	}
-	
 	private var resolvedGivenName: String? {
 		var givenName = self.givenName
 		if givenName == nil || givenName?.trimmingCharacters(in: .whitespacesAndNewlines) == "" {

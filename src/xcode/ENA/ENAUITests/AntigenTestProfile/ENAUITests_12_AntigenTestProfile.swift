@@ -57,10 +57,10 @@ class ENAUITests_12_AntigenTestProfile: CWATestCase {
 		let dataPrivacyButton = try XCTUnwrap(app.cells[AccessibilityIdentifiers.ExposureSubmission.AntigenTest.Information.dataPrivacyTitle])
 		
 		let maxTries = 10
-		var currentTry = 0
-		while dataPrivacyButton.isHittable == false && currentTry < maxTries {
+		var actualTry = 0
+		while dataPrivacyButton.isHittable == false && actualTry < maxTries {
 			app.swipeUp()
-			currentTry += 1
+			actualTry += 1
 		}
 		dataPrivacyButton.waitAndTap()
 		

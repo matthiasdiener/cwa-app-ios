@@ -356,7 +356,6 @@ class KeyPackageDownload: KeyPackageDownloadProtocol {
 					Log.info("KeyPackageDownload: Server data is available for day packages.", log: .riskDetection)
 					completion(.success(days))
 				case .failure:
-					Log.info("KeyPackageDownload: No network connection or no response from server", log: .riskDetection)
 					completion(.failure(.uncompletedPackages))
 				}
 			}
@@ -368,7 +367,6 @@ class KeyPackageDownload: KeyPackageDownloadProtocol {
 					let packageKeys = hours.map { String($0) }
 					completion(.success(packageKeys))
 				case .failure:
-					Log.info("KeyPackageDownload: No network connection or no response from server", log: .riskDetection)
 					completion(.failure(.uncompletedPackages))
 				}
 			}

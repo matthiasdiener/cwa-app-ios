@@ -4,7 +4,7 @@
 
 import Foundation
 
-public extension String {
+extension String {
     func dropPrefix(_ prefix: String) -> String {
         guard self.hasPrefix(prefix) else {
             return self

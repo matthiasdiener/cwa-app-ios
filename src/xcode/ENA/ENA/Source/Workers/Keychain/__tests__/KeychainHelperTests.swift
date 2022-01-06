@@ -26,9 +26,9 @@ class KeychainHelperTests: CWATestCase {
     func testDatabaseKeyGeneration() throws {
 		let keychain = try KeychainHelper(service: serviceID)
 
-		let key = try keychain.generateDatabaseKey(persistForKeychainKey: SecureStore.encryptionKeyKeychainKey)
+		let key = try keychain.generateDatabaseKey()
 		XCTAssertFalse(key.isEmpty)
-		XCTAssertNotNil(keychain.loadFromKeychain(key: SecureStore.encryptionKeyKeychainKey))
+		XCTAssertNotNil(keychain.loadFromKeychain(key: SecureStore.keychainDatabaseKey))
     }
 
 	func testKeyRetrieval() throws {
@@ -55,7 +55,7 @@ class KeychainHelperTests: CWATestCase {
 	func testKeyRemoval() throws {
 		let keychain = try KeychainHelper(service: serviceID)
 
-		let key = try keychain.generateDatabaseKey(persistForKeychainKey: SecureStore.encryptionKeyKeychainKey)
+		let key = try keychain.generateDatabaseKey()
 		XCTAssertFalse(key.isEmpty)
     }
 }

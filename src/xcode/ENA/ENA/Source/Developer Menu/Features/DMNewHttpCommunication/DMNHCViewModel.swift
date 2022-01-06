@@ -15,7 +15,7 @@ final class DMNHCViewModel {
 		store: Store
 	) {
 		self.store = store
-		self.restService = RestServiceProvider(cache: KeyValueCacheFake())
+		self.restService = RestServiceProvider()
 	}
 
 	// MARK: - Internal

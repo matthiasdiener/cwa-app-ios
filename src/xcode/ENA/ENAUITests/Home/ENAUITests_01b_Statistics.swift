@@ -47,7 +47,6 @@ class ENAUITests_01b_Statistics: CWATestCase {
 
 		app.setPreferredContentSizeCategory(accessibility: .normal, size: .S)
 		app.launch()
-		
 		// Wait and check for the navbar to make sure App is really launched, otherwise the swipe will do nothing
 		let leftNavbarButton = app.images[AccessibilityIdentifiers.Home.leftBarButtonDescription]
 		XCTAssertTrue(leftNavbarButton.waitForExistence(timeout: .medium))
@@ -78,15 +77,14 @@ class ENAUITests_01b_Statistics: CWATestCase {
 		
 		let deleteButton = statisticsCell.buttons[AccessibilityIdentifiers.General.deleteButton].firstMatch
 		XCTAssertFalse(deleteButton.isHittable)
-		
+
 		// Management card(s) pt.2 - removal
-		XCTAssertTrue(statisticsCell.waitForExistence(timeout: .long))
 		statisticsCell.swipeRight() // because of ui reset
 		XCTAssertTrue(statisticsCell.buttons[addButton].isHittable)
 		XCTAssertTrue(statisticsCell.buttons[modifyButton].isHittable)
 		statisticsCell.buttons[modifyButton].waitAndTap()
 		
-		XCTAssertTrue(deleteButton.waitForExistence(timeout: .long))
+		XCTAssertTrue(deleteButton.waitForExistence(timeout: .medium))
 		XCTAssertTrue(deleteButton.isHittable)
 		deleteButton.waitAndTap()
 		XCTAssertFalse(localStatisticCell.isHittable)

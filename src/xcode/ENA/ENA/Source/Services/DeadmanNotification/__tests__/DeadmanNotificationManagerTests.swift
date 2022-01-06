@@ -29,9 +29,7 @@ class DeadmanNotificationManagerTests: CWATestCase {
 					appConfiguration: appConfiguration,
 					boosterNotificationsService: BoosterNotificationsService(rulesDownloadService: RulesDownloadService(store: store, client: client)),
 					recycleBin: .fake()
-				),
-				recycleBin: .fake(),
-				badgeWrapper: .fake()
+				)
 			),
 			userNotificationCenter: notificationCenter
 		)
@@ -82,9 +80,7 @@ class DeadmanNotificationManagerTests: CWATestCase {
 					appConfiguration: appConfiguration,
 					boosterNotificationsService: BoosterNotificationsService(rulesDownloadService: RulesDownloadService(store: store, client: client)),
 					recycleBin: .fake()
-				),
-				recycleBin: .fake(),
-				badgeWrapper: .fake()
+				)
 			),
 			userNotificationCenter: notificationCenter
 		)
@@ -118,9 +114,7 @@ class DeadmanNotificationManagerTests: CWATestCase {
 					appConfiguration: appConfiguration,
 					boosterNotificationsService: BoosterNotificationsService(rulesDownloadService: RulesDownloadService(store: store, client: client)),
 					recycleBin: .fake()
-				),
-				recycleBin: .fake(),
-				badgeWrapper: .fake()
+				)
 			),
 			userNotificationCenter: notificationCenter
 		)
@@ -156,9 +150,7 @@ class DeadmanNotificationManagerTests: CWATestCase {
 					appConfiguration: appConfiguration,
 					boosterNotificationsService: BoosterNotificationsService(rulesDownloadService: RulesDownloadService(store: store, client: client)),
 					recycleBin: .fake()
-				),
-				recycleBin: .fake(),
-				badgeWrapper: .fake()
+				)
 			),
 			userNotificationCenter: notificationCenter
 		)
@@ -197,9 +189,7 @@ class DeadmanNotificationManagerTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				),
-				recycleBin: .fake(),
-				badgeWrapper: .fake()
+				)
 			),
 			userNotificationCenter: notificationCenter
 		)
@@ -237,9 +227,7 @@ class DeadmanNotificationManagerTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				),
-				recycleBin: .fake(),
-				badgeWrapper: .fake()
+				)
 			),
 			userNotificationCenter: notificationCenter
 		)
@@ -278,9 +266,7 @@ class DeadmanNotificationManagerTests: CWATestCase {
 						rulesDownloadService: RulesDownloadService(store: store, client: client)
 					),
 					recycleBin: .fake()
-				),
-				recycleBin: .fake(),
-				badgeWrapper: .fake()
+				)
 			),
 			userNotificationCenter: notificationCenter
 		)

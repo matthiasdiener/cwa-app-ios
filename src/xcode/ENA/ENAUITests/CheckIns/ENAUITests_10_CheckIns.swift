@@ -42,14 +42,14 @@ class ENAUITests_10_CheckIns: CWATestCase {
 		}
 		
 		let maxTries = 10
-		var currentTry = 0
-		while lastCell.isHittable == false && currentTry < maxTries {
+		var actualTry = 0
+		while lastCell.isHittable == false && actualTry < maxTries {
 			app.swipeUp()
-			currentTry += 1
+			actualTry += 1
 		}
 		lastCell.waitAndTap()
 		
-		XCTAssertTrue(app.images[AccessibilityIdentifiers.AppInformation.privacyImageDescription].waitForExistence(timeout: .extraLong))
+		XCTAssertTrue(app.staticTexts["AppStrings.AppInformation.privacyTitle"].waitForExistence(timeout: .short))
 	}
 	
 	func testCheckinInfoScreen_confirmConsent() throws {

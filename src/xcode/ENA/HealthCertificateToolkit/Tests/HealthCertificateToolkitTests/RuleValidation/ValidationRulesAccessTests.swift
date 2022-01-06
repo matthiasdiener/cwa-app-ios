@@ -42,7 +42,7 @@ class ValidationRulesAccessTests: XCTestCase {
     }
 
     func test_when_applyBoosterNotificationValidationRules_then_passedResultReturned() {
-        let rules = [Rule.fake(identifier: "5"), Rule.fake(identifier: "1")]
+        let rules = [Rule.fake()]
 
         let certificates = [
             DigitalCovidCertificateWithHeader.fake(
@@ -63,13 +63,10 @@ class ValidationRulesAccessTests: XCTestCase {
             )
         ]
 
-        let firstPassedResult = ValidationResult(rule: Rule.fake(identifier: "1"), result: .passed, validationErrors: nil)
-        let secondPassedResult = ValidationResult(rule: Rule.fake(identifier: "5"), result: .passed, validationErrors: nil)
-
+        let passedResult = ValidationResult(rule: nil, result: .passed, validationErrors: nil)
         let certLogicStub = CertLogicEngineStub(validationResult: [
-            ValidationResult(rule: nil, result: .open, validationErrors: nil),
-            secondPassedResult,
-            firstPassedResult
+            passedResult,
+            ValidationResult(rule: nil, result: .open, validationErrors: nil)
         ])
         let result = ValidationRulesAccess().applyBoosterNotificationValidationRules(
             certificates: certificates,
@@ -83,7 +80,7 @@ class ValidationRulesAccessTests: XCTestCase {
             return
         }
 
-        XCTAssertEqual(validationResult, secondPassedResult)
+        XCTAssertEqual(validationResult, passedResult)
     }
 
     func test_when_applyBoosterNotificationValidationRules_then_noPassedResultFailureReturned() {

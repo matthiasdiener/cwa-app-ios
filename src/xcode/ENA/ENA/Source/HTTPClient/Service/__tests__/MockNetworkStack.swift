@@ -18,13 +18,11 @@ struct MockNetworkStack {
 	/// Convenience, creates a `MockUrlSession`, `URLResponse` under the hood
 	init(
 		baseURL: URL = URL(staticString: "http://example.com"),
-		httpStatus: Int = 200,
+		httpStatus: Int,
 		httpVersion: String = "HTTP/2",
 		headerFields: [String: String] = [:],
-		responseData: Data? = nil,
-		requestObserver: MockUrlSession.URLRequestObserver? = nil,
-		sessionDelegate: URLSessionDelegate? = nil,
-		error: Error? = nil
+		responseData: Data?,
+		requestObserver: MockUrlSession.URLRequestObserver? = nil
 	) {
 		let mockResponse = HTTPURLResponse(
 			url: baseURL,
@@ -35,9 +33,8 @@ struct MockNetworkStack {
 		urlSession = MockUrlSession(
 			data: responseData,
 			nextResponse: mockResponse,
-			error: error,
-			urlRequestObserver: requestObserver,
-			sessionDelegate: sessionDelegate
+			error: nil,
+			urlRequestObserver: requestObserver
 		)
 	}
 }

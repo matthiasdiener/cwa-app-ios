@@ -12,10 +12,17 @@ class OnBehalfCheckinSubmissionServiceTests: CWATestCase {
 		let client = ClientMock()
 		let restServiceProvider = RestServiceProviderStub(
 			results: [
-				.success(RegistrationTokenModel(registrationToken: "fake")),
-				.success(SubmissionTANModel(submissionTAN: "fake"))
+				.success(
+					RegistrationTokenModel(registrationToken: "fake")
+				)
 			]
 		)
+
+		let getTANForExposureSubmitExpectation = expectation(description: "getTANForExposureSubmit called")
+		client.onGetTANForExposureSubmit = { _, _, completion in
+			completion(.success("submissionTAN"))
+			getTANForExposureSubmitExpectation.fulfill()
+		}
 
 		let submitOnBehalfExpectation = expectation(description: "getRegistrationTokenExpectation called")
 		client.onSubmitOnBehalf = { _, _, completion in
@@ -61,7 +68,7 @@ class OnBehalfCheckinSubmissionServiceTests: CWATestCase {
 			case .success:
 				XCTFail("Expected failure")
 			case .failure(let error):
-				XCTAssertEqual(error, .teleTanError(ServiceError<TeleTanError>.receivedResourceError(.teleTanAlreadyUsed)))
+				XCTAssertEqual(error, .registrationTokenError(ServiceError<TeleTanError>.receivedResourceError(.teleTanAlreadyUsed)))
 				XCTAssertEqual(
 					error.localizedDescription,
 					"Ungültige TAN. Bitte überprüfen Sie Ihre Eingabe oder kontaktieren Sie die Stelle, die Ihnen die TAN mitgeteilt hat. (REGTOKEN_OB_CLIENT_ERROR)"
@@ -93,7 +100,7 @@ class OnBehalfCheckinSubmissionServiceTests: CWATestCase {
 			case .success:
 				XCTFail("Expected failure")
 			case .failure(let error):
-				XCTAssertEqual(error, .teleTanError(ServiceError<TeleTanError>.receivedResourceError(.qrAlreadyUsed)))
+				XCTAssertEqual(error, .registrationTokenError(ServiceError<TeleTanError>.receivedResourceError(.qrAlreadyUsed)))
 				XCTAssertEqual(
 					error.localizedDescription,
 					"Ungültige TAN. Bitte überprüfen Sie Ihre Eingabe oder kontaktieren Sie die Stelle, die Ihnen die TAN mitgeteilt hat. (REGTOKEN_OB_CLIENT_ERROR)"
@@ -125,7 +132,7 @@ class OnBehalfCheckinSubmissionServiceTests: CWATestCase {
 			case .success:
 				XCTFail("Expected failure")
 			case .failure(let error):
-				XCTAssertEqual(error, .teleTanError(.unexpectedServerError(400)))
+				XCTAssertEqual(error, .registrationTokenError(.unexpectedServerError(400)))
 				XCTAssertEqual(
 					error.localizedDescription,
 					"Ungültige TAN. Bitte überprüfen Sie Ihre Eingabe oder kontaktieren Sie die Stelle, die Ihnen die TAN mitgeteilt hat. (REGTOKEN_OB_CLIENT_ERROR)"
@@ -157,7 +164,7 @@ class OnBehalfCheckinSubmissionServiceTests: CWATestCase {
 			case .success:
 				XCTFail("Expected failure")
 			case .failure(let error):
-				XCTAssertEqual(error, .teleTanError(.unexpectedServerError(500)))
+				XCTAssertEqual(error, .registrationTokenError(.unexpectedServerError(500)))
 				XCTAssertEqual(
 					error.localizedDescription,
 					"Ein Fehler ist aufgetreten. Bitte versuchen Sie es später noch einmal oder kontaktieren Sie die technische Hotline über App-Informationen -> Technische Hotline. (REGTOKEN_OB_SERVER_ERROR)"
@@ -190,7 +197,7 @@ class OnBehalfCheckinSubmissionServiceTests: CWATestCase {
 			case .success:
 				XCTFail("Expected failure")
 			case .failure(let error):
-				XCTAssertEqual(error, .teleTanError(.transportationError(errorFake)))
+				XCTAssertEqual(error, .registrationTokenError(.transportationError(errorFake)))
 				XCTAssertEqual(
 					error.localizedDescription,
 					"Ihre Internetverbindung wurde unterbrochen. Bitte prüfen Sie die Verbindung und versuchen Sie es erneut. (REGTOKEN_OB_NO_NETWORK)"
@@ -206,10 +213,17 @@ class OnBehalfCheckinSubmissionServiceTests: CWATestCase {
 		let client = ClientMock()
 		let restServiceProvider = RestServiceProviderStub(
 			results: [
-				.success(RegistrationTokenModel(registrationToken: "fake")),
-				.failure(ServiceError<RegistrationTokenError>.unexpectedServerError(400))
+				.success(
+					RegistrationTokenModel(registrationToken: "fake")
+				)
 			]
 		)
+
+		let getTANForExposureSubmitExpectation = expectation(description: "getTANForExposureSubmit called")
+		client.onGetTANForExposureSubmit = { _, _, completion in
+			completion(.failure(.serverError(400)))
+			getTANForExposureSubmitExpectation.fulfill()
+		}
 
 		let service = OnBehalfCheckinSubmissionService(
 			restServiceProvider: restServiceProvider,
@@ -223,7 +237,7 @@ class OnBehalfCheckinSubmissionServiceTests: CWATestCase {
 			case .success:
 				XCTFail("Expected failure")
 			case .failure(let error):
-				XCTAssertEqual(error, .registrationTokenError(.unexpectedServerError(400)))
+				XCTAssertEqual(error, .submissionTANError(.serverError(400)))
 				XCTAssertEqual(
 					error.localizedDescription,
 					"Ein Fehler ist aufgetreten. Bitte kontaktieren Sie die technische Hotline über App-Informationen -> Technische Hotline. (TAN_OB_CLIENT_ERROR)"
@@ -239,10 +253,17 @@ class OnBehalfCheckinSubmissionServiceTests: CWATestCase {
 		let client = ClientMock()
 		let restServiceProvider = RestServiceProviderStub(
 			results: [
-				.success(RegistrationTokenModel(registrationToken: "fake")),
-				.failure(ServiceError<RegistrationTokenError>.unexpectedServerError(500))
+				.success(
+					RegistrationTokenModel(registrationToken: "fake")
+				)
 			]
 		)
+
+		let getTANForExposureSubmitExpectation = expectation(description: "getTANForExposureSubmit called")
+		client.onGetTANForExposureSubmit = { _, _, completion in
+			completion(.failure(.serverError(500)))
+			getTANForExposureSubmitExpectation.fulfill()
+		}
 
 		let service = OnBehalfCheckinSubmissionService(
 			restServiceProvider: restServiceProvider,
@@ -256,7 +277,7 @@ class OnBehalfCheckinSubmissionServiceTests: CWATestCase {
 			case .success:
 				XCTFail("Expected failure")
 			case .failure(let error):
-				XCTAssertEqual(error, .registrationTokenError(.unexpectedServerError(500)))
+				XCTAssertEqual(error, .submissionTANError(.serverError(500)))
 				XCTAssertEqual(
 					error.localizedDescription,
 					"Ein Fehler ist aufgetreten. Bitte versuchen Sie es später noch einmal oder kontaktieren Sie die technische Hotline über App-Informationen -> Technische Hotline. (TAN_OB_SERVER_ERROR)"
@@ -270,13 +291,19 @@ class OnBehalfCheckinSubmissionServiceTests: CWATestCase {
 
 	func testSubmissionWithSubmissionTANRequestNoNetworkError() {
 		let client = ClientMock()
-		let errorFake = NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
 		let restServiceProvider = RestServiceProviderStub(
 			results: [
-				.success(RegistrationTokenModel(registrationToken: "fake")),
-				.failure(ServiceError<RegistrationTokenError>.transportationError(errorFake))
+				.success(
+					RegistrationTokenModel(registrationToken: "fake")
+				)
 			]
 		)
+
+		let getTANForExposureSubmitExpectation = expectation(description: "getTANForExposureSubmit called")
+		client.onGetTANForExposureSubmit = { _, _, completion in
+			completion(.failure(.noNetworkConnection))
+			getTANForExposureSubmitExpectation.fulfill()
+		}
 
 		let service = OnBehalfCheckinSubmissionService(
 			restServiceProvider: restServiceProvider,
@@ -290,7 +317,7 @@ class OnBehalfCheckinSubmissionServiceTests: CWATestCase {
 			case .success:
 				XCTFail("Expected failure")
 			case .failure(let error):
-				XCTAssertEqual(error, .registrationTokenError(.transportationError(errorFake)))
+				XCTAssertEqual(error, .submissionTANError(.noNetworkConnection))
 				XCTAssertEqual(
 					error.localizedDescription,
 					"Ihre Internetverbindung wurde unterbrochen. Bitte prüfen Sie die Verbindung und versuchen Sie es erneut. (TAN_OB_NO_NETWORK)"
@@ -306,8 +333,9 @@ class OnBehalfCheckinSubmissionServiceTests: CWATestCase {
 		let client = ClientMock()
 		let restServiceProvider = RestServiceProviderStub(
 			results: [
-				.success(RegistrationTokenModel(registrationToken: "fake")),
-				.success(SubmissionTANModel(submissionTAN: "fake"))
+				.success(
+					RegistrationTokenModel(registrationToken: "fake")
+				)
 			]
 		)
 
@@ -345,8 +373,9 @@ class OnBehalfCheckinSubmissionServiceTests: CWATestCase {
 		let client = ClientMock()
 		let restServiceProvider = RestServiceProviderStub(
 			results: [
-				.success(RegistrationTokenModel(registrationToken: "fake")),
-				.success(SubmissionTANModel(submissionTAN: "fake"))
+				.success(
+					RegistrationTokenModel(registrationToken: "fake")
+				)
 			]
 		)
 
@@ -384,8 +413,9 @@ class OnBehalfCheckinSubmissionServiceTests: CWATestCase {
 		let client = ClientMock()
 		let restServiceProvider = RestServiceProviderStub(
 			results: [
-				.success(RegistrationTokenModel(registrationToken: "fake")),
-				.success(SubmissionTANModel(submissionTAN: "fake"))
+				.success(
+					RegistrationTokenModel(registrationToken: "fake")
+				)
 			]
 		)
 
@@ -423,8 +453,9 @@ class OnBehalfCheckinSubmissionServiceTests: CWATestCase {
 		let client = ClientMock()
 		let restServiceProvider = RestServiceProviderStub(
 			results: [
-				.success(RegistrationTokenModel(registrationToken: "fake")),
-				.success(SubmissionTANModel(submissionTAN: "fake"))
+				.success(
+					RegistrationTokenModel(registrationToken: "fake")
+				)
 			]
 		)
 
@@ -462,8 +493,9 @@ class OnBehalfCheckinSubmissionServiceTests: CWATestCase {
 		let client = ClientMock()
 		let restServiceProvider = RestServiceProviderStub(
 			results: [
-				.success(RegistrationTokenModel(registrationToken: "fake")),
-				.success(SubmissionTANModel(submissionTAN: "fake"))
+				.success(
+					RegistrationTokenModel(registrationToken: "fake")
+				)
 			]
 		)
 

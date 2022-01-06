@@ -15,7 +15,6 @@ final class HealthCertificateDecodingContainer: Codable {
 	let base45: Base45
 	let validityState: HealthCertificateValidityState?
 	let didShowInvalidNotification: Bool?
-	let didShowBlockedNotification: Bool?
 	let isNew: Bool?
 	let isValidityStateNew: Bool?
 }

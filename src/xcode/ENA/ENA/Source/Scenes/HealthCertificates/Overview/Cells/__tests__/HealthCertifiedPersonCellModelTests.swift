@@ -6,8 +6,6 @@ import XCTest
 import HealthCertificateToolkit
 @testable import ENA
 
-// swiftlint:disable file_length
-// swiftlint:disable type_body_length
 class HealthCertifiedPersonCellModelTests: XCTestCase {
 
 	func testHealthCertifiedPersonWithValidVaccinationCertificate() throws {
@@ -26,7 +24,7 @@ class HealthCertifiedPersonCellModelTests: XCTestCase {
 		let viewModel = try XCTUnwrap(
 			HealthCertifiedPersonCellModel(
 				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
+				showInfoHit: { }
 			)
 		)
 
@@ -55,7 +53,7 @@ class HealthCertifiedPersonCellModelTests: XCTestCase {
 		let viewModel = try XCTUnwrap(
 			HealthCertifiedPersonCellModel(
 				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
+				showInfoHit: { }
 			)
 		)
 
@@ -94,7 +92,7 @@ class HealthCertifiedPersonCellModelTests: XCTestCase {
 		let viewModel = try XCTUnwrap(
 			HealthCertifiedPersonCellModel(
 				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
+				showInfoHit: { }
 			)
 		)
 
@@ -126,7 +124,7 @@ class HealthCertifiedPersonCellModelTests: XCTestCase {
 		let viewModel = try XCTUnwrap(
 			HealthCertifiedPersonCellModel(
 				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
+				showInfoHit: { }
 			)
 		)
 
@@ -137,38 +135,6 @@ class HealthCertifiedPersonCellModelTests: XCTestCase {
 		if case let .validityState(image: image, description: description) = viewModel.caption {
 			XCTAssertEqual(image, UIImage(named: "Icon_ExpiredInvalid"))
 			XCTAssertEqual(description, "Zertifikat (Signatur) ungültig")
-		} else {
-			XCTFail("Expected caption to be set to validityState")
-		}
-	}
-
-	func testHealthCertifiedPersonWithBlockedVaccinationCertificate() throws {
-		// GIVEN
-		let healthCertificate = try HealthCertificate(
-			base45: try base45Fake(
-				from: DigitalCovidCertificate.fake(
-					vaccinationEntries: [.fake()]
-				)
-			),
-			validityState: .blocked
-		)
-
-		let healthCertifiedPerson = HealthCertifiedPerson(healthCertificates: [healthCertificate])
-
-		let viewModel = try XCTUnwrap(
-			HealthCertifiedPersonCellModel(
-				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
-			)
-		)
-
-		// THEN
-		XCTAssertEqual(viewModel.title, AppStrings.HealthCertificate.Overview.covidTitle)
-		XCTAssertEqual(viewModel.name, healthCertifiedPerson.name?.fullName)
-
-		if case let .validityState(image: image, description: description) = viewModel.caption {
-			XCTAssertEqual(image, UIImage(named: "Icon_ExpiredInvalid"))
-			XCTAssertEqual(description, "Zertifikat ungültig")
 		} else {
 			XCTFail("Expected caption to be set to validityState")
 		}
@@ -190,7 +156,7 @@ class HealthCertifiedPersonCellModelTests: XCTestCase {
 		let viewModel = try XCTUnwrap(
 			HealthCertifiedPersonCellModel(
 				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
+				showInfoHit: { }
 			)
 		)
 
@@ -218,7 +184,7 @@ class HealthCertifiedPersonCellModelTests: XCTestCase {
 		let viewModel = try XCTUnwrap(
 			HealthCertifiedPersonCellModel(
 				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
+				showInfoHit: { }
 			)
 		)
 
@@ -245,7 +211,7 @@ class HealthCertifiedPersonCellModelTests: XCTestCase {
 		let viewModel = try XCTUnwrap(
 			HealthCertifiedPersonCellModel(
 				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
+				showInfoHit: { }
 			)
 		)
 
@@ -272,7 +238,7 @@ class HealthCertifiedPersonCellModelTests: XCTestCase {
 		let viewModel = try XCTUnwrap(
 			HealthCertifiedPersonCellModel(
 				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
+				showInfoHit: { }
 			)
 		)
 
@@ -282,37 +248,6 @@ class HealthCertifiedPersonCellModelTests: XCTestCase {
 		if case let .validityState(image: image, description: description) = viewModel.caption {
 			XCTAssertEqual(image, UIImage(named: "Icon_ExpiredInvalid"))
 			XCTAssertEqual(description, "Zertifikat (Signatur) ungültig")
-		} else {
-			XCTFail("Expected caption to be set to validityState")
-		}
-	}
-
-	func testHealthCertifiedPersonWithBlockedTestCertificate() throws {
-		// GIVEN
-		let healthCertificate = try HealthCertificate(
-			base45: try base45Fake(
-				from: DigitalCovidCertificate.fake(
-					testEntries: [.fake()]
-				)
-			),
-			validityState: .blocked
-		)
-
-		let healthCertifiedPerson = HealthCertifiedPerson(healthCertificates: [healthCertificate])
-
-		let viewModel = try XCTUnwrap(
-			HealthCertifiedPersonCellModel(
-				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
-			)
-		)
-
-		// THEN
-		XCTAssertEqual(viewModel.title, AppStrings.HealthCertificate.Overview.covidTitle)
-		XCTAssertEqual(viewModel.name, healthCertifiedPerson.name?.fullName)
-		if case let .validityState(image: image, description: description) = viewModel.caption {
-			XCTAssertEqual(image, UIImage(named: "Icon_ExpiredInvalid"))
-			XCTAssertEqual(description, "Zertifikat ungültig")
 		} else {
 			XCTFail("Expected caption to be set to validityState")
 		}
@@ -334,7 +269,7 @@ class HealthCertifiedPersonCellModelTests: XCTestCase {
 		let viewModel = try XCTUnwrap(
 			HealthCertifiedPersonCellModel(
 				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
+				showInfoHit: { }
 			)
 		)
 
@@ -363,7 +298,7 @@ class HealthCertifiedPersonCellModelTests: XCTestCase {
 		let viewModel = try XCTUnwrap(
 			HealthCertifiedPersonCellModel(
 				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
+				showInfoHit: { }
 			)
 		)
 
@@ -402,7 +337,7 @@ class HealthCertifiedPersonCellModelTests: XCTestCase {
 		let viewModel = try XCTUnwrap(
 			HealthCertifiedPersonCellModel(
 				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
+				showInfoHit: { }
 			)
 		)
 
@@ -434,7 +369,7 @@ class HealthCertifiedPersonCellModelTests: XCTestCase {
 		let viewModel = try XCTUnwrap(
 			HealthCertifiedPersonCellModel(
 				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
+				showInfoHit: { }
 			)
 		)
 
@@ -445,38 +380,6 @@ class HealthCertifiedPersonCellModelTests: XCTestCase {
 		if case let .validityState(image: image, description: description) = viewModel.caption {
 			XCTAssertEqual(image, UIImage(named: "Icon_ExpiredInvalid"))
 			XCTAssertEqual(description, "Zertifikat (Signatur) ungültig")
-		} else {
-			XCTFail("Expected caption to be set to validityState")
-		}
-	}
-
-	func testHealthCertifiedPersonWithBlockedRecoveryCertificate() throws {
-		// GIVEN
-		let healthCertificate = try HealthCertificate(
-			base45: try base45Fake(
-				from: DigitalCovidCertificate.fake(
-					recoveryEntries: [.fake()]
-				)
-			),
-			validityState: .blocked
-		)
-
-		let healthCertifiedPerson = HealthCertifiedPerson(healthCertificates: [healthCertificate])
-
-		let viewModel = try XCTUnwrap(
-			HealthCertifiedPersonCellModel(
-				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
-			)
-		)
-
-		// THEN
-		XCTAssertEqual(viewModel.title, AppStrings.HealthCertificate.Overview.covidTitle)
-		XCTAssertEqual(viewModel.name, healthCertifiedPerson.name?.fullName)
-
-		if case let .validityState(image: image, description: description) = viewModel.caption {
-			XCTAssertEqual(image, UIImage(named: "Icon_ExpiredInvalid"))
-			XCTAssertEqual(description, "Zertifikat ungültig")
 		} else {
 			XCTFail("Expected caption to be set to validityState")
 		}
@@ -538,7 +441,7 @@ class HealthCertifiedPersonCellModelTests: XCTestCase {
 		let viewModel = try XCTUnwrap(
 			HealthCertifiedPersonCellModel(
 				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
+				showInfoHit: { }
 			)
 		)
 
@@ -561,7 +464,7 @@ class HealthCertifiedPersonCellModelTests: XCTestCase {
 		let viewModel = try XCTUnwrap(
 			HealthCertifiedPersonCellModel(
 				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
+				showInfoHit: { }
 			)
 		)
 
@@ -580,198 +483,12 @@ class HealthCertifiedPersonCellModelTests: XCTestCase {
 		let viewModel = try XCTUnwrap(
 			HealthCertifiedPersonCellModel(
 				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
+				showInfoHit: { }
 			)
 		)
 
 		// THEN
 		XCTAssertNil(viewModel.caption)
-	}
-
-	func testAdmissionStateThreeGWithAntigen() throws {
-		let healthCertifiedPerson = HealthCertifiedPerson(
-			healthCertificates: [try testCertificate(type: .antigen)]
-		)
-		healthCertifiedPerson.admissionState = .threeGWithAntigen
-
-		let cellModel = try XCTUnwrap(
-			HealthCertifiedPersonCellModel(
-				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
-			)
-		)
-
-		XCTAssertEqual(cellModel.qrCodeViewModel.covPassCheckInfoPosition, .bottom)
-		XCTAssertTrue(cellModel.isStatusTitleVisible)
-		XCTAssertTrue(cellModel.switchableHealthCertificates.isEmpty)
-		XCTAssertEqual(cellModel.shortStatus, "3G")
-	}
-
-	func testAdmissionStateThreeGWithPCR() throws {
-		let healthCertifiedPerson = HealthCertifiedPerson(
-			healthCertificates: [try testCertificate(type: .pcr)]
-		)
-		healthCertifiedPerson.admissionState = .threeGWithPCR
-
-		let cellModel = try XCTUnwrap(
-			HealthCertifiedPersonCellModel(
-				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
-			)
-		)
-
-		XCTAssertEqual(cellModel.qrCodeViewModel.covPassCheckInfoPosition, .bottom)
-		XCTAssertTrue(cellModel.isStatusTitleVisible)
-		XCTAssertTrue(cellModel.switchableHealthCertificates.isEmpty)
-		XCTAssertEqual(cellModel.shortStatus, "3G+")
-	}
-
-	func testAdmissionStateTwoG() throws {
-		let healthCertifiedPerson = HealthCertifiedPerson(
-			healthCertificates: [try vaccinationCertificate()]
-		)
-		healthCertifiedPerson.admissionState = .twoG
-
-		let cellModel = try XCTUnwrap(
-			HealthCertifiedPersonCellModel(
-				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
-			)
-		)
-
-		XCTAssertEqual(cellModel.qrCodeViewModel.covPassCheckInfoPosition, .bottom)
-		XCTAssertTrue(cellModel.isStatusTitleVisible)
-		XCTAssertTrue(cellModel.switchableHealthCertificates.isEmpty)
-		XCTAssertEqual(cellModel.shortStatus, "2G")
-	}
-
-	func testAdmissionStateTwoGPlusAntigen() throws {
-		let twoGCertificate = try vaccinationCertificate(daysOffset: -1, doseNumber: 2, totalSeriesOfDoses: 2)
-		let testCertificate = try testCertificate(daysOffset: -1, type: .antigen)
-
-		let healthCertifiedPerson = HealthCertifiedPerson(healthCertificates: [twoGCertificate, testCertificate])
-		healthCertifiedPerson.admissionState = .twoGPlusAntigen(twoG: twoGCertificate, antigenTest: testCertificate)
-
-		let cellModel = try XCTUnwrap(
-			HealthCertifiedPersonCellModel(
-				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
-			)
-		)
-
-		XCTAssertEqual(cellModel.qrCodeViewModel.covPassCheckInfoPosition, .bottom)
-		XCTAssertTrue(cellModel.isStatusTitleVisible)
-		XCTAssertEqual(
-			cellModel.switchableHealthCertificates,
-			["2G-Zertifikat": twoGCertificate, "Testzertifikat": testCertificate]
-		)
-		XCTAssertEqual(cellModel.shortStatus, "2G+")
-	}
-
-	func testAdmissionStateTwoGPlusPCR() throws {
-		let twoGCertificate = try vaccinationCertificate(daysOffset: -1, doseNumber: 2, totalSeriesOfDoses: 2)
-		let testCertificate = try testCertificate(daysOffset: -1, type: .pcr)
-
-		let healthCertifiedPerson = HealthCertifiedPerson(healthCertificates: [twoGCertificate, testCertificate])
-		healthCertifiedPerson.admissionState = .twoGPlusPCR(twoG: twoGCertificate, pcrTest: testCertificate)
-
-		let cellModel = try XCTUnwrap(
-			HealthCertifiedPersonCellModel(
-				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
-			)
-		)
-
-		XCTAssertEqual(cellModel.qrCodeViewModel.covPassCheckInfoPosition, .bottom)
-		XCTAssertTrue(cellModel.isStatusTitleVisible)
-		XCTAssertEqual(
-			cellModel.switchableHealthCertificates,
-			["2G-Zertifikat": twoGCertificate, "Testzertifikat": testCertificate]
-		)
-		XCTAssertEqual(cellModel.shortStatus, "2G+")
-	}
-
-	func testAdmissionStateOther() throws {
-		let healthCertifiedPerson = HealthCertifiedPerson(
-			healthCertificates: [try vaccinationCertificate()]
-		)
-		healthCertifiedPerson.admissionState = .other
-
-		let cellModel = try XCTUnwrap(
-			HealthCertifiedPersonCellModel(
-				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
-			)
-		)
-
-		XCTAssertEqual(cellModel.qrCodeViewModel.covPassCheckInfoPosition, .bottom)
-		XCTAssertFalse(cellModel.isStatusTitleVisible)
-		XCTAssertTrue(cellModel.switchableHealthCertificates.isEmpty)
-		XCTAssertNil(cellModel.shortStatus)
-	}
-
-	func testSolidGreyGradient() throws {
-		let healthCertifiedPerson = HealthCertifiedPerson(
-			healthCertificates: [try vaccinationCertificate()]
-		)
-		healthCertifiedPerson.gradientType = .solidGrey
-
-		let cellModel = try XCTUnwrap(
-			HealthCertifiedPersonCellModel(
-				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
-			)
-		)
-
-		XCTAssertEqual(cellModel.backgroundGradientType, .solidGrey)
-	}
-
-	func testLightBlueGradient() throws {
-		let healthCertifiedPerson = HealthCertifiedPerson(
-			healthCertificates: [try vaccinationCertificate()]
-		)
-		healthCertifiedPerson.gradientType = .lightBlue
-
-		let cellModel = try XCTUnwrap(
-			HealthCertifiedPersonCellModel(
-				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
-			)
-		)
-
-		XCTAssertEqual(cellModel.backgroundGradientType, .lightBlue)
-	}
-
-	func testMediumBlueGradient() throws {
-		let healthCertifiedPerson = HealthCertifiedPerson(
-			healthCertificates: [try vaccinationCertificate()]
-		)
-		healthCertifiedPerson.gradientType = .mediumBlue
-
-		let cellModel = try XCTUnwrap(
-			HealthCertifiedPersonCellModel(
-				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
-			)
-		)
-
-		XCTAssertEqual(cellModel.backgroundGradientType, .mediumBlue)
-	}
-
-	func testDarkBlueGradient() throws {
-		let healthCertifiedPerson = HealthCertifiedPerson(
-			healthCertificates: [try vaccinationCertificate()]
-		)
-		healthCertifiedPerson.gradientType = .darkBlue
-
-		let cellModel = try XCTUnwrap(
-			HealthCertifiedPersonCellModel(
-				healthCertifiedPerson: healthCertifiedPerson,
-				onCovPassCheckInfoButtonTap: { }
-			)
-		)
-
-		XCTAssertEqual(cellModel.backgroundGradientType, .darkBlue)
 	}
 
 }

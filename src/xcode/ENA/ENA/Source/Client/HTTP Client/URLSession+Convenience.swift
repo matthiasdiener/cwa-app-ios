@@ -120,6 +120,7 @@ extension URLSession.Response {
 		/// The session received an `Error`.
 		case httpError(String, HTTPURLResponse)
 		case qrDoesNotExist
+		case regTokenNotExist
 		case invalidResponse
 		case invalidRequest
 		case noNetworkConnection
@@ -153,6 +154,8 @@ extension URLSession.Response.Failure: LocalizedError {
 			return AppStrings.ExposureSubmissionError.noNetworkConnection
 		case .qrDoesNotExist:
 			return AppStrings.ExposureSubmissionError.qrNotExist
+		case .regTokenNotExist:
+			return AppStrings.ExposureSubmissionError.regTokenNotExist
 		default:
 			Log.error("\(self)", log: .api)
 			return AppStrings.ExposureSubmissionError.defaultError

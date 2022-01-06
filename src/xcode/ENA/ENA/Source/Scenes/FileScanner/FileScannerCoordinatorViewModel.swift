@@ -7,7 +7,7 @@ import PhotosUI
 import PDFKit
 import OpenCombine
 
-enum FileScannerError {
+enum FileScannerError: CaseIterable {
 	case noQRCodeFound
 	case fileNotReadable
 	case invalidQRCode
@@ -15,7 +15,6 @@ enum FileScannerError {
 	case passwordInput
 	case unlockPDF
 	case alreadyRegistered
-	case qrCodeParserError(QRCodeParserError)
 
 	var title: String {
 		switch self {
@@ -33,8 +32,6 @@ enum FileScannerError {
 			return AppStrings.FileScanner.PasswordError.title
 		case .alreadyRegistered:
 			return AppStrings.FileScanner.AlreadyRegistered.title
-		case .qrCodeParserError:
-			return ""
 		}
 	}
 
@@ -54,8 +51,6 @@ enum FileScannerError {
 			return AppStrings.FileScanner.PasswordError.message
 		case .alreadyRegistered:
 			return AppStrings.FileScanner.AlreadyRegistered.message
-		case .qrCodeParserError:
-			return ""
 		}
 	}
 }
@@ -272,8 +267,12 @@ class FileScannerCoordinatorViewModel: FileScannerProcessing {
 				completion(firstValidResult)
 			} else {
 				Log.debug("Didn't find a valid QR-Code from codes.", log: .fileScanner)
-				if let parseError = errors.first {
-					self?.processingFailedOnQueue(.qrCodeParserError(parseError))
+				if let parseError = errors.first,
+				   case let .certificateQrError(registerError) = parseError,
+				   case .certificateAlreadyRegistered = registerError {
+					self?.processingFailedOnQueue(.alreadyRegistered)
+				} else {
+					self?.processingFailedOnQueue(.invalidQRCode)
 				}
 				completion(nil)
 			}
@@ -297,7 +296,7 @@ class FileScannerCoordinatorViewModel: FileScannerProcessing {
 			self.processingFailed?(error)
 		}
 	}
-	
+
 	private func missingPasswordForPDFOnQueue(_ callback: @escaping (String) -> Void) {
 		DispatchQueue.main.async {
 			self.missingPasswordForPDF?(callback)

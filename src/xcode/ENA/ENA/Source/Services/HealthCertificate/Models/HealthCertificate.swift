@@ -14,14 +14,12 @@ final class HealthCertificate: Codable, Equatable, Comparable, RecycleBinIdentif
 		base45: Base45,
 		validityState: HealthCertificateValidityState = .valid,
 		didShowInvalidNotification: Bool = false,
-		didShowBlockedNotification: Bool = false,
 		isNew: Bool = false,
 		isValidityStateNew: Bool = false
 	) throws {
 		self.base45 = base45
 		self.validityState = validityState
 		self.didShowInvalidNotification = didShowInvalidNotification
-		self.didShowBlockedNotification = didShowBlockedNotification
 		self.isNew = isNew
 		self.isValidityStateNew = isValidityStateNew
 
@@ -38,7 +36,6 @@ final class HealthCertificate: Codable, Equatable, Comparable, RecycleBinIdentif
 		isValidityStateNew = try container.decodeIfPresent(Bool.self, forKey: .isValidityStateNew) ?? false
 		isNew = try container.decodeIfPresent(Bool.self, forKey: .isNew) ?? false
 		didShowInvalidNotification = try container.decodeIfPresent(Bool.self, forKey: .didShowInvalidNotification) ?? false
-		didShowBlockedNotification = try container.decodeIfPresent(Bool.self, forKey: .didShowBlockedNotification) ?? false
 
 		cborWebTokenHeader = try Self.extractCBORWebTokenHeader(from: base45)
 		digitalCovidCertificate = try Self.extractDigitalCovidCertificate(from: base45)
@@ -61,7 +58,6 @@ final class HealthCertificate: Codable, Equatable, Comparable, RecycleBinIdentif
 		case isNew
 		case isValidityStateNew
 		case didShowInvalidNotification
-		case didShowBlockedNotification
 	}
 
 	func encode(to encoder: Encoder) throws {
@@ -72,7 +68,6 @@ final class HealthCertificate: Codable, Equatable, Comparable, RecycleBinIdentif
 		try container.encode(isNew, forKey: .isNew)
 		try container.encode(isValidityStateNew, forKey: .isValidityStateNew)
 		try container.encode(didShowInvalidNotification, forKey: .didShowInvalidNotification)
-		try container.encode(didShowBlockedNotification, forKey: .didShowBlockedNotification)
 	}
 
 	// MARK: - Protocol Equatable
@@ -82,8 +77,7 @@ final class HealthCertificate: Codable, Equatable, Comparable, RecycleBinIdentif
 		lhs.validityState == rhs.validityState &&
 		lhs.isNew == rhs.isNew &&
 		lhs.isValidityStateNew == rhs.isValidityStateNew &&
-		lhs.didShowInvalidNotification == rhs.didShowInvalidNotification &&
-		lhs.didShowBlockedNotification == rhs.didShowBlockedNotification
+		lhs.didShowInvalidNotification == rhs.didShowInvalidNotification
 	}
 
 	// MARK: - Protocol Comparable
@@ -132,14 +126,6 @@ final class HealthCertificate: Codable, Equatable, Comparable, RecycleBinIdentif
 			}
 		}
 	}
-
-	@DidSetPublished var didShowBlockedNotification: Bool {
-		didSet {
-			if didShowBlockedNotification != oldValue {
-				objectDidChange.send(self)
-			}
-		}
-	}
 				
 	@DidSetPublished var isNew: Bool {
 		didSet {
@@ -173,15 +159,8 @@ final class HealthCertificate: Codable, Equatable, Comparable, RecycleBinIdentif
 		return ISO8601DateFormatter.justLocalDateFormatter.date(from: digitalCovidCertificate.dateOfBirth)
 	}
 
-	var uniqueCertificateIdentifier: String {
-		switch entry {
-		case .vaccination(let vaccinationEntry):
-			return vaccinationEntry.uniqueCertificateIdentifier
-		case .test(let testEntry):
-			return testEntry.uniqueCertificateIdentifier
-		case .recovery(let recoveryEntry):
-			return recoveryEntry.uniqueCertificateIdentifier
-		}
+	var uniqueCertificateIdentifier: String? {
+		vaccinationEntry?.uniqueCertificateIdentifier ?? testEntry?.uniqueCertificateIdentifier ?? recoveryEntry?.uniqueCertificateIdentifier
 	}
 
 	var vaccinationEntry: VaccinationEntry? {
@@ -247,39 +226,6 @@ final class HealthCertificate: Codable, Equatable, Comparable, RecycleBinIdentif
 		}
 
 		return Calendar.current.dateComponents([.day], from: sortDate, to: Date()).day
-	}
-
-	var isUsable: Bool {
-		validityState == .valid || validityState == .expiringSoon || (type == .test && validityState == .expired)
-	}
-
-	/// On test certificates only `.valid`, `.invalid`, and `.blocked` states are shown, the `.expiringSoon` and `.expired` states are considered valid as well
-	var isConsideredValid: Bool {
-		validityState == .valid || type == .test && (validityState == .expiringSoon || validityState == .expired)
-	}
-
-	var uniqueCertificateIdentifierChunks: [String] {
-		uniqueCertificateIdentifier
-			.dropPrefix("URN:UVCI:")
-			.components(separatedBy: CharacterSet(charactersIn: "/#:"))
-	}
-
-	func isBlocked(by blockedIdentifierChunks: [SAP_Internal_V2_DGCBlockedUVCIChunk]) -> Bool {
-		blockedIdentifierChunks.contains {
-			/// Skip if at least one index would be out of bounds
-			guard $0.indices.allSatisfy({ $0 < uniqueCertificateIdentifierChunks.count }) else {
-				return false
-			}
-
-			let blockedChunks = $0.indices
-				.map { uniqueCertificateIdentifierChunks[Int($0)] }
-				.joined(separator: "/")
-
-			let hash = ENAHasher.sha256(blockedChunks)
-			let hashData = hash.dataWithHexString()
-
-			return hashData == $0.hash
-		}
 	}
 
 	// MARK: - Private

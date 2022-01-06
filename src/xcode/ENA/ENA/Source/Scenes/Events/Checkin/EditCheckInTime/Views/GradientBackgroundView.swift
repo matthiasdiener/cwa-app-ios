@@ -8,15 +8,9 @@ class GradientBackgroundView: UIView {
 
 	// MARK: - Init
 
-	init(
-		type: GradientView.GradientType = .blueRedTilted,
-		withStars starsAreVisible: Bool = false
-	) {
+	init(type: GradientView.GradientType = .blueRedTilted) {
 		self.type = type
-		self.starsAreVisible = starsAreVisible
-
 		super.init(frame: .zero)
-
 		setupView()
 	}
 
@@ -28,16 +22,9 @@ class GradientBackgroundView: UIView {
 	// MARK: - Internal
 
 	var gradientHeightConstraint: NSLayoutConstraint!
-
 	var type: GradientView.GradientType {
 		didSet {
 			gradientView.type = type
-		}
-	}
-
-	var starsAreVisible: Bool = false {
-		didSet {
-			gradientView.starsAreVisible = starsAreVisible
 		}
 	}
 
@@ -62,7 +49,6 @@ class GradientBackgroundView: UIView {
 		gradientView.translatesAutoresizingMaskIntoConstraints = false
 		addSubview(gradientView)
 		gradientView.type = type
-		gradientView.starsAreVisible = starsAreVisible
 
 		topLayoutConstraint = gradientView.topAnchor.constraint(equalTo: topAnchor)
 		gradientHeightConstraint = gradientView.heightAnchor.constraint(equalToConstant: 150)
